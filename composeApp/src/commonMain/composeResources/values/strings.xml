@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="app_name">Imp</string>
+    <string name="welcome_to_format">Bem-vindx ao %1$s</string>
+    <string name="login_error_title">Erro no login</string>
+    <string name="login_error_message">Ocorreu um erro ao entrar na sua conta. Por favor, tente novamente.</string>
+    <string name="ok_label">Ok</string>
+    <string name="email_label">E-mail</string>
+    <string name="password_label">Senha</string>
+    <string name="create_account_label">Criar conta</string>
+    <string name="sign_in_label">Entrar</string>
+    <string name="create_account_title">Crie sua conta</string>
+    <string name="switch_team_title">Trocar de time</string>
+    <string name="projects_title">Projetos</string>
+    <string name="created_by_format">Criado por %1$s</string>
+    <string name="no_projects_message">Não há projetos no time atual.</string>
+    <string name="projects_error_message">Ocorreu um erro ao carregar os projetos do time. Por favor, tente novamente.</string>
+    <string name="new_project_label">Novo projeto</string>
+    <string name="project_options_label">Opções de projeto</string>
+    <string name="rename_label">Renomear</string>
+    <string name="delete_label">Excluir</string>
+    <string name="cancel_label">Cancelar</string>
+    <string name="delete_project_title">Excluir projeto</string>
+    <string name="delete_project_message">Tem certeza de que deseja excluir o projeto? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
+</resources>
