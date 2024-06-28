@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.session.UserSession
 import com.julia.imp.team.Team
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.app_name
@@ -33,10 +34,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreen(
-    onLoggedIn: (Team) -> Unit,
     viewModel: LoginViewModel = viewModel { LoginViewModel() }
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.clearSession()
+    }
 
     Scaffold {
         val scrollState = rememberScrollState()
@@ -65,11 +67,11 @@ fun LoginScreen(
 
                 LoginFormFields(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
-                    email = uiState.email,
-                    password = uiState.password,
+                    email = viewModel.uiState.email,
+                    password = viewModel.uiState.password,
                     onEmailChange = { viewModel.setEmail(it) },
                     onPasswordChange = { viewModel.setPassword(it) },
-                    enabled = !uiState.isLoggingIn
+                    enabled = !viewModel.uiState.isLoggingIn
                 )
 
                 if (compact) Spacer(Modifier.weight(1f))
@@ -80,7 +82,7 @@ fun LoginScreen(
                         .padding(bottom = 24.dp)
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
                     compact = compact,
-                    signingIn = uiState.isLoggingIn,
+                    signingIn = viewModel.uiState.isLoggingIn,
                     onLoginClick = { viewModel.login() },
                     onRegisterClick = {}
                 )
@@ -88,12 +90,8 @@ fun LoginScreen(
         }
     }
 
-    if (uiState.showError) {
+    if (viewModel.uiState.showError) {
         LoginErrorDialog(onDismissRequest = { viewModel.dismissError() })
-    }
-
-    LaunchedEffect(uiState.loggedTeam) {
-        uiState.loggedTeam?.let { onLoggedIn(it) }
     }
 }
 

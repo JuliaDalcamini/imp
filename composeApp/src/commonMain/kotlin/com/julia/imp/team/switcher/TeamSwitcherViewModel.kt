@@ -1,53 +1,77 @@
 package com.julia.imp.team.switcher
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julia.imp.common.network.setAuthTokens
+import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.session.UserSession
+import com.julia.imp.common.session.requireSession
 import com.julia.imp.team.Team
 import com.julia.imp.team.TeamRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.julia.imp.team.member.TeamMember
+import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
+import com.julia.imp.team.switcher.TeamSwitcherError.ErrorSwitchingActiveTeam
 import kotlinx.coroutines.launch
 
 class TeamSwitcherViewModel(
     private val repository: TeamRepository = TeamRepository()
 ) : ViewModel() {
-    
-    private val mutableUiState = MutableStateFlow(TeamSwitcherUiState())
-    val uiState = mutableUiState.asStateFlow()
+
+    val currentTeam: Team = requireSession().team
+
+    var uiState by mutableStateOf(TeamSwitcherUiState())
+        private set
 
     fun openSwitcher() {
-        mutableUiState.update {
-            it.copy(
-                isSwitcherOpen = true,
-                isLoading = true,
-                teams = null
-            )
-        }
+        uiState = uiState.copy(
+            isLoading = true,
+            teams = null,
+            error = null,
+            isSwitcherOpen = true
+        )
 
         viewModelScope.launch {
             try {
                 val teams = repository.getTeams()
-
-                mutableUiState.update {
-                    it.copy(isLoading = false, teams = teams)
-                }
+                uiState = uiState.copy(teams = teams)
             } catch (error: Throwable) {
-                mutableUiState.update { it.copy(error = error.message) }
+                uiState = uiState.copy(error = ErrorLoadingTeams)
             } finally {
-                mutableUiState.update { it.copy(isLoading = false) }
+                uiState = uiState.copy(isLoading = false)
             }
         }
     }
 
     fun closeSwitcher() {
-        mutableUiState.update {
-            it.copy(
-                isSwitcherOpen = false,
-                isLoading = false,
-                teams = null
-            )
+        uiState = uiState.copy(isSwitcherOpen = false)
+    }
+
+    fun switchToTeam(team: Team) {
+        uiState = uiState.copy(isLoading = true, teams = null)
+
+        viewModelScope.launch {
+            try {
+                val member = repository.getMember(
+                    teamId = team.id,
+                    userId = requireSession().userId
+                )
+
+                SessionManager.activeSession = createUserSession(team, member)
+                closeSwitcher()
+            } catch (error: Throwable) {
+                uiState = uiState.copy(error = ErrorSwitchingActiveTeam)
+            } finally {
+                uiState = uiState.copy(isLoading = false)
+            }
         }
     }
+
+    private fun createUserSession(team: Team, member: TeamMember): UserSession =
+        UserSession(
+            userId = member.userId,
+            team = team,
+            roleInTeam = member.role
+        )
 }

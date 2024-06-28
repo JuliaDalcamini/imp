@@ -11,6 +11,8 @@
     <string name="sign_in_label">Entrar</string>
     <string name="create_account_title">Crie sua conta</string>
     <string name="switch_team_title">Trocar de time</string>
+    <string name="load_teams_error">Ocorreu um erro ao carregar os times. Por favor, tente novamente.</string>
+    <string name="switch_team_error">Ocorreu um erro ao trocar de time. Por favor, tente novamente.</string>
     <string name="projects_title">Projetos</string>
     <string name="created_by_format">Criado por %1$s</string>
     <string name="no_projects_message">Não há projetos no time atual.</string>
@@ -21,5 +23,5 @@
     <string name="delete_label">Excluir</string>
     <string name="cancel_label">Cancelar</string>
     <string name="delete_project_title">Excluir projeto</string>
-    <string name="delete_project_message">Tem certeza de que deseja excluir o projeto? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
+    <string name="delete_project_message">Tem certeza de que deseja excluir o projeto %1$s? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
 </resources>

@@ -11,7 +11,7 @@ import io.ktor.http.contentType
 
 class LoginRepository(private val client: HttpClient = configuredHttpClient) {
     
-    suspend fun login(email: String, password: String): TokenPair {
+    suspend fun login(email: String, password: String): LoginResponse {
         val response = client.post("login") {
             contentType(ContentType.Application.Json)
             setBody(LoginRequest(email, password))

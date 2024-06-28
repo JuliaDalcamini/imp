@@ -3,8 +3,10 @@ package com.julia.imp.team.switcher
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,20 +22,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.text.getInitials
-import com.julia.imp.common.ui.theme.ImpTheme
-import com.julia.imp.common.ui.tooling.Preview
 import com.julia.imp.team.Team
-import com.julia.imp.team.switcher.TeamSwitcherDefaults.TeamIconButtonSize
-import com.julia.imp.team.switcher.TeamSwitcherDefaults.TeamSwitcherPadding
+import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
+import com.julia.imp.team.switcher.TeamSwitcherError.ErrorSwitchingActiveTeam
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.load_teams_error
+import imp.composeapp.generated.resources.switch_team_error
 import imp.composeapp.generated.resources.switch_team_title
 import org.jetbrains.compose.resources.stringResource
 
@@ -41,20 +41,16 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamSwitcher(
-    currentTeam: Team,
-    onTeamChanged: (Team) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() },
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     TeamIcon(
         modifier = modifier,
-        initials = currentTeam.name.getInitials(),
+        initials = viewModel.currentTeam.name.getInitials(),
         onClick = { viewModel.openSwitcher() }
     )
 
-    if (uiState.isSwitcherOpen) {
+    if (viewModel.uiState.isSwitcherOpen) {
         BasicAlertDialog(
             onDismissRequest = { viewModel.closeSwitcher() }
         ) {
@@ -62,37 +58,29 @@ fun TeamSwitcher(
                 shape = RoundedCornerShape(28.0.dp),
                 tonalElevation = 6.0.dp
             ) {
-                Column(Modifier.fillMaxWidth().padding(TeamSwitcherPadding)) {
+                Column(Modifier.fillMaxWidth().padding(24.dp)) {
                     Text(
-                        modifier = Modifier.padding(16.dp),
                         text = stringResource(Res.string.switch_team_title),
                         style = MaterialTheme.typography.headlineSmall
                     )
 
-                    if (uiState.isLoading) {
-                        Box(Modifier.weight(1f, fill = false).fillMaxWidth()) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center).padding(48.dp)
-                            )
-                        }
+                    Spacer(Modifier.height(12.dp))
+
+                    if (viewModel.uiState.isLoading) {
+                        TeamSwitcherListPlaceholder(Modifier.fillMaxWidth())
                     } else {
-                        LazyColumn(Modifier.weight(1f, fill = false).fillMaxWidth()) {
-                            uiState.teams?.let {
-                                items(it) { team ->
-                                    ListItem(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight()
-                                            .clickable {
-                                                onTeamChanged(team)
-                                                viewModel.closeSwitcher()
-                                            },
-                                        headlineContent = { Text(team.name) },
-                                        leadingContent = { TeamIcon(team.name.getInitials()) }
-                                    )
-                                }
-                            }
-                        }
+                        TeamSwitcherList(
+                            modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
+                            teams = viewModel.uiState.teams.orEmpty(),
+                            onTeamClick = { viewModel.switchToTeam(it) }
+                        )
+                    }
+
+                    viewModel.uiState.error?.let { error ->
+                        TeamSwitcherErrorMessage(
+                            modifier = Modifier.fillMaxWidth(),
+                            error = error
+                        )
                     }
                 }
             }
@@ -101,13 +89,57 @@ fun TeamSwitcher(
 }
 
 @Composable
-fun TeamIcon(
+private fun TeamSwitcherListPlaceholder(modifier: Modifier = Modifier) {
+    Box(modifier) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center).padding(48.dp)
+        )
+    }
+}
+
+@Composable
+private fun TeamSwitcherErrorMessage(
+    modifier: Modifier = Modifier,
+    error: TeamSwitcherError
+) {
+    Box(modifier) {
+        Text(
+            text = when (error) {
+                ErrorLoadingTeams -> stringResource(Res.string.load_teams_error)
+                ErrorSwitchingActiveTeam -> stringResource(Res.string.switch_team_error)
+            }
+        )
+    }
+}
+
+@Composable
+private fun TeamSwitcherList(
+    teams: List<Team>,
+    onTeamClick: (Team) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(modifier) {
+        items(teams) { team ->
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .clickable { onTeamClick(team) },
+                headlineContent = { Text(team.name) },
+                leadingContent = { TeamIcon(team.name.getInitials()) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun TeamIcon(
     initials: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.size(TeamIconButtonSize),
+        modifier = modifier.size(40.dp),
         onClick = onClick,
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primaryContainer
@@ -124,12 +156,12 @@ fun TeamIcon(
 }
 
 @Composable
-fun TeamIcon(
+private fun TeamIcon(
     initials: String,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.size(TeamIconButtonSize),
+        modifier = modifier.size(40.dp),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primaryContainer
     ) {
@@ -142,20 +174,4 @@ fun TeamIcon(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun TeamSwitcherPreview() {
-    ImpTheme {
-        TeamSwitcher(
-            currentTeam = Team(id = "", name = "Time da Julia"),
-            onTeamChanged = {}
-        )
-    }
-}
-
-object TeamSwitcherDefaults {
-    val TeamSwitcherPadding = 24.dp
-    val TeamIconButtonSize = 40.dp
 }

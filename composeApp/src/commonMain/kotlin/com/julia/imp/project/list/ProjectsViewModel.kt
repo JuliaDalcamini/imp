@@ -1,7 +1,12 @@
 package com.julia.imp.project.list
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.session.requireSession
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,42 +18,62 @@ class ProjectsViewModel(
     private val repository: ProjectRepository = ProjectRepository()
 ) : ViewModel() {
     
-    private val mutableUiState = MutableStateFlow(ProjectsUiState())
-    val uiState = mutableUiState.asStateFlow()
+    var uiState by mutableStateOf(ProjectsUiState())
+        private set
 
-    fun getProjects(teamId: String) {
+    fun getProjects() {
         viewModelScope.launch {
             try {
-                val projects = repository.getProjects(teamId)
+                val projects = repository.getProjects(requireSession().team.id)
 
-                mutableUiState.update {
-                    it.copy(isLoading = false, projects = projects)
-                }
+                uiState = uiState.copy(
+                    isLoading = false,
+                    projects = projects,
+                    showCreateButton = requireSession().isTeamAdmin
+                )
             } catch (error: Throwable) {
-                mutableUiState.update { it.copy(error = error.message) }
+                uiState = uiState.copy(error = error.message)
             } finally {
-                mutableUiState.update { it.copy(isLoading = false) }
+                uiState = uiState.copy(isLoading = false)
             }
         }
     }
 
     fun askToDeleteProject(project: Project) {
-        mutableUiState.update { it.copy(projectToDelete = project) }
+        uiState = uiState.copy(projectToDelete = project)
     }
 
     fun dismissProjectDeletion() {
-        mutableUiState.update { it.copy(projectToDelete = null) }
+        uiState = uiState.copy(projectToDelete = null)
     }
 
-    fun deleteProject(project: Project, teamId: String) {
+    fun deleteProject(project: Project) {
         viewModelScope.launch {
             try {
                 repository.deleteProject(project.id)
-
-                // TODO: Remove teamId parameter, handle success and loading
-                getProjects(teamId)
+                getProjects()
             } catch (error: Throwable) {
                 // TODO: Handle error
+            }
+        }
+    }
+
+    fun askToRenameProject(project: Project) {
+        uiState = uiState.copy(projectToRename = project)
+    }
+
+    fun dismissProjectRenaming() {
+        uiState = uiState.copy(projectToRename = null)
+    }
+
+    fun renameProject(project: Project, newName: String) {
+        viewModelScope.launch {
+            try {
+                repository.renameProject(project.id, newName)
+                getProjects()
+            } catch (error: Throwable) {
+                // TODO: Handle error
+                error.printStackTrace()
             }
         }
     }

@@ -1,12 +1,14 @@
 package com.julia.imp.login
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.network.setAuthTokens
+import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.session.UserSession
 import com.julia.imp.team.TeamRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
@@ -14,43 +16,48 @@ class LoginViewModel(
     private val teamRepository: TeamRepository = TeamRepository()
 ) : ViewModel() {
     
-    private val mutableUiState = MutableStateFlow(LoginUiState())
-    val uiState = mutableUiState.asStateFlow()
+    var uiState by mutableStateOf(LoginUiState())
+        private set
+
+    fun clearSession() {
+        SessionManager.activeSession = null
+    }
     
     fun login() {
         viewModelScope.launch {
-            mutableUiState.update { it.copy(showError = false, isLoggingIn = true) }
+            uiState = uiState.copy(showError = false, isLoggingIn = true)
             
             try {
-                val authTokens = repository.login(
-                    email = uiState.value.email,
-                    password = uiState.value.password
-                )
+                val response = repository.login(uiState.email, uiState.password)
                 
-                setAuthTokens(authTokens)
+                setAuthTokens(response.tokens)
 
                 val teams = teamRepository.getTeams()
+                val initialTeam = teams.first()
+                val teamMember = teamRepository.getMember(initialTeam.id, response.userId)
 
-                mutableUiState.update {
-                    it.copy(loggedTeam = teams.first())
-                }
+                SessionManager.activeSession = UserSession(
+                    userId = response.userId,
+                    team = initialTeam,
+                    roleInTeam = teamMember.role
+                )
             } catch (error: Throwable) {
-                mutableUiState.update { it.copy(showError = true) }
+                uiState = uiState.copy(showError = true)
             } finally {
-                mutableUiState.update { it.copy(isLoggingIn = false) }
+                uiState = uiState.copy(isLoggingIn = false)
             }
         }
     }
     
     fun setEmail(email: String) {
-        mutableUiState.update { it.copy(email = email) }
+        uiState = uiState.copy(email = email)
     }
     
     fun setPassword(password: String) {
-        mutableUiState.update { it.copy(password = password) }
+        uiState = uiState.copy(password = password)
     }
 
     fun dismissError() {
-        mutableUiState.update { it.copy(showError = false) }
+        uiState = uiState.copy(showError = false)
     }
 }

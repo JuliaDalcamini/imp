@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -16,5 +17,12 @@ class ProjectRepository(private val client: HttpClient = configuredHttpClient) {
 
     suspend fun deleteProject(projectId: String) {
         client.delete("projects/$projectId")
+    }
+
+    suspend fun renameProject(projectId: String, newName: String) {
+        client.patch("projects/$projectId") {
+            contentType(ContentType.Application.Json)
+            setBody(UpdateProjectRequest(name = newName))
+        }
     }
 }
