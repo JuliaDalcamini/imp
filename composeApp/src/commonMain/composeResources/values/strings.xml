@@ -10,6 +10,10 @@
     <string name="create_account_label">Criar conta</string>
     <string name="sign_in_label">Entrar</string>
     <string name="create_account_title">Crie sua conta</string>
+    <string name="password_confirmation_label">Confirmação de senha</string>
+    <string name="use_existing_account_label">Usar conta existente</string>
+    <string name="register_error_title">Erro no cadastro</string>
+    <string name="register_error_message">Ocorreu um erro ao criar seu cadastro. Por favor, tente novamente.</string>
     <string name="switch_team_title">Trocar de time</string>
     <string name="load_teams_error">Ocorreu um erro ao carregar os times. Por favor, tente novamente.</string>
     <string name="switch_team_error">Ocorreu um erro ao trocar de time. Por favor, tente novamente.</string>

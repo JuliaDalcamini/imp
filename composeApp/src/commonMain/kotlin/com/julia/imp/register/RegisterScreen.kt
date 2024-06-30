@@ -1,4 +1,4 @@
-package com.julia.imp.login
+package com.julia.imp.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,11 +31,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -43,21 +40,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.app_name
 import imp.composeapp.generated.resources.create_account_label
+import imp.composeapp.generated.resources.create_account_title
 import imp.composeapp.generated.resources.email_label
-import imp.composeapp.generated.resources.login_error_message
-import imp.composeapp.generated.resources.login_error_title
 import imp.composeapp.generated.resources.ok_label
+import imp.composeapp.generated.resources.password_confirmation_label
 import imp.composeapp.generated.resources.password_label
-import imp.composeapp.generated.resources.sign_in_label
-import imp.composeapp.generated.resources.welcome_to_format
+import imp.composeapp.generated.resources.register_error_message
+import imp.composeapp.generated.resources.register_error_title
+import imp.composeapp.generated.resources.use_existing_account_label
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun LoginScreen(
-    onRegisterClick: () -> Unit,
-    viewModel: LoginViewModel = viewModel { LoginViewModel() }
+fun RegisterScreen(
+    onLoginClick: () -> Unit,
+    onRegistrationComplete: () -> Unit,
+    viewModel: RegisterViewModel = viewModel { RegisterViewModel() }
 ) {
     Scaffold { paddingValues ->
         val scrollState = rememberScrollState()
@@ -83,43 +81,51 @@ fun LoginScreen(
             ) {
                 if (compact) Spacer(Modifier.weight(1f))
 
-                LoginFormTitle(Modifier.padding(top = 24.dp))
+                Text(
+                    modifier = Modifier.padding(top = 24.dp),
+                    text = stringResource(Res.string.create_account_title),
+                    style = MaterialTheme.typography.headlineLarge,
+                    textAlign = TextAlign.Center
+                )
 
-                LoginFormFields(
+                RegisterFormFields(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
                     email = viewModel.uiState.email,
                     password = viewModel.uiState.password,
+                    passwordConfirmation = viewModel.uiState.passwordConfirmation,
                     onEmailChange = { viewModel.setEmail(it) },
                     onPasswordChange = { viewModel.setPassword(it) },
+                    onPasswordConfirmationChange = { viewModel.setPasswordConfirmation(it) },
+                    passwordMismatch = viewModel.uiState.passwordMismatch,
                     enabled = !viewModel.uiState.isLoading
                 )
 
                 if (compact) Spacer(Modifier.weight(1f))
 
-                LoginFormButtons(
+                RegisterFormButtons(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 24.dp),
                     compact = compact,
                     loading = viewModel.uiState.isLoading,
-                    onLoginClick = { viewModel.login() },
-                    onRegisterClick = onRegisterClick
+                    onRegisterClick = { viewModel.register() },
+                    onLoginClick = onLoginClick
                 )
             }
         }
     }
 
     if (viewModel.uiState.showError) {
-        LoginErrorDialog(onDismissRequest = { viewModel.dismissError() })
+        RegisterErrorDialog(onDismissRequest = { viewModel.dismissError() })
     }
 }
 
 @Composable
-fun LoginErrorDialog(onDismissRequest: () -> Unit) {
+fun RegisterErrorDialog(onDismissRequest: () -> Unit) {
     AlertDialog(
         icon = { Icon(Icons.Outlined.Warning, null) },
-        title = { Text(text = stringResource(Res.string.login_error_title)) },
-        text = { Text(text = stringResource(Res.string.login_error_message)) },
+        title = { Text(text = stringResource(Res.string.register_error_title)) },
+        text = { Text(text = stringResource(Res.string.register_error_message)) },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onDismissRequest) {
@@ -130,32 +136,14 @@ fun LoginErrorDialog(onDismissRequest: () -> Unit) {
 }
 
 @Composable
-fun LoginFormTitle(modifier: Modifier = Modifier) {
-    val appName = stringResource(Res.string.app_name)
-    val title = stringResource(Res.string.welcome_to_format, appName)
-
-    Text(
-        modifier = modifier,
-        text = buildAnnotatedString {
-            append(title)
-
-            addStyle(
-                style = SpanStyle(color = MaterialTheme.colorScheme.primary),
-                start = title.indexOf(appName),
-                end = title.indexOf(appName) + appName.length
-            )
-        },
-        style = MaterialTheme.typography.headlineLarge,
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
-fun LoginFormFields(
+fun RegisterFormFields(
     email: String,
     password: String,
+    passwordConfirmation: String,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
+    onPasswordConfirmationChange: (String) -> Unit,
+    passwordMismatch: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean
 ) {
@@ -179,11 +167,26 @@ fun LoginFormFields(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            value = passwordConfirmation,
+            onValueChange = onPasswordConfirmationChange,
+            enabled = enabled,
+            singleLine = true,
+            isError = passwordMismatch,
+            supportingText = {
+                if (passwordMismatch) Text("Senhas não coincidem")
+            },
+            label = { Text(stringResource(Res.string.password_confirmation_label)) },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
     }
 }
 
 @Composable
-fun LoginFormButtons(
+fun RegisterFormButtons(
     compact: Boolean,
     loading: Boolean,
     onLoginClick: () -> Unit,
@@ -194,17 +197,17 @@ fun LoginFormButtons(
         Column(modifier) {
             FilledTonalButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onRegisterClick,
+                onClick = onLoginClick,
                 enabled = !loading
             ) {
-                Text(stringResource(Res.string.create_account_label))
+                Text(stringResource(Res.string.use_existing_account_label))
             }
 
             Spacer(Modifier.height(4.dp))
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onLoginClick,
+                onClick = onRegisterClick,
                 enabled = !loading
             ) {
                 if (loading) {
@@ -213,7 +216,7 @@ fun LoginFormButtons(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(stringResource(Res.string.sign_in_label))
+                    Text(stringResource(Res.string.create_account_label))
                 }
             }
         }
@@ -221,17 +224,17 @@ fun LoginFormButtons(
         Row(modifier) {
             FilledTonalButton(
                 modifier = Modifier.weight(1f),
-                onClick = onRegisterClick,
+                onClick = onLoginClick,
                 enabled = !loading
             ) {
-                Text(stringResource(Res.string.create_account_label))
+                Text(stringResource(Res.string.use_existing_account_label))
             }
 
             Spacer(Modifier.width(16.dp))
 
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = onLoginClick,
+                onClick = onRegisterClick,
                 enabled = !loading
             ) {
                 if (loading) {
@@ -240,7 +243,7 @@ fun LoginFormButtons(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(stringResource(Res.string.sign_in_label))
+                    Text(stringResource(Res.string.create_account_label))
                 }
             }
         }

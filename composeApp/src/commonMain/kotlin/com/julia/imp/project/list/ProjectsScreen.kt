@@ -63,10 +63,11 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ProjectsScreen(
+    onProjectClick: (Project) -> Unit,
     onNewProjectClick: () -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(SessionManager.activeSession) {
         viewModel.getProjects()
     }
 
@@ -107,7 +108,7 @@ fun ProjectsScreen(
                                     .padding(horizontal = 16.dp)
                                     .padding(bottom = 8.dp),
                                 project = project,
-                                onClick = {},
+                                onClick = { onProjectClick(project) },
                                 onRenameClick = { viewModel.askToRenameProject(project) },
                                 onDeleteClick = { viewModel.askToDeleteProject(project) }
                             )
