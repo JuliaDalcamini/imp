@@ -19,9 +19,19 @@
     <string name="projects_error_message">Ocorreu um erro ao carregar os projetos do time. Por favor, tente novamente.</string>
     <string name="new_project_label">Novo projeto</string>
     <string name="project_options_label">Opções de projeto</string>
+    <string name="go_back_label">Voltar</string>
     <string name="rename_label">Renomear</string>
     <string name="delete_label">Excluir</string>
     <string name="cancel_label">Cancelar</string>
     <string name="delete_project_title">Excluir projeto</string>
     <string name="delete_project_message">Tem certeza de que deseja excluir o projeto %1$s? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
+    <string name="new_project_title">Novo projeto</string>
+    <string name="project_name_label">Nome do projeto</string>
+    <string name="prioritization_method_label">Método de priorização</string>
+    <string name="create_project_label">Criar projeto</string>
+    <string name="wiegers_label">Wiegers</string>
+    <string name="moscow_label">Moscow</string>
+    <string name="user_value_weight_label">Peso do valor para o usuário</string>
+    <string name="complexity_weight_label">Peso da complexidade</string>
+    <string name="impact_weight_label">Peso do impacto</string>
 </resources>

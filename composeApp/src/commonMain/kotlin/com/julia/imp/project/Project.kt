@@ -18,6 +18,9 @@ data class Project(
     @Serializable
     data class ProjectCreator(
         val id: String,
-        val name: String
-    )
+        val firstName: String,
+        val lastName: String
+    ) {
+        val fullName by lazy { "$firstName $lastName" }
+    }
 }

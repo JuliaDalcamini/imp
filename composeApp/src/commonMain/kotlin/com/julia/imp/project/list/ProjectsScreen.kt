@@ -1,6 +1,6 @@
 package com.julia.imp.project.list
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,15 +26,12 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
@@ -59,16 +54,16 @@ import imp.composeapp.generated.resources.delete_project_message
 import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.no_projects_message
 import imp.composeapp.generated.resources.ok_label
-import imp.composeapp.generated.resources.project_options_label
 import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.switch_team_title
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ProjectsScreen(
+    onNewProjectClick: () -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
     LaunchedEffect(Unit) {
@@ -84,23 +79,25 @@ fun ProjectsScreen(
         },
         floatingActionButton = {
             if (SessionManager.activeSession?.isTeamAdmin == true) {
-                ExtendedFloatingActionButton(
-                    text = { Text(stringResource(Res.string.new_project_label)) },
-                    icon = { Icon(Icons.Default.Add, null) },
-                    onClick = {}
-                )
+                NewProjectButton(onClick = onNewProjectClick)
             }
         }
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
             if (viewModel.uiState.isLoading) {
-                CircularProgressIndicator(Modifier.align(Alignment.Center).padding(paddingValues))
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(paddingValues)
+                )
             }
 
             viewModel.uiState.projects?.let { projects ->
                 if (projects.isNotEmpty()) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().consumeWindowInsets(paddingValues),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .consumeWindowInsets(paddingValues),
                         contentPadding = paddingValues
                     ) {
                         items(projects) { project ->
@@ -158,6 +155,19 @@ fun ProjectsScreen(
 }
 
 @Composable
+fun NewProjectButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ExtendedFloatingActionButton(
+        modifier = modifier,
+        text = { Text(stringResource(Res.string.new_project_label)) },
+        icon = { Icon(Icons.Default.Add, null) },
+        onClick = onClick
+    )
+}
+
+@Composable
 fun ProjectListItem(
     project: Project,
     onClick: () -> Unit,
@@ -184,7 +194,7 @@ fun ProjectListItem(
 
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = stringResource(Res.string.created_by_format, project.creator.name),
+                    text = stringResource(Res.string.created_by_format, project.creator.fullName),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -196,86 +206,63 @@ fun ProjectListItem(
                 var showOptions by remember { mutableStateOf(false) }
 
                 IconButton(onClick = { showOptions = true }) {
-                    Icon(Icons.Outlined.MoreVert, stringResource(Res.string.project_options_label))
+                    Icon(Icons.Outlined.MoreVert, null)
                 }
 
-                DropdownMenu(
+                ProjectOptionsDropdown(
                     expanded = showOptions,
-                    onDismissRequest = { showOptions = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.rename_label)) },
-                        onClick = {
-                            onRenameClick()
-                            showOptions = false
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.delete_label)) },
-                        onClick = {
-                            onDeleteClick()
-                            showOptions = false
-                        }
-                    )
-                }
+                    onDismissRequest = { showOptions = false },
+                    onRenameClick = onRenameClick,
+                    onDeleteClick = onDeleteClick
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProjectOptionsDropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onRenameClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DropdownMenu(
+        modifier = modifier,
+        expanded = expanded,
+        onDismissRequest = onDismissRequest
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.rename_label)) },
+            onClick = {
+                onRenameClick()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.delete_label)) },
+            onClick = {
+                onDeleteClick()
+                onDismissRequest()
+            }
+        )
+    }
+}
+
 @Composable
 fun RenameProjectDialog(
     projectName: String,
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
-    BasicAlertDialog(onDismissRequest) {
-        Surface(
-            shape = RoundedCornerShape(28.0.dp),
-            tonalElevation = 6.0.dp
-        ) {
-            Column(Modifier.fillMaxWidth().padding(24.dp)) {
-                var typedName by remember { mutableStateOf(projectName) }
-
-                Text(
-                    text = stringResource(Res.string.switch_team_title),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = typedName,
-                    onValueChange = { typedName = it }
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismissRequest) {
-                        Text(stringResource(Res.string.cancel_label))
-                    }
-
-                    Spacer(Modifier.width(8.dp))
-
-                    TextButton(
-                        onClick = {
-                            onConfirm(typedName)
-                            onDismissRequest()
-                        }
-                    ) {
-                        Text(stringResource(Res.string.rename_label))
-                    }
-                }
-            }
-        }
-    }
+    RenameDialog(
+        title = stringResource(Res.string.switch_team_title),
+        initialValue = projectName,
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
 }
 
 @Composable

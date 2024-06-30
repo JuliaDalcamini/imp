@@ -1,4 +1,4 @@
-package com.julia.imp.project
+package com.julia.imp.project.list
 
 import kotlinx.serialization.Serializable
 

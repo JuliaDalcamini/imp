@@ -38,6 +38,7 @@ val configuredHttpClient: HttpClient by lazy {
                 Json {
                     prettyPrint = true
                     isLenient = true
+                    encodeDefaults = true
                 }
             )
         }
