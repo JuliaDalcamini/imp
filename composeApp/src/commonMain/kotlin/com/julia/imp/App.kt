@@ -62,8 +62,8 @@ fun App() {
 
                 composable<ProjectsRoute> {
                     ProjectsScreen(
-                        onProjectClick = { navController.navigate(ArtifactsRoute(projectId = it.id)) },
-                        onNewProjectClick = { navController.navigate(CreateProjectRoute) }
+                        onNewProjectClick = { navController.navigate(CreateProjectRoute) },
+                        onProjectClick = { navController.navigate(ArtifactsRoute(projectId = it.id)) }
                     )
                 }
 
@@ -80,7 +80,11 @@ fun App() {
 
                 composable<ArtifactsRoute> {
                     val route = it.toRoute<ArtifactsRoute>()
-                    ArtifactsScreen(route.projectId)
+
+                    ArtifactsScreen(
+                        projectId = route.projectId,
+                        onBackClick = { navController.popBackStack() }
+                    )
                 }
             }
         }

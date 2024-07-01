@@ -20,7 +20,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-private const val API_BASE_URL = "http://192.168.15.14:8080/"
+private const val API_BASE_URL = "http://192.168.15.22:8080/"
 private var authTokens: TokenPair? = null
 
 /**
