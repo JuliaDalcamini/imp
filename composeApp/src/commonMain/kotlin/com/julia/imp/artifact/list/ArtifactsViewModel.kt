@@ -25,5 +25,4 @@ class ArtifactsViewModel(
             uiState = uiState.copy(artifacts = artifacts, isLoading = false)
         }
     }
-
 }

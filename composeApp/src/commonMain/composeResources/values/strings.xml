@@ -38,4 +38,11 @@
     <string name="user_value_weight_label">Peso do valor para o usuário</string>
     <string name="complexity_weight_label">Peso da complexidade</string>
     <string name="impact_weight_label">Peso do impacto</string>
+    <string name="artifacts_title">Artefatos</string>
+    <string name="priority_moscow_wont_have">Prioridade: Não terá</string>
+    <string name="priority_moscow_could_have">Prioridade: Poderia ter</string>
+    <string name="priority_moscow_should_have">Prioridade: Deveria ter</string>
+    <string name="priority_moscow_must_have">Prioridade: Deve ter</string>
+    <string name="priority_wiegers_format">Valor: %1$d · Complexidade: %2$d · Impacto: %3$d</string>
+    <string name="new_artifact_label">Novo artefato</string>
 </resources>
