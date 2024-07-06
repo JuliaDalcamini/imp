@@ -18,8 +18,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -31,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,33 +41,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.MoscowPriorityLevel
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
-import com.julia.imp.project.list.DeleteProjectDialog
-import com.julia.imp.project.list.NewProjectButton
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.archive_artifact_message
 import imp.composeapp.generated.resources.archive_artifact_title
 import imp.composeapp.generated.resources.archive_label
 import imp.composeapp.generated.resources.artifacts_title
-import imp.composeapp.generated.resources.cancel_label
-import imp.composeapp.generated.resources.delete_label
-import imp.composeapp.generated.resources.delete_project_message
-import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.edit_label
 import imp.composeapp.generated.resources.new_artifact_label
-import imp.composeapp.generated.resources.new_project_label
-import imp.composeapp.generated.resources.ok_label
 import imp.composeapp.generated.resources.priority_moscow_could_have
 import imp.composeapp.generated.resources.priority_moscow_must_have
 import imp.composeapp.generated.resources.priority_moscow_should_have
 import imp.composeapp.generated.resources.priority_moscow_wont_have
 import imp.composeapp.generated.resources.priority_wiegers_format
-import imp.composeapp.generated.resources.rename_label
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)

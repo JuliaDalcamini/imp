@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.session.requireSession
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ArtifactsViewModel(
