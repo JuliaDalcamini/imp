@@ -65,6 +65,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.io)
             implementation(libs.lifecycle.runtime)
             implementation(libs.lifecycle.viewmodel)
             implementation(libs.navigation)
@@ -74,6 +75,7 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kermit)
+            implementation(libs.comshot)
         }
 
         androidMain.dependencies {

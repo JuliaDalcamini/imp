@@ -1,6 +1,7 @@
+package com.julia.imp
+
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,9 +29,11 @@ import com.julia.imp.project.create.CreateProjectScreen
 import com.julia.imp.project.list.ProjectsScreen
 import com.julia.imp.register.RegisterRoute
 import com.julia.imp.register.RegisterScreen
+import com.julia.imp.report.ReportRoute
+import com.julia.imp.report.ReportScreen
 
 @Composable
-fun App() {
+fun App(onShareReportRequest: (List<ImageBitmap>) -> Unit) {
     ImpTheme {
         Box(Modifier.background(MaterialTheme.colorScheme.background).fillMaxSize()) {
             val navController = rememberNavController()
@@ -86,6 +90,13 @@ fun App() {
                         onBackClick = { navController.popBackStack() },
                         onNewArtifactClick = {},
                         onEditArtifactClick = { navController.navigate(ReportRoute) }
+                    )
+                }
+
+                composable<ReportRoute> {
+                    ReportScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onShareRequest = onShareReportRequest
                     )
                 }
             }

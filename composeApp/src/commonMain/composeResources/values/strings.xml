@@ -21,6 +21,7 @@
     <string name="created_by_format">Criado por %1$s</string>
     <string name="no_projects_message">Não há projetos no time atual.</string>
     <string name="projects_error_message">Ocorreu um erro ao carregar os projetos do time. Por favor, tente novamente.</string>
+    <string name="try_again_label">Tentar novamente</string>
     <string name="new_project_label">Novo projeto</string>
     <string name="project_options_label">Opções de projeto</string>
     <string name="go_back_label">Voltar</string>
@@ -45,4 +46,10 @@
     <string name="priority_moscow_must_have">Prioridade: Deve ter</string>
     <string name="priority_wiegers_format">Valor: %1$d · Complexidade: %2$d · Impacto: %3$d</string>
     <string name="new_artifact_label">Novo artefato</string>
+    <string name="edit_label">Editar</string>
+    <string name="archive_label">Arquivar</string>
+    <string name="archive_artifact_title">Arquivar artefato</string>
+    <string name="archive_artifact_message">Tem certeza de que deseja arquivar o artefato %1$s? Isso não afeta as inspeções já realizadas, mas impede novas inspeções desse artefato.</string>
+    <string name="share_label">Compartilhar</string>
+    <string name="share_report_title">Compartilhar relatório</string>
 </resources>

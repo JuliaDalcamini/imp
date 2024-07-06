@@ -13,6 +13,18 @@
         android:enableOnBackInvokedCallback="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         tools:targetApi="tiramisu">
+
+        <provider
+            android:name="com.julia.imp.ImpFileProvider"
+            android:authorities="com.julia.imp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+
+        </provider>
             
         <activity
             android:exported="true"
@@ -24,5 +36,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:name=".ShareReportActivity" />
+
     </application>
 </manifest>
