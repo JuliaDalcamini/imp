@@ -189,7 +189,7 @@ fun ProjectsScreen(
                 }
 
                 LaunchedEffect(Unit) {
-                    delay(1000)
+                    delay(10)
                     onShowReportRequest(listOf(graphicsLayer.toImageBitmap()))
                     viewModel.onReportOpened()
                 }

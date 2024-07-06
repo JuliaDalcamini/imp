@@ -1,5 +1,6 @@
 package com.julia.imp.report
 
+import androidx.compose.animation.core.snap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -232,6 +233,7 @@ fun Table(
 fun ExampleChart(modifier: Modifier = Modifier) {
     PieChart(
         modifier = modifier,
-        values = List(6) { Random.nextInt(80, 3450).toFloat() }
+        values = List(6) { Random.nextInt(80, 3450).toFloat() },
+        animationSpec = snap()
     )
 }
