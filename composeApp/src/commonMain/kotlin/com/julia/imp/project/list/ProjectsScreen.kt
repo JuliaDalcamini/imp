@@ -1,6 +1,7 @@
 package com.julia.imp.project.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +15,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,10 +42,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
 import com.julia.imp.team.switcher.TeamSwitcher
@@ -58,6 +64,7 @@ import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.switch_team_title
+import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -109,8 +116,8 @@ fun ProjectsScreen(
                                     .padding(bottom = 8.dp),
                                 project = project,
                                 onClick = { onProjectClick(project) },
-                                onRenameClick = { viewModel.askToRenameProject(project) },
-                                onDeleteClick = { viewModel.askToDeleteProject(project) }
+                                onRenameClick = { viewModel.askToRename(project) },
+                                onDeleteClick = { viewModel.askToDelete(project) }
                             )
                         }
 
@@ -126,29 +133,45 @@ fun ProjectsScreen(
                 }
             }
 
-            viewModel.uiState.error?.let {
-                Text(
+            if (viewModel.uiState.error) {
+                Column(
                     modifier = Modifier
+                        .fillMaxSize()
+                        .consumeWindowInsets(paddingValues)
                         .padding(paddingValues)
-                        .padding(24.dp)
-                        .align(Alignment.Center),
-                    text = stringResource(Res.string.projects_error_message)
-                )
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = stringResource(Res.string.projects_error_message),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+
+                    TextButton(
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        onClick = { viewModel.getProjects() }
+                    ) {
+                        Icon(Icons.Outlined.Refresh, null)
+                        Text(stringResource(Res.string.try_again_label))
+                    }
+                }
             }
 
             viewModel.uiState.projectToDelete?.let { project ->
                 DeleteProjectDialog(
                     projectName = project.name,
-                    onDismissRequest = { viewModel.dismissProjectDeletion() },
-                    onConfirm = { viewModel.deleteProject(project) }
+                    onDismissRequest = { viewModel.dismissDeletion() },
+                    onConfirm = { viewModel.delete(project) }
                 )
             }
 
             viewModel.uiState.projectToRename?.let { project ->
                 RenameProjectDialog(
                     projectName = project.name,
-                    onDismissRequest = { viewModel.dismissProjectRenaming() },
-                    onConfirm = { newName -> viewModel.renameProject(project, newName) }
+                    onDismissRequest = { viewModel.dismissRenaming() },
+                    onConfirm = { newName -> viewModel.rename(project, newName) }
                 )
             }
         }
@@ -236,6 +259,7 @@ fun ProjectOptionsDropdown(
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.rename_label)) },
+            leadingIcon = { Icon(Icons.Outlined.Edit, null) },
             onClick = {
                 onRenameClick()
                 onDismissRequest()
@@ -244,6 +268,7 @@ fun ProjectOptionsDropdown(
 
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.delete_label)) },
+            leadingIcon = { Icon(Icons.Outlined.Delete, null) },
             onClick = {
                 onDeleteClick()
                 onDismissRequest()
@@ -272,25 +297,10 @@ fun DeleteProjectDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        icon = { Icon(Icons.Outlined.Warning, null) },
-        title = { Text(text = stringResource(Res.string.delete_project_title)) },
-        text = { Text(text = stringResource(Res.string.delete_project_message, projectName)) },
+    ConfirmationDialog(
+        title = stringResource(Res.string.delete_project_title),
+        message = stringResource(Res.string.delete_project_message, projectName),
         onDismissRequest = onDismissRequest,
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(Res.string.cancel_label))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm()
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(Res.string.ok_label))
-            }
-        }
+        onConfirm = onConfirm
     )
 }

@@ -5,13 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ProjectsViewModel(
@@ -23,6 +20,8 @@ class ProjectsViewModel(
 
     fun getProjects() {
         viewModelScope.launch {
+            uiState = uiState.copy(isLoading = true, error = false)
+
             try {
                 val projects = repository.getProjects(requireSession().team.id)
 
@@ -32,41 +31,42 @@ class ProjectsViewModel(
                     showCreateButton = requireSession().isTeamAdmin
                 )
             } catch (error: Throwable) {
-                uiState = uiState.copy(error = error.message)
+                uiState = uiState.copy(error = true)
             } finally {
                 uiState = uiState.copy(isLoading = false)
             }
         }
     }
 
-    fun askToDeleteProject(project: Project) {
+    fun askToDelete(project: Project) {
         uiState = uiState.copy(projectToDelete = project)
     }
 
-    fun dismissProjectDeletion() {
+    fun dismissDeletion() {
         uiState = uiState.copy(projectToDelete = null)
     }
 
-    fun deleteProject(project: Project) {
+    fun delete(project: Project) {
         viewModelScope.launch {
             try {
                 repository.deleteProject(project.id)
                 getProjects()
             } catch (error: Throwable) {
                 // TODO: Handle error
+                error.printStackTrace()
             }
         }
     }
 
-    fun askToRenameProject(project: Project) {
+    fun askToRename(project: Project) {
         uiState = uiState.copy(projectToRename = project)
     }
 
-    fun dismissProjectRenaming() {
+    fun dismissRenaming() {
         uiState = uiState.copy(projectToRename = null)
     }
 
-    fun renameProject(project: Project, newName: String) {
+    fun rename(project: Project, newName: String) {
         viewModelScope.launch {
             try {
                 repository.renameProject(project.id, newName)

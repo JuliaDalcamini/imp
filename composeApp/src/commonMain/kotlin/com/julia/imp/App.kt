@@ -83,7 +83,9 @@ fun App() {
 
                     ArtifactsScreen(
                         projectId = route.projectId,
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onNewArtifactClick = {},
+                        onEditArtifactClick = { navController.navigate(ReportRoute) }
                     )
                 }
             }

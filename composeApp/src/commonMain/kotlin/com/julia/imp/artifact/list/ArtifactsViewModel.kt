@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.ArtifactRepository
+import com.julia.imp.common.session.requireSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -22,7 +23,23 @@ class ArtifactsViewModel(
 
             val artifacts = repository.getArtifacts(projectId)
 
-            uiState = uiState.copy(artifacts = artifacts, isLoading = false)
+            uiState = uiState.copy(
+                artifacts = artifacts,
+                isLoading = false,
+                showCreateButton = requireSession().isTeamAdmin
+            )
         }
+    }
+
+    fun askToArchive(artifact: ArtifactListEntry) {
+        uiState = uiState.copy(artifactToArchive = artifact)
+    }
+
+    fun dismissArchiving() {
+        uiState = uiState.copy(artifactToArchive = null)
+    }
+
+    fun archive(artifact: ArtifactListEntry) {
+        // TODO: Implement
     }
 }

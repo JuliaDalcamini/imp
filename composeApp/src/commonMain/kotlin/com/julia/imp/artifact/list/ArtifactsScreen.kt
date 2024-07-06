@@ -15,8 +15,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -25,29 +31,46 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.MoscowPriorityLevel
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
+import com.julia.imp.project.list.DeleteProjectDialog
 import com.julia.imp.project.list.NewProjectButton
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.archive_artifact_message
+import imp.composeapp.generated.resources.archive_artifact_title
+import imp.composeapp.generated.resources.archive_label
 import imp.composeapp.generated.resources.artifacts_title
+import imp.composeapp.generated.resources.cancel_label
+import imp.composeapp.generated.resources.delete_label
+import imp.composeapp.generated.resources.delete_project_message
+import imp.composeapp.generated.resources.delete_project_title
+import imp.composeapp.generated.resources.edit_label
 import imp.composeapp.generated.resources.new_artifact_label
 import imp.composeapp.generated.resources.new_project_label
+import imp.composeapp.generated.resources.ok_label
 import imp.composeapp.generated.resources.priority_moscow_could_have
 import imp.composeapp.generated.resources.priority_moscow_must_have
 import imp.composeapp.generated.resources.priority_moscow_should_have
 import imp.composeapp.generated.resources.priority_moscow_wont_have
 import imp.composeapp.generated.resources.priority_wiegers_format
+import imp.composeapp.generated.resources.rename_label
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +78,8 @@ import org.jetbrains.compose.resources.stringResource
 fun ArtifactsScreen(
     projectId: String,
     onBackClick: () -> Unit,
+    onNewArtifactClick: () -> Unit,
+    onEditArtifactClick: (ArtifactListEntry) -> Unit,
     viewModel: ArtifactsViewModel = viewModel { ArtifactsViewModel() }
 ) {
     LaunchedEffect(Unit) {
@@ -73,8 +98,8 @@ fun ArtifactsScreen(
             )
         },
         floatingActionButton = {
-            if (SessionManager.activeSession?.isTeamAdmin == true) {
-                NewArtifactButton(onClick = {})
+            if (viewModel.uiState.showCreateButton) {
+                NewArtifactButton(onClick = onNewArtifactClick)
             }
         }
     ) { paddingValues ->
@@ -93,11 +118,35 @@ fun ArtifactsScreen(
                         .consumeWindowInsets(paddingValues)
                         .fillMaxSize(),
                     contentPadding = paddingValues,
-                    artifacts = artifacts
+                    artifacts = artifacts,
+                    onEditArtifactClick = onEditArtifactClick,
+                    onArchiveArtifactClick = { viewModel.askToArchive(it) }
                 )
             }
         }
+
+        viewModel.uiState.artifactToArchive?.let { artifact ->
+            ArchiveArtifactDialog(
+                artifactName = artifact.name,
+                onDismissRequest = { viewModel.dismissArchiving() },
+                onConfirm = { viewModel.archive(artifact) }
+            )
+        }
     }
+}
+
+@Composable
+fun ArchiveArtifactDialog(
+    artifactName: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(Res.string.archive_artifact_title),
+        message = stringResource(Res.string.archive_artifact_message, artifactName),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
 }
 
 @Composable
@@ -116,6 +165,8 @@ fun NewArtifactButton(
 @Composable
 fun ArtifactList(
     artifacts: List<ArtifactListEntry>,
+    onEditArtifactClick: (ArtifactListEntry) -> Unit,
+    onArchiveArtifactClick: (ArtifactListEntry) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
@@ -129,7 +180,9 @@ fun ArtifactList(
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 8.dp)
                     .fillMaxWidth(),
-                artifact = artifact
+                artifact = artifact,
+                onEditClick = { onEditArtifactClick(artifact) },
+                onArchiveClick = { onArchiveArtifactClick(artifact) }
             )
         }
 
@@ -142,6 +195,8 @@ fun ArtifactList(
 @Composable
 fun ArtifactListItem(
     artifact: ArtifactListEntry,
+    onEditClick: () -> Unit,
+    onArchiveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(modifier) {
@@ -177,8 +232,21 @@ fun ArtifactListItem(
                 )
             }
 
-            IconButton(onClick = {}) {
-                Icon(Icons.Outlined.MoreVert, null)
+            Box {
+                var showOptions by remember { mutableStateOf(false) }
+
+                IconButton(
+                    onClick = { showOptions = true }
+                ) {
+                    Icon(Icons.Outlined.MoreVert, null)
+                }
+
+                ArtifactOptionsDropdown(
+                    expanded = showOptions,
+                    onDismissRequest = { showOptions = false },
+                    onEditClick = onEditClick,
+                    onArchiveClick = onArchiveClick
+                )
             }
         }
     }
@@ -208,3 +276,36 @@ private fun getWiegersPriorityText(priority: WiegersPriority) =
         priority.complexity,
         priority.impact
     )
+
+@Composable
+fun ArtifactOptionsDropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onEditClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DropdownMenu(
+        modifier = modifier,
+        expanded = expanded,
+        onDismissRequest = onDismissRequest
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.edit_label)) },
+            leadingIcon = { Icon(Icons.Outlined.Edit, null) },
+            onClick = {
+                onEditClick()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.archive_label)) },
+            leadingIcon = { Icon(Icons.Outlined.Lock, null) },
+            onClick = {
+                onArchiveClick()
+                onDismissRequest()
+            }
+        )
+    }
+}
