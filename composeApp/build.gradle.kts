@@ -75,7 +75,7 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kermit)
-            implementation(libs.comshot)
+            implementation(libs.koalaplot)
         }
 
         androidMain.dependencies {
@@ -92,6 +92,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.itext.pdf)
         }
 
         wasmJsMain.dependencies {

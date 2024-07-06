@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ProjectsViewModel(
@@ -76,5 +75,13 @@ class ProjectsViewModel(
                 error.printStackTrace()
             }
         }
+    }
+
+    fun generateReport(project: Project) {
+        uiState = uiState.copy(projectToGenerateReport = project)
+    }
+
+    fun onReportOpened() {
+        uiState = uiState.copy(projectToGenerateReport = null)
     }
 }

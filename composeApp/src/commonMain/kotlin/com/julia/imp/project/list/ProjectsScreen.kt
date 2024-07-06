@@ -17,10 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,29 +41,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.ui.capture.recordOffscreen
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
+import com.julia.imp.report.PrintableReportPage
+import com.julia.imp.report.ReportPage1
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.cancel_label
-import imp.composeapp.generated.resources.new_project_label
 import imp.composeapp.generated.resources.created_by_format
 import imp.composeapp.generated.resources.delete_label
 import imp.composeapp.generated.resources.delete_project_message
 import imp.composeapp.generated.resources.delete_project_title
+import imp.composeapp.generated.resources.generate_report_label
+import imp.composeapp.generated.resources.new_project_label
 import imp.composeapp.generated.resources.no_projects_message
-import imp.composeapp.generated.resources.ok_label
 import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.switch_team_title
 import imp.composeapp.generated.resources.try_again_label
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -72,6 +76,7 @@ import org.jetbrains.compose.resources.stringResource
 fun ProjectsScreen(
     onNewProjectClick: () -> Unit,
     onProjectClick: (Project) -> Unit,
+    onShowReportRequest: (List<ImageBitmap>) -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
     LaunchedEffect(SessionManager.activeSession) {
@@ -117,7 +122,8 @@ fun ProjectsScreen(
                                 project = project,
                                 onClick = { onProjectClick(project) },
                                 onRenameClick = { viewModel.askToRename(project) },
-                                onDeleteClick = { viewModel.askToDelete(project) }
+                                onDeleteClick = { viewModel.askToDelete(project) },
+                                onGenerateReportClick = { viewModel.generateReport(project) }
                             )
                         }
 
@@ -174,6 +180,20 @@ fun ProjectsScreen(
                     onConfirm = { newName -> viewModel.rename(project, newName) }
                 )
             }
+
+            viewModel.uiState.projectToGenerateReport?.let { project ->
+                val graphicsLayer = rememberGraphicsLayer()
+
+                PrintableReportPage(Modifier.recordOffscreen(graphicsLayer)) {
+                    ReportPage1(Modifier.fillMaxSize())
+                }
+
+                LaunchedEffect(Unit) {
+                    delay(1000)
+                    onShowReportRequest(listOf(graphicsLayer.toImageBitmap()))
+                    viewModel.onReportOpened()
+                }
+            }
         }
     }
 }
@@ -197,6 +217,7 @@ fun ProjectListItem(
     onClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -237,7 +258,8 @@ fun ProjectListItem(
                     expanded = showOptions,
                     onDismissRequest = { showOptions = false },
                     onRenameClick = onRenameClick,
-                    onDeleteClick = onDeleteClick
+                    onDeleteClick = onDeleteClick,
+                    onGenerateReportClick = onGenerateReportClick
                 )
             }
         }
@@ -250,6 +272,7 @@ fun ProjectOptionsDropdown(
     onDismissRequest: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
@@ -262,6 +285,15 @@ fun ProjectOptionsDropdown(
             leadingIcon = { Icon(Icons.Outlined.Edit, null) },
             onClick = {
                 onRenameClick()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.generate_report_label)) },
+            leadingIcon = { Icon(Icons.Outlined.Info, null) },
+            onClick = {
+                onGenerateReportClick()
                 onDismissRequest()
             }
         )

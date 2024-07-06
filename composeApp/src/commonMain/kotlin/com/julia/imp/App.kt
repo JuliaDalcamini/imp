@@ -29,11 +29,9 @@ import com.julia.imp.project.create.CreateProjectScreen
 import com.julia.imp.project.list.ProjectsScreen
 import com.julia.imp.register.RegisterRoute
 import com.julia.imp.register.RegisterScreen
-import com.julia.imp.report.ReportRoute
-import com.julia.imp.report.ReportScreen
 
 @Composable
-fun App(onShareReportRequest: (List<ImageBitmap>) -> Unit) {
+fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
     ImpTheme {
         Box(Modifier.background(MaterialTheme.colorScheme.background).fillMaxSize()) {
             val navController = rememberNavController()
@@ -67,7 +65,8 @@ fun App(onShareReportRequest: (List<ImageBitmap>) -> Unit) {
                 composable<ProjectsRoute> {
                     ProjectsScreen(
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
-                        onProjectClick = { navController.navigate(ArtifactsRoute(projectId = it.id)) }
+                        onProjectClick = { navController.navigate(ArtifactsRoute(projectId = it.id)) },
+                        onShowReportRequest = onShowReportRequest
                     )
                 }
 
@@ -89,14 +88,7 @@ fun App(onShareReportRequest: (List<ImageBitmap>) -> Unit) {
                         projectId = route.projectId,
                         onBackClick = { navController.popBackStack() },
                         onNewArtifactClick = {},
-                        onEditArtifactClick = { navController.navigate(ReportRoute) }
-                    )
-                }
-
-                composable<ReportRoute> {
-                    ReportScreen(
-                        onBackClick = { navController.popBackStack() },
-                        onShareRequest = onShareReportRequest
+                        onEditArtifactClick = {}
                     )
                 }
             }

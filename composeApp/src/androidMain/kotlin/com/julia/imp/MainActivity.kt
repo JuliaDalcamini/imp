@@ -10,11 +10,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.lifecycleScope
 import com.julia.imp.common.file.getShareableUri
 import com.julia.imp.common.pdf.getPdfWriter
-import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.share_report_title
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
-import org.jetbrains.compose.resources.stringResource
 import java.io.File
 
 class MainActivity : ComponentActivity() {
@@ -24,20 +21,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val shareReportTitle = stringResource(Res.string.share_report_title)
-
-            App(
-                onShareReportRequest = { images ->
-                    shareReport(
-                        title = shareReportTitle,
-                        images = images
-                    )
-                }
-            )
+            App(onShowReportRequest = { saveAndOpenReport(it) })
         }
     }
 
-    private fun shareReport(title: String, images: List<ImageBitmap>) {
+    private fun saveAndOpenReport(images: List<ImageBitmap>) {
         lifecycleScope.launch {
             val imagesFolder = File(cacheDir, "reports").also { it.mkdirs() }
             val file = File(imagesFolder, "report-${System.currentTimeMillis()}.pdf")
@@ -47,21 +35,16 @@ class MainActivity : ComponentActivity() {
                 writeTo = Path(file.path)
             )
 
-            shareFile(
-                title = title,
-                uri = file.getShareableUri(this@MainActivity, "com.julia.imp.fileprovider"),
-                type = "application/pdf"
-            )
+            openPdf(file.getShareableUri(this@MainActivity, "com.julia.imp.fileprovider"))
         }
     }
 
-    private fun shareFile(title: String, uri: Uri, type: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_STREAM, uri)
+    private fun openPdf(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            setDataAndType(uri, type)
+            setDataAndType(uri, "application/pdf")
         }
 
-        startActivity(Intent.createChooser(intent, title), null)
+        startActivity(Intent.createChooser(intent, null), null)
     }
 }
