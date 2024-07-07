@@ -10,7 +10,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.lifecycleScope
 import com.julia.imp.common.file.getShareableUri
 import com.julia.imp.common.pdf.getPdfWriter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.io.files.Path
 import java.io.File
 
@@ -27,15 +29,17 @@ class MainActivity : ComponentActivity() {
 
     private fun saveAndOpenReport(images: List<ImageBitmap>) {
         lifecycleScope.launch {
-            val imagesFolder = File(cacheDir, "reports").also { it.mkdirs() }
-            val file = File(imagesFolder, "report-${System.currentTimeMillis()}.pdf")
+            withContext(Dispatchers.IO) {
+                val imagesFolder = File(cacheDir, "reports").also { it.mkdirs() }
+                val file = File(imagesFolder, "report-${System.currentTimeMillis()}.pdf")
 
-            getPdfWriter().createFromImages(
-                images = images,
-                writeTo = Path(file.path)
-            )
+                getPdfWriter().createFromImages(
+                    images = images,
+                    writeTo = Path(file.path)
+                )
 
-            openPdf(file.getShareableUri(this@MainActivity, "com.julia.imp.fileprovider"))
+                openPdf(file.getShareableUri(this@MainActivity, "com.julia.imp.fileprovider"))
+            }
         }
     }
 
