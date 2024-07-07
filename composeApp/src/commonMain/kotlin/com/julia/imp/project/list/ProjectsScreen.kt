@@ -42,18 +42,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
-import com.julia.imp.common.ui.capture.recordOffscreen
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
-import com.julia.imp.report.PrintableReportPage
-import com.julia.imp.report.ReportPage1
+import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.created_by_format
@@ -68,7 +65,6 @@ import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.switch_team_title
 import imp.composeapp.generated.resources.try_again_label
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -182,15 +178,8 @@ fun ProjectsScreen(
             }
 
             viewModel.uiState.projectToGenerateReport?.let { project ->
-                val graphicsLayer = rememberGraphicsLayer()
-
-                PrintableReportPage(Modifier.recordOffscreen(graphicsLayer)) {
-                    ReportPage1(Modifier.fillMaxSize())
-                }
-
-                LaunchedEffect(Unit) {
-                    delay(10)
-                    onShowReportRequest(listOf(graphicsLayer.toImageBitmap()))
+                ProjectReportGenerator { pages ->
+                    onShowReportRequest(pages)
                     viewModel.onReportOpened()
                 }
             }
