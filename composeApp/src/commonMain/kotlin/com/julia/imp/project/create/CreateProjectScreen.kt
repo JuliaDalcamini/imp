@@ -1,43 +1,38 @@
 package com.julia.imp.project.create
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.form.FormField
+import com.julia.imp.common.ui.form.SliderFormField
 import com.julia.imp.priority.MoscowPrioritizer
 import com.julia.imp.priority.WiegersPrioritizer
-import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.complexity_weight_label
 import imp.composeapp.generated.resources.create_project_label
@@ -62,6 +57,7 @@ fun CreateProjectScreen(
     }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -69,8 +65,7 @@ fun CreateProjectScreen(
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, null)
                     }
                  },
-                title = { Text(stringResource(Res.string.new_project_title)) },
-                actions = { TeamSwitcher() }
+                title = { Text(stringResource(Res.string.new_project_title)) }
             )
         }
     ) { paddingValues ->
@@ -159,73 +154,13 @@ fun CreateProjectScreen(
                 Spacer(Modifier.height(24.dp))
             }
 
-            Button(
+            PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.create_project_label),
+                onClick = { viewModel.createProject() },
                 enabled = !viewModel.uiState.loading,
-                onClick = { viewModel.createProject() }
-            ) {
-                if (viewModel.uiState.loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(Res.string.create_project_label))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun FormField(
-    label: String,
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(modifier) {
-        Text(
-            modifier = Modifier.padding(bottom = 4.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            text = label
-        )
-
-        content()
-    }
-}
-
-@Composable
-fun SliderFormField(
-    label: String,
-    value: Float,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    steps: Int = 0,
-    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    valueText: String? = null,
-) {
-    FormField(
-        modifier = modifier,
-        label = label
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Slider(
-                modifier = Modifier.weight(1f),
-                enabled = enabled,
-                value = value,
-                steps = steps,
-                valueRange = valueRange,
-                onValueChange = onValueChange
+                loading = viewModel.uiState.loading
             )
-
-            valueText?.let { text ->
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = text,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
     }
 }

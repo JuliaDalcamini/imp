@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.requireSession
+import com.julia.imp.common.session.requireTeam
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class ProjectsViewModel(
             uiState = uiState.copy(isLoading = true, error = false)
 
             try {
-                val projects = repository.getProjects(requireSession().team.id)
+                val projects = repository.getProjects(requireTeam().id)
 
                 uiState = uiState.copy(
                     isLoading = false,

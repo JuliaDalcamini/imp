@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -21,9 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,10 +36,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.auth.UserCredentials
+import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.button.SecondaryButton
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.create_account_label
 import imp.composeapp.generated.resources.create_account_title
 import imp.composeapp.generated.resources.email_label
+import imp.composeapp.generated.resources.first_name_label
+import imp.composeapp.generated.resources.last_name_label
 import imp.composeapp.generated.resources.ok_label
 import imp.composeapp.generated.resources.password_confirmation_label
 import imp.composeapp.generated.resources.password_label
@@ -54,14 +56,20 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun RegisterScreen(
     onLoginClick: () -> Unit,
-    onRegistrationComplete: () -> Unit,
+    onRegistrationComplete: (UserCredentials) -> Unit,
     viewModel: RegisterViewModel = viewModel { RegisterViewModel() }
 ) {
-    Scaffold { paddingValues ->
+    LaunchedEffect(viewModel.uiState.registeredCredentials) {
+        viewModel.uiState.registeredCredentials?.let {
+            onRegistrationComplete(it)
+        }
+    }
+
+    Scaffold(Modifier.imePadding()) { paddingValues ->
         val scrollState = rememberScrollState()
 
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize().imePadding(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
             val compact = maxWidth < 600.dp
@@ -90,9 +98,13 @@ fun RegisterScreen(
 
                 RegisterFormFields(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
+                    firstName = viewModel.uiState.firstName,
+                    lastName = viewModel.uiState.lastName,
                     email = viewModel.uiState.email,
                     password = viewModel.uiState.password,
                     passwordConfirmation = viewModel.uiState.passwordConfirmation,
+                    onFirstNameChange = { viewModel.setFirstName(it) },
+                    onLastNameChange = { viewModel.setLastName(it) },
                     onEmailChange = { viewModel.setEmail(it) },
                     onPasswordChange = { viewModel.setPassword(it) },
                     onPasswordConfirmationChange = { viewModel.setPasswordConfirmation(it) },
@@ -137,9 +149,13 @@ fun RegisterErrorDialog(onDismissRequest: () -> Unit) {
 
 @Composable
 fun RegisterFormFields(
+    firstName: String,
+    lastName: String,
     email: String,
     password: String,
     passwordConfirmation: String,
+    onFirstNameChange: (String) -> Unit,
+    onLastNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onPasswordConfirmationChange: (String) -> Unit,
@@ -148,6 +164,24 @@ fun RegisterFormFields(
     enabled: Boolean
 ) {
     Column(modifier) {
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = firstName,
+            onValueChange = onFirstNameChange,
+            enabled = enabled,
+            singleLine = true,
+            label = { Text(stringResource(Res.string.first_name_label)) }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = lastName,
+            onValueChange = onLastNameChange,
+            enabled = enabled,
+            singleLine = true,
+            label = { Text(stringResource(Res.string.last_name_label)) }
+        )
+
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = email,
@@ -195,57 +229,41 @@ fun RegisterFormButtons(
 ) {
     if (compact) {
         Column(modifier) {
-            FilledTonalButton(
+            SecondaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.use_existing_account_label),
                 onClick = onLoginClick,
                 enabled = !loading
-            ) {
-                Text(stringResource(Res.string.use_existing_account_label))
-            }
+            )
 
             Spacer(Modifier.height(4.dp))
 
-            Button(
+            PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.create_account_label),
                 onClick = onRegisterClick,
-                enabled = !loading
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(Res.string.create_account_label))
-                }
-            }
+                enabled = !loading,
+                loading = loading
+            )
         }
     } else {
         Row(modifier) {
-            FilledTonalButton(
+            SecondaryButton(
                 modifier = Modifier.weight(1f),
+                label = stringResource(Res.string.use_existing_account_label),
                 onClick = onLoginClick,
                 enabled = !loading
-            ) {
-                Text(stringResource(Res.string.use_existing_account_label))
-            }
+            )
 
             Spacer(Modifier.width(16.dp))
 
-            Button(
+            PrimaryButton(
                 modifier = Modifier.weight(1f),
+                label = stringResource(Res.string.create_account_label),
                 onClick = onRegisterClick,
-                enabled = !loading
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(Res.string.create_account_label))
-                }
-            }
+                enabled = !loading,
+                loading = loading
+            )
         }
     }
 }

@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.0"
 agp = "8.2.2"
-compose-plugin = "1.7.0-alpha01"
+compose-plugin = "1.7.0-dev1727"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -28,7 +28,6 @@ navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }

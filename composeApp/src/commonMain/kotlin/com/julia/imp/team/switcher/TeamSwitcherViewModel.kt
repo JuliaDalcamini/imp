@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.session.requireSession
+import com.julia.imp.common.session.requireTeam
 import com.julia.imp.team.Team
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMember
@@ -19,9 +19,7 @@ class TeamSwitcherViewModel(
     private val repository: TeamRepository = TeamRepository()
 ) : ViewModel() {
 
-    val currentTeam: Team = requireSession().team
-
-    var uiState by mutableStateOf(TeamSwitcherUiState())
+    var uiState by mutableStateOf(TeamSwitcherUiState(requireTeam()))
         private set
 
     fun openSwitcher() {
@@ -58,7 +56,7 @@ class TeamSwitcherViewModel(
                     userId = requireSession().userId
                 )
 
-                SessionManager.activeSession = createUserSession(team, member)
+                uiState = uiState.copy(newSession = createUserSession(team, member))
                 closeSwitcher()
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = ErrorSwitchingActiveTeam)

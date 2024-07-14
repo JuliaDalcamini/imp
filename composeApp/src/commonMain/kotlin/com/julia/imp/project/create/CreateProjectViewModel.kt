@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julia.imp.common.session.requireSession
+import com.julia.imp.common.session.requireTeam
 import com.julia.imp.priority.Prioritizer
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ class CreateProjectViewModel(
                 repository.createProject(
                     name = uiState.name,
                     prioritizer = uiState.prioritizer,
-                    teamId = requireSession().team.id
+                    teamId = requireTeam().id
                 )
 
                 uiState = uiState.copy(created = true)

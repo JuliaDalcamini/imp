@@ -166,7 +166,8 @@ fun ArtifactList(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .animateItem(),
                 artifact = artifact,
                 onEditClick = { onEditArtifactClick(artifact) },
                 onArchiveClick = { onArchiveArtifactClick(artifact) }
@@ -222,9 +223,7 @@ fun ArtifactListItem(
             Box {
                 var showOptions by remember { mutableStateOf(false) }
 
-                IconButton(
-                    onClick = { showOptions = true }
-                ) {
+                IconButton(onClick = { showOptions = true }) {
                     Icon(Icons.Outlined.MoreVert, null)
                 }
 

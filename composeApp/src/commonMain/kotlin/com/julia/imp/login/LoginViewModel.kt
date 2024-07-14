@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.network.setAuthTokens
-import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.team.TeamRepository
 import kotlinx.coroutines.launch
@@ -18,10 +17,6 @@ class LoginViewModel(
     
     var uiState by mutableStateOf(LoginUiState())
         private set
-
-    fun clearSession() {
-        SessionManager.activeSession = null
-    }
     
     fun login() {
         viewModelScope.launch {
@@ -33,13 +28,18 @@ class LoginViewModel(
                 setAuthTokens(response.tokens)
 
                 val teams = teamRepository.getTeams()
-                val initialTeam = teams.first()
-                val teamMember = teamRepository.getMember(initialTeam.id, response.userId)
+                val initialTeam = teams.firstOrNull()
 
-                SessionManager.activeSession = UserSession(
-                    userId = response.userId,
-                    team = initialTeam,
-                    roleInTeam = teamMember.role
+                val teamMember = initialTeam?.let { team ->
+                    teamRepository.getMember(team.id, response.userId)
+                }
+
+                uiState = uiState.copy(
+                    newSession = UserSession(
+                        userId = response.userId,
+                        team = initialTeam,
+                        roleInTeam = teamMember?.role
+                    )
                 )
             } catch (error: Throwable) {
                 uiState = uiState.copy(showError = true)

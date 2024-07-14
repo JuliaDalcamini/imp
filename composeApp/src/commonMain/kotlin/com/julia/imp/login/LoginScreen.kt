@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -21,9 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,6 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.session.UserSession
+import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.button.SecondaryButton
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.app_name
 import imp.composeapp.generated.resources.create_account_label
@@ -56,14 +55,26 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreen(
+    presetEmail: String? = null,
+    presetPassword: String? = null,
+    onSignIn: (UserSession) -> Unit,
     onRegisterClick: () -> Unit,
     viewModel: LoginViewModel = viewModel { LoginViewModel() }
 ) {
-    Scaffold { paddingValues ->
+    LaunchedEffect(Unit) {
+        presetEmail?.let { viewModel.setEmail(it) }
+        presetPassword?.let { viewModel.setPassword(it) }
+    }
+
+    LaunchedEffect(viewModel.uiState.newSession) {
+        viewModel.uiState.newSession?.let { onSignIn(it) }
+    }
+
+    Scaffold(Modifier.imePadding()) { paddingValues ->
         val scrollState = rememberScrollState()
 
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize().imePadding(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
             val compact = maxWidth < 600.dp
@@ -192,57 +203,41 @@ fun LoginFormButtons(
 ) {
     if (compact) {
         Column(modifier) {
-            FilledTonalButton(
+            SecondaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.create_account_label),
                 onClick = onRegisterClick,
                 enabled = !loading
-            ) {
-                Text(stringResource(Res.string.create_account_label))
-            }
+            )
 
             Spacer(Modifier.height(4.dp))
 
-            Button(
+            PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.sign_in_label),
                 onClick = onLoginClick,
-                enabled = !loading
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(Res.string.sign_in_label))
-                }
-            }
+                enabled = !loading,
+                loading = loading
+            )
         }
     } else {
         Row(modifier) {
-            FilledTonalButton(
+            SecondaryButton(
                 modifier = Modifier.weight(1f),
+                label = stringResource(Res.string.create_account_label),
                 onClick = onRegisterClick,
                 enabled = !loading
-            ) {
-                Text(stringResource(Res.string.create_account_label))
-            }
+            )
 
             Spacer(Modifier.width(16.dp))
 
-            Button(
+            PrimaryButton(
                 modifier = Modifier.weight(1f),
+                label = stringResource(Res.string.sign_in_label),
                 onClick = onLoginClick,
-                enabled = !loading
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(stringResource(Res.string.sign_in_label))
-                }
-            }
+                enabled = !loading,
+                loading = loading
+            )
         }
     }
 }

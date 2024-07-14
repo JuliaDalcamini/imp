@@ -1,6 +1,5 @@
 package com.julia.imp.project.list
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
+import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
@@ -67,11 +68,12 @@ import imp.composeapp.generated.resources.switch_team_title
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
     onNewProjectClick: () -> Unit,
     onProjectClick: (Project) -> Unit,
+    onTeamSwitch: (UserSession) -> Unit,
     onShowReportRequest: (List<ImageBitmap>) -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
@@ -83,7 +85,7 @@ fun ProjectsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.projects_title)) },
-                actions = { TeamSwitcher() }
+                actions = { TeamSwitcher(onTeamSwitch = onTeamSwitch) }
             )
         },
         floatingActionButton = {
@@ -114,7 +116,8 @@ fun ProjectsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp)
-                                    .padding(bottom = 8.dp),
+                                    .padding(bottom = 8.dp)
+                                    .animateItem(),
                                 project = project,
                                 onClick = { onProjectClick(project) },
                                 onRenameClick = { viewModel.askToRename(project) },
@@ -152,10 +155,11 @@ fun ProjectsScreen(
                     )
 
                     TextButton(
-                        modifier = Modifier.padding(bottom = 4.dp),
+                        modifier = Modifier.padding(top = 4.dp),
                         onClick = { viewModel.getProjects() }
                     ) {
                         Icon(Icons.Outlined.Refresh, null)
+                        Spacer(Modifier.width(8.dp))
                         Text(stringResource(Res.string.try_again_label))
                     }
                 }

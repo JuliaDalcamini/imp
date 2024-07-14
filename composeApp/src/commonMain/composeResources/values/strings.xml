@@ -10,6 +10,8 @@
     <string name="create_account_label">Criar conta</string>
     <string name="sign_in_label">Entrar</string>
     <string name="create_account_title">Crie sua conta</string>
+    <string name="first_name_label">Nome</string>
+    <string name="last_name_label">Sobrenome</string>
     <string name="password_confirmation_label">Confirmação de senha</string>
     <string name="use_existing_account_label">Usar conta existente</string>
     <string name="register_error_title">Erro no cadastro</string>
@@ -52,4 +54,8 @@
     <string name="archive_artifact_message">Tem certeza de que deseja arquivar o artefato %1$s? Isso não afeta as inspeções já realizadas, mas impede novas inspeções desse artefato.</string>
     <string name="share_label">Compartilhar</string>
     <string name="generate_report_label">Gerar relatório</string>
+    <string name="no_teams_message">Você não faz parte de nenhum time. Peça para ser adicionado, ou crie seu próprio time.</string>
+    <string name="new_team_title">Novo time</string>
+    <string name="team_name_label">Nome do time</string>
+    <string name="create_team_label">Criar time</string>
 </resources>
