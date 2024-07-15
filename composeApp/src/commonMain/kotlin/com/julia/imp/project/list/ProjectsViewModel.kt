@@ -20,16 +20,19 @@ class ProjectsViewModel(
 
     fun getProjects() {
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, error = false)
-
             try {
+                val isAdmin = requireSession().isTeamAdmin
+
+                uiState = ProjectsUiState(
+                    isLoading = true,
+                    showCreateButton = isAdmin,
+                    showRenameOption = isAdmin,
+                    showDeleteOption = isAdmin
+                )
+
                 val projects = repository.getProjects(requireTeam().id)
 
-                uiState = uiState.copy(
-                    isLoading = false,
-                    projects = projects,
-                    showCreateButton = requireSession().isTeamAdmin
-                )
+                uiState = uiState.copy(projects = projects)
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = true)
             } finally {

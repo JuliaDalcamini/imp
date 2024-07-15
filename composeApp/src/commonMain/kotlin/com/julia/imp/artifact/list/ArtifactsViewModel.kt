@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.session.requireSession
 import kotlinx.coroutines.launch
@@ -16,21 +17,40 @@ class ArtifactsViewModel(
     var uiState by mutableStateOf(ArtifactsUiState())
         private set
 
-    fun getArtifacts(projectId: String) {
+    fun getArtifacts(projectId: String, filter: ArtifactFilter) {
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true)
+            try {
+                val isAdmin = requireSession().isTeamAdmin
 
-            val artifacts = repository.getArtifacts(projectId)
+                uiState = ArtifactsUiState(
+                    isLoading = true,
+                    filter = filter,
+                    showCreateButton = isAdmin
+                )
 
-            uiState = uiState.copy(
-                artifacts = artifacts,
-                isLoading = false,
-                showCreateButton = requireSession().isTeamAdmin
-            )
+                val artifacts = repository.getArtifacts(projectId, filter)
+
+                uiState = uiState.copy(
+                    entries = artifacts.map { artifact ->
+                        ArtifactListEntry(
+                            artifact = artifact,
+                            showOptions = isAdmin && !artifact.archived
+                        )
+                    }
+                )
+            } catch (error: Throwable) {
+                uiState = uiState.copy(isError = true)
+            } finally {
+                uiState = uiState.copy(isLoading = false)
+            }
         }
     }
 
-    fun askToArchive(artifact: ArtifactListEntry) {
+    fun setFilter(filter: ArtifactFilter) {
+        uiState = uiState.copy(filter = filter)
+    }
+
+    fun askToArchive(artifact: Artifact) {
         uiState = uiState.copy(artifactToArchive = artifact)
     }
 
@@ -38,7 +58,19 @@ class ArtifactsViewModel(
         uiState = uiState.copy(artifactToArchive = null)
     }
 
-    fun archive(artifact: ArtifactListEntry) {
-        // TODO: Implement
+    fun archive(artifact: Artifact) {
+        viewModelScope.launch {
+            try {
+                repository.archiveArtifact(
+                    projectId = artifact.projectId,
+                    artifactId = artifact.id
+                )
+
+                getArtifacts(artifact.projectId, uiState.filter)
+            } catch (error: Throwable) {
+                // TODO: Handle error
+                error.printStackTrace()
+            }
+        }
     }
 }

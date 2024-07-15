@@ -53,6 +53,11 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     loggedIn && !hasTeam -> NoTeamsRoute
                     else -> LoginRoute()
                 }
+
+                navController.popBackStack(
+                    route = startDestination,
+                    inclusive = false
+                )
             }
 
             NavHost(
@@ -96,6 +101,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
                         onProjectClick = { navController.navigate(ArtifactsRoute(it.id)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
+                        onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
                         onShowReportRequest = onShowReportRequest
                     )
                 }

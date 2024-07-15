@@ -50,6 +50,7 @@ private val TeamIconSize = 40.dp
 fun TeamSwitcher(
     modifier: Modifier = Modifier,
     onTeamSwitch: (UserSession) -> Unit,
+    onCreateTeamClick: () -> Unit,
     viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() },
 ) {
     val uiState = viewModel.uiState
@@ -102,7 +103,10 @@ fun TeamSwitcher(
                                 modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
                                 teams = uiState.teams.orEmpty(),
                                 onTeamClick = { viewModel.switchToTeam(it) },
-                                onCreateTeamClick = {}
+                                onCreateTeamClick = {
+                                    onCreateTeamClick()
+                                    viewModel.closeSwitcher()
+                                }
                             )
                         }
                     }

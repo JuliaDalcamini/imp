@@ -74,6 +74,7 @@ fun ProjectsScreen(
     onNewProjectClick: () -> Unit,
     onProjectClick: (Project) -> Unit,
     onTeamSwitch: (UserSession) -> Unit,
+    onCreateTeamClick: () -> Unit,
     onShowReportRequest: (List<ImageBitmap>) -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
@@ -85,11 +86,16 @@ fun ProjectsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.projects_title)) },
-                actions = { TeamSwitcher(onTeamSwitch = onTeamSwitch) }
+                actions = {
+                    TeamSwitcher(
+                        onTeamSwitch = onTeamSwitch,
+                        onCreateTeamClick = onCreateTeamClick
+                    )
+                }
             )
         },
         floatingActionButton = {
-            if (SessionManager.activeSession?.isTeamAdmin == true) {
+            if (viewModel.uiState.showCreateButton) {
                 NewProjectButton(onClick = onNewProjectClick)
             }
         }
@@ -119,6 +125,8 @@ fun ProjectsScreen(
                                     .padding(bottom = 8.dp)
                                     .animateItem(),
                                 project = project,
+                                showRenameOption = viewModel.uiState.showRenameOption,
+                                showDeleteOption = viewModel.uiState.showDeleteOption,
                                 onClick = { onProjectClick(project) },
                                 onRenameClick = { viewModel.askToRename(project) },
                                 onDeleteClick = { viewModel.askToDelete(project) },
@@ -207,6 +215,8 @@ fun NewProjectButton(
 @Composable
 fun ProjectListItem(
     project: Project,
+    showRenameOption: Boolean,
+    showDeleteOption: Boolean,
     onClick: () -> Unit,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -241,15 +251,17 @@ fun ProjectListItem(
             }
 
             Box {
-                var showOptions by remember { mutableStateOf(false) }
+                var expandOptions by remember { mutableStateOf(false) }
 
-                IconButton(onClick = { showOptions = true }) {
+                IconButton(onClick = { expandOptions = true }) {
                     Icon(Icons.Outlined.MoreVert, null)
                 }
 
                 ProjectOptionsDropdown(
-                    expanded = showOptions,
-                    onDismissRequest = { showOptions = false },
+                    expanded = expandOptions,
+                    onDismissRequest = { expandOptions = false },
+                    showRenameOption = showRenameOption,
+                    showDeleteOption = showDeleteOption,
                     onRenameClick = onRenameClick,
                     onDeleteClick = onDeleteClick,
                     onGenerateReportClick = onGenerateReportClick
@@ -263,6 +275,8 @@ fun ProjectListItem(
 fun ProjectOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    showRenameOption: Boolean,
+    showDeleteOption: Boolean,
     onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
@@ -274,15 +288,6 @@ fun ProjectOptionsDropdown(
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
-            text = { Text(stringResource(Res.string.rename_label)) },
-            leadingIcon = { Icon(Icons.Outlined.Edit, null) },
-            onClick = {
-                onRenameClick()
-                onDismissRequest()
-            }
-        )
-
-        DropdownMenuItem(
             text = { Text(stringResource(Res.string.generate_report_label)) },
             leadingIcon = { Icon(Icons.Outlined.Info, null) },
             onClick = {
@@ -291,14 +296,27 @@ fun ProjectOptionsDropdown(
             }
         )
 
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.delete_label)) },
-            leadingIcon = { Icon(Icons.Outlined.Delete, null) },
-            onClick = {
-                onDeleteClick()
-                onDismissRequest()
-            }
-        )
+        if (showRenameOption) {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.rename_label)) },
+                leadingIcon = { Icon(Icons.Outlined.Edit, null) },
+                onClick = {
+                    onRenameClick()
+                    onDismissRequest()
+                }
+            )
+        }
+
+        if (showDeleteOption) {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.delete_label)) },
+                leadingIcon = { Icon(Icons.Outlined.Delete, null) },
+                onClick = {
+                    onDeleteClick()
+                    onDismissRequest()
+                }
+            )
+        }
     }
 }
 
