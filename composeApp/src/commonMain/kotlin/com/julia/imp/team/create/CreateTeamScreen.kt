@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,12 +25,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.create_team_error_message
 import imp.composeapp.generated.resources.create_team_error_title
 import imp.composeapp.generated.resources.create_team_label
 import imp.composeapp.generated.resources.new_team_title
 import imp.composeapp.generated.resources.team_name_label
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +46,7 @@ fun CreateTeamScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, null)
+                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 },
                 title = { Text(stringResource(Res.string.new_team_title)) }

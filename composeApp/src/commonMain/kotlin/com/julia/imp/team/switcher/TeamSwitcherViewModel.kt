@@ -7,19 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.session.requireSession
-import com.julia.imp.common.session.requireTeam
 import com.julia.imp.team.Team
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMember
+import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorSwitchingActiveTeam
 import kotlinx.coroutines.launch
 
 class TeamSwitcherViewModel(
-    private val repository: TeamRepository = TeamRepository()
+    private val repository: TeamRepository = TeamRepository(),
+    private val memberRepository: TeamMemberRepository = TeamMemberRepository()
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(TeamSwitcherUiState(requireTeam()))
+    var uiState by mutableStateOf(TeamSwitcherUiState())
         private set
 
     fun openSwitcher() {
@@ -51,7 +52,7 @@ class TeamSwitcherViewModel(
 
         viewModelScope.launch {
             try {
-                val member = repository.getMember(
+                val member = memberRepository.getMember(
                     teamId = team.id,
                     userId = requireSession().userId
                 )

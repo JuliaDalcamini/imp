@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +33,7 @@ import com.julia.imp.common.ui.form.SliderFormField
 import com.julia.imp.priority.MoscowPrioritizer
 import com.julia.imp.priority.WiegersPrioritizer
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.complexity_weight_label
 import imp.composeapp.generated.resources.create_project_error_message
 import imp.composeapp.generated.resources.create_project_error_title
@@ -47,6 +46,7 @@ import imp.composeapp.generated.resources.project_name_label
 import imp.composeapp.generated.resources.user_value_weight_label
 import imp.composeapp.generated.resources.wiegers_label
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +65,7 @@ fun CreateProjectScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, null)
+                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                  },
                 title = { Text(stringResource(Res.string.new_project_title)) }

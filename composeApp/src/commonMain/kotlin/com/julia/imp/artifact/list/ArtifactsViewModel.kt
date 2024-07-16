@@ -14,10 +14,14 @@ class ArtifactsViewModel(
     private val repository: ArtifactRepository = ArtifactRepository()
 ) : ViewModel() {
 
+    private var lastProjectId: String? = null
+
     var uiState by mutableStateOf(ArtifactsUiState())
         private set
 
     fun getArtifacts(projectId: String, filter: ArtifactFilter) {
+        lastProjectId = projectId
+
         viewModelScope.launch {
             try {
                 val isAdmin = requireSession().isTeamAdmin
@@ -36,7 +40,8 @@ class ArtifactsViewModel(
                             artifact = artifact,
                             showOptions = isAdmin && !artifact.archived
                         )
-                    }
+                    },
+                    empty = artifacts.isEmpty()
                 )
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = true)
@@ -66,7 +71,7 @@ class ArtifactsViewModel(
                     artifactId = artifact.id
                 )
 
-                getArtifacts(artifact.projectId, uiState.filter)
+                reload()
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
             }
@@ -75,5 +80,9 @@ class ArtifactsViewModel(
 
     fun dismissActionError() {
         uiState = uiState.copy(actionError = false)
+    }
+
+    fun reload() {
+        lastProjectId?.let { getArtifacts(it, uiState.filter) }
     }
 }

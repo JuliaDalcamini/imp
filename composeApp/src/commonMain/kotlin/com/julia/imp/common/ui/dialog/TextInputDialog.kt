@@ -35,12 +35,13 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RenameDialog(
+fun TextInputDialog(
     title: String,
-    initialValue: String,
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    initialValue: String = "",
+    placeholder: String? = null
 ) {
     BasicAlertDialog(
         modifier = modifier,
@@ -73,7 +74,8 @@ fun RenameDialog(
                     modifier = Modifier.fillMaxWidth().focusRequester(inputFocusRequester),
                     value = inputState,
                     onValueChange = { inputState = it },
-                    singleLine = true
+                    singleLine = true,
+                    placeholder = { placeholder?.let { Text(it) }}
                 )
 
                 Spacer(Modifier.height(12.dp))

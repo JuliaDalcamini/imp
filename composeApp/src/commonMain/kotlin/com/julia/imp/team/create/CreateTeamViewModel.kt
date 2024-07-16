@@ -9,10 +9,12 @@ import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.team.TeamRepository
+import com.julia.imp.team.member.TeamMemberRepository
 import kotlinx.coroutines.launch
 
 class CreateTeamViewModel(
-    private val repository: TeamRepository = TeamRepository()
+    private val repository: TeamRepository = TeamRepository(),
+    private val memberRepository: TeamMemberRepository = TeamMemberRepository()
 ) : ViewModel() {
 
     var uiState by mutableStateOf(CreateTeamUiState())
@@ -29,8 +31,7 @@ class CreateTeamViewModel(
             try {
                 val team = repository.createTeam(name = uiState.name)
                 val userId = requireSession().userId
-
-                val teamMember = repository.getMember(team.id, userId)
+                val teamMember = memberRepository.getMember(team.id, userId)
 
                 SessionManager.activeSession = UserSession(
                     userId = userId,

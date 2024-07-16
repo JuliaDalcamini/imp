@@ -14,12 +14,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,11 +37,15 @@ import com.julia.imp.team.Team
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorSwitchingActiveTeam
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.create_team_label
+import imp.composeapp.generated.resources.current_team_label
 import imp.composeapp.generated.resources.load_teams_error
+import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.switch_team_error
 import imp.composeapp.generated.resources.switch_team_title
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 private val TeamIconSize = 40.dp
 
@@ -50,6 +54,7 @@ private val TeamIconSize = 40.dp
 fun TeamSwitcher(
     modifier: Modifier = Modifier,
     onTeamSwitch: (UserSession) -> Unit,
+    onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
     viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() },
 ) {
@@ -102,7 +107,12 @@ fun TeamSwitcher(
                             TeamSwitcherList(
                                 modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
                                 teams = uiState.teams.orEmpty(),
+                                currentTeam = uiState.currentTeam,
                                 onTeamClick = { viewModel.switchToTeam(it) },
+                                onManageTeamClick = {
+                                    onManageTeamClick()
+                                    viewModel.closeSwitcher()
+                                },
                                 onCreateTeamClick = {
                                     onCreateTeamClick()
                                     viewModel.closeSwitcher()
@@ -143,12 +153,37 @@ private fun TeamSwitcherErrorMessage(
 @Composable
 private fun TeamSwitcherList(
     teams: List<Team>,
+    currentTeam: Team,
     onTeamClick: (Team) -> Unit,
+    onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val otherTeams = teams.filterNot { it == currentTeam }
+
     LazyColumn(modifier) {
-        items(teams) { team ->
+        item("currentTeam") {
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .animateItem(),
+                headlineContent = { Text(currentTeam.name) },
+                leadingContent = { TeamIcon(currentTeam.name.getInitials()) },
+                supportingContent = { Text(stringResource(Res.string.current_team_label)) },
+                trailingContent = {
+                    IconButton(onClick = onManageTeamClick) {
+                        Icon(vectorResource(Res.drawable.settings_24px), null)
+                    }
+                }
+            )
+        }
+
+        item("divider") {
+            HorizontalDivider(Modifier.fillMaxWidth().padding(bottom = 8.dp))
+        }
+
+        items(otherTeams) { team ->
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -233,7 +268,7 @@ private fun CreateTeamIcon(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Outlined.Add, null)
+            Icon(vectorResource(Res.drawable.add_24px), null)
         }
     }
 }

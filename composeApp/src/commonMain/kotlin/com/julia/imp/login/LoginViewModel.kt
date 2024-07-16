@@ -8,11 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.network.setAuthTokens
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.team.TeamRepository
+import com.julia.imp.team.member.TeamMemberRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val repository: LoginRepository = LoginRepository(),
-    private val teamRepository: TeamRepository = TeamRepository()
+    private val teamRepository: TeamRepository = TeamRepository(),
+    private val teamMemberRepository: TeamMemberRepository = TeamMemberRepository()
 ) : ViewModel() {
     
     var uiState by mutableStateOf(LoginUiState())
@@ -31,7 +33,7 @@ class LoginViewModel(
                 val initialTeam = teams.firstOrNull()
 
                 val teamMember = initialTeam?.let { team ->
-                    teamRepository.getMember(team.id, response.userId)
+                    teamMemberRepository.getMember(team.id, response.userId)
                 }
 
                 uiState = uiState.copy(

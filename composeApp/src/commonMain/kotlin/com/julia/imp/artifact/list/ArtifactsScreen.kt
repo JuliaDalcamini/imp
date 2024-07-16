@@ -13,15 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,23 +54,34 @@ import com.julia.imp.priority.WiegersPriority
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
+import imp.composeapp.generated.resources.add_24px
+import imp.composeapp.generated.resources.archive_24px
 import imp.composeapp.generated.resources.archive_artifact_message
 import imp.composeapp.generated.resources.archive_artifact_title
 import imp.composeapp.generated.resources.archive_label
 import imp.composeapp.generated.resources.archived_label
+import imp.composeapp.generated.resources.arrow_back_24px
+import imp.composeapp.generated.resources.artifacts_error_message
 import imp.composeapp.generated.resources.artifacts_title
+import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.edit_label
 import imp.composeapp.generated.resources.filter_active
 import imp.composeapp.generated.resources.filter_all
 import imp.composeapp.generated.resources.filter_archived
 import imp.composeapp.generated.resources.filter_assigned_to_me
+import imp.composeapp.generated.resources.inventory_2_20px
+import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
+import imp.composeapp.generated.resources.no_artifacts_message
 import imp.composeapp.generated.resources.priority_moscow_could_have
 import imp.composeapp.generated.resources.priority_moscow_must_have
 import imp.composeapp.generated.resources.priority_moscow_should_have
 import imp.composeapp.generated.resources.priority_moscow_wont_have
 import imp.composeapp.generated.resources.priority_wiegers_format
+import imp.composeapp.generated.resources.refresh_24px
+import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +102,7 @@ fun ArtifactsScreen(
                 title = { Text(stringResource(Res.string.artifacts_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, null)
+                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 }
             )
@@ -125,6 +133,38 @@ fun ArtifactsScreen(
                 selectedFilter = viewModel.uiState.filter,
                 onFilterChange = { viewModel.setFilter(it) }
             )
+
+            if (viewModel.uiState.error) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(Res.string.artifacts_error_message),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+
+                    TextButton(
+                        modifier = Modifier.padding(top = 4.dp),
+                        onClick = { viewModel.reload() }
+                    ) {
+                        Icon(vectorResource(Res.drawable.refresh_24px), null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(Res.string.try_again_label))
+                    }
+                }
+            }
+
+            if (viewModel.uiState.empty) {
+                Text(
+                    modifier = Modifier.padding(24.dp).align(Alignment.Center),
+                    text = stringResource(Res.string.no_artifacts_message)
+                )
+            }
         }
     }
 
@@ -167,7 +207,7 @@ fun NewArtifactButton(
     ExtendedFloatingActionButton(
         modifier = modifier,
         text = { Text(stringResource(Res.string.new_artifact_label)) },
-        icon = { Icon(Icons.Default.Add, null) },
+        icon = { Icon(vectorResource(Res.drawable.add_24px), null) },
         onClick = onClick
     )
 }
@@ -209,10 +249,10 @@ fun ArtifactList(
                     onArchiveClick = { onArchiveArtifactClick(entry.artifact) }
                 )
             }
+        }
 
-            item {
-                Spacer(Modifier.height(56.dp))
-            }
+        item {
+            Spacer(Modifier.height(56.dp))
         }
     }
 }
@@ -281,7 +321,7 @@ fun ArtifactListItem(
                     if (artifact.archived) {
                         Icon(
                             modifier = Modifier.size(16.dp),
-                            imageVector = Icons.Outlined.Lock,
+                            imageVector = vectorResource(Res.drawable.inventory_2_20px),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface
                         )
@@ -323,7 +363,7 @@ fun ArtifactListItem(
                     var expandOptions by remember { mutableStateOf(false) }
 
                     IconButton(onClick = { expandOptions = true }) {
-                        Icon(Icons.Outlined.MoreVert, null)
+                        Icon(vectorResource(Res.drawable.more_vert_24px), null)
                     }
 
                     ArtifactOptionsDropdown(
@@ -378,7 +418,7 @@ fun ArtifactOptionsDropdown(
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.edit_label)) },
-            leadingIcon = { Icon(Icons.Outlined.Edit, null) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
             onClick = {
                 onEditClick()
                 onDismissRequest()
@@ -387,7 +427,7 @@ fun ArtifactOptionsDropdown(
 
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.archive_label)) },
-            leadingIcon = { Icon(Icons.Outlined.Lock, null) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.archive_24px), null) },
             onClick = {
                 onArchiveClick()
                 onDismissRequest()

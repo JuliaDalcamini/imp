@@ -35,6 +35,10 @@ import com.julia.imp.team.NoTeamsRoute
 import com.julia.imp.team.NoTeamsScreen
 import com.julia.imp.team.create.CreateTeamRoute
 import com.julia.imp.team.create.CreateTeamScreen
+import com.julia.imp.team.manage.ManageTeamRoute
+import com.julia.imp.team.manage.ManageTeamScreen
+import com.julia.imp.team.member.list.TeamMembersRoute
+import com.julia.imp.team.member.list.TeamMembersScreen
 
 @Composable
 fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
@@ -96,11 +100,25 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     )
                 }
 
+                composable<ManageTeamRoute> {
+                    ManageTeamScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onManageMembersClick = { navController.navigate(TeamMembersRoute) }
+                    )
+                }
+
+                composable<TeamMembersRoute> {
+                    TeamMembersScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+
                 composable<ProjectsRoute> {
                     ProjectsScreen(
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
                         onProjectClick = { navController.navigate(ArtifactsRoute(it.id)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
+                        onManageTeamClick = { navController.navigate(ManageTeamRoute) },
                         onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
                         onShowReportRequest = onShowReportRequest
                     )

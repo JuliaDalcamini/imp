@@ -1,4 +1,4 @@
-package com.julia.imp.project.list
+package com.julia.imp.team.member.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,74 +34,64 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.julia.imp.common.session.SessionManager
-import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.project.Project
-import com.julia.imp.report.ProjectReportGenerator
-import com.julia.imp.team.switcher.TeamSwitcher
+import com.julia.imp.team.member.Role
+import com.julia.imp.team.member.TeamMember
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
-import imp.composeapp.generated.resources.created_by_format
-import imp.composeapp.generated.resources.delete_24px
-import imp.composeapp.generated.resources.delete_label
-import imp.composeapp.generated.resources.delete_project_message
-import imp.composeapp.generated.resources.delete_project_title
-import imp.composeapp.generated.resources.description_24px
-import imp.composeapp.generated.resources.edit_24px
-import imp.composeapp.generated.resources.generate_report_label
+import imp.composeapp.generated.resources.add_member_label
+import imp.composeapp.generated.resources.add_member_title
+import imp.composeapp.generated.resources.arrow_back_24px
+import imp.composeapp.generated.resources.change_role_label
+import imp.composeapp.generated.resources.change_role_title
+import imp.composeapp.generated.resources.email_label
 import imp.composeapp.generated.resources.more_vert_24px
-import imp.composeapp.generated.resources.new_project_label
 import imp.composeapp.generated.resources.no_projects_message
+import imp.composeapp.generated.resources.person_remove_24px
 import imp.composeapp.generated.resources.projects_error_message
-import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.refresh_24px
-import imp.composeapp.generated.resources.rename_label
-import imp.composeapp.generated.resources.rename_project_title
+import imp.composeapp.generated.resources.remove_label
+import imp.composeapp.generated.resources.remove_member_message
+import imp.composeapp.generated.resources.remove_member_title
+import imp.composeapp.generated.resources.rule_settings_24px
+import imp.composeapp.generated.resources.team_member_role_format
+import imp.composeapp.generated.resources.team_members_title
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProjectsScreen(
-    onNewProjectClick: () -> Unit,
-    onProjectClick: (Project) -> Unit,
-    onTeamSwitch: (UserSession) -> Unit,
-    onManageTeamClick: () -> Unit,
-    onCreateTeamClick: () -> Unit,
-    onShowReportRequest: (List<ImageBitmap>) -> Unit,
-    viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
+fun TeamMembersScreen(
+    onBackClick: () -> Unit,
+    viewModel: TeamMembersViewModel = viewModel { TeamMembersViewModel() }
 ) {
-    LaunchedEffect(SessionManager.activeSession) {
-        viewModel.getProjects()
+    LaunchedEffect(Unit) {
+        viewModel.getMembers()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.projects_title)) },
-                actions = {
-                    TeamSwitcher(
-                        onTeamSwitch = onTeamSwitch,
-                        onManageTeamClick = onManageTeamClick,
-                        onCreateTeamClick = onCreateTeamClick
-                    )
+                title = { Text(stringResource(Res.string.team_members_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
+                    }
                 }
             )
         },
         floatingActionButton = {
-            if (viewModel.uiState.showCreateButton) {
-                NewProjectButton(onClick = onNewProjectClick)
+            if (viewModel.uiState.showAddButton) {
+                AddMemberButton(onClick = { viewModel.askToAdd() })
             }
         }
     ) { paddingValues ->
@@ -114,28 +104,25 @@ fun ProjectsScreen(
                 )
             }
 
-            viewModel.uiState.projects?.let { projects ->
-                if (projects.isNotEmpty()) {
+            viewModel.uiState.members?.let { members ->
+                if (members.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .consumeWindowInsets(paddingValues),
                         contentPadding = paddingValues
                     ) {
-                        items(projects) { project ->
-                            ProjectListItem(
+                        items(members) { member ->
+                            TeamMemberListItem(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp)
                                     .padding(bottom = 8.dp)
                                     .animateItem(),
-                                project = project,
-                                showRenameOption = viewModel.uiState.showRenameOption,
-                                showDeleteOption = viewModel.uiState.showDeleteOption,
-                                onClick = { onProjectClick(project) },
-                                onRenameClick = { viewModel.askToRename(project) },
-                                onDeleteClick = { viewModel.askToDelete(project) },
-                                onGenerateReportClick = { viewModel.generateReport(project) }
+                                member = member,
+                                showOptions = viewModel.uiState.showOptions,
+                                onChangeRoleClick = { viewModel.askToChangeRole(member) },
+                                onRemoveClick = { viewModel.askToRemove(member) }
                             )
                         }
 
@@ -169,7 +156,7 @@ fun ProjectsScreen(
 
                     TextButton(
                         modifier = Modifier.padding(top = 4.dp),
-                        onClick = { viewModel.getProjects() }
+                        onClick = { viewModel.getMembers() }
                     ) {
                         Icon(vectorResource(Res.drawable.refresh_24px), null)
                         Spacer(Modifier.width(8.dp))
@@ -180,27 +167,27 @@ fun ProjectsScreen(
         }
     }
 
-    viewModel.uiState.projectToDelete?.let { project ->
-        DeleteProjectDialog(
-            projectName = project.name,
-            onDismissRequest = { viewModel.dismissDeletion() },
-            onConfirm = { viewModel.delete(project) }
+    viewModel.uiState.memberToRemove?.let { member ->
+        RemoveMemberDialog(
+            memberName = member.fullName,
+            onDismissRequest = { viewModel.dismissRemoval() },
+            onConfirm = { viewModel.remove(member) }
         )
     }
 
-    viewModel.uiState.projectToRename?.let { project ->
-        RenameProjectDialog(
-            projectName = project.name,
-            onDismissRequest = { viewModel.dismissRenaming() },
-            onConfirm = { newName -> viewModel.rename(project, newName) }
+    viewModel.uiState.memberToChangeRole?.let { member ->
+        ChangeMemberRoleDialog(
+            currentRole = member.role,
+            onDismissRequest = { viewModel.dismissRoleChange() },
+            onConfirm = { newRole -> viewModel.changeRole(member, newRole) }
         )
     }
 
-    viewModel.uiState.projectToGenerateReport?.let { project ->
-        ProjectReportGenerator { pages ->
-            onShowReportRequest(pages)
-            viewModel.onReportOpened()
-        }
+    if (viewModel.uiState.showAddDialog) {
+        AddMemberDialog(
+            onDismissRequest = { viewModel.dismissAdding() },
+            onConfirm = { email, role -> viewModel.add(email, role) }
+        )
     }
 
     if (viewModel.uiState.actionError) {
@@ -213,40 +200,34 @@ fun ProjectsScreen(
 }
 
 @Composable
-fun NewProjectButton(
+fun AddMemberButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ExtendedFloatingActionButton(
         modifier = modifier,
-        text = { Text(stringResource(Res.string.new_project_label)) },
+        text = { Text(stringResource(Res.string.add_member_label)) },
         icon = { Icon(vectorResource(Res.drawable.add_24px), null) },
         onClick = onClick
     )
 }
 
 @Composable
-fun ProjectListItem(
-    project: Project,
-    showRenameOption: Boolean,
-    showDeleteOption: Boolean,
-    onClick: () -> Unit,
-    onRenameClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onGenerateReportClick: () -> Unit,
+fun TeamMemberListItem(
+    member: TeamMember,
+    showOptions: Boolean,
+    onChangeRoleClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(
-        modifier = modifier,
-        onClick = onClick,
-    ) {
+    ElevatedCard(modifier = modifier) {
         Row(
             modifier = Modifier.padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = project.name,
+                    text = member.fullName,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -255,7 +236,7 @@ fun ProjectListItem(
 
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = stringResource(Res.string.created_by_format, project.creator.fullName),
+                    text = stringResource(Res.string.team_member_role_format, member.role.name),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -263,36 +244,32 @@ fun ProjectListItem(
                 )
             }
 
-            Box {
-                var expandOptions by remember { mutableStateOf(false) }
+            if (showOptions) {
+                Box {
+                    var expandOptions by remember { mutableStateOf(false) }
 
-                IconButton(onClick = { expandOptions = true }) {
-                    Icon(vectorResource(Res.drawable.more_vert_24px), null)
+                    IconButton(onClick = { expandOptions = true }) {
+                        Icon(vectorResource(Res.drawable.more_vert_24px), null)
+                    }
+
+                    TeamMemberOptionsDropdown(
+                        expanded = expandOptions,
+                        onDismissRequest = { expandOptions = false },
+                        onChangeRoleClick = onChangeRoleClick,
+                        onRemoveClick = onRemoveClick
+                    )
                 }
-
-                ProjectOptionsDropdown(
-                    expanded = expandOptions,
-                    onDismissRequest = { expandOptions = false },
-                    showRenameOption = showRenameOption,
-                    showDeleteOption = showDeleteOption,
-                    onRenameClick = onRenameClick,
-                    onDeleteClick = onDeleteClick,
-                    onGenerateReportClick = onGenerateReportClick
-                )
             }
         }
     }
 }
 
 @Composable
-fun ProjectOptionsDropdown(
+fun TeamMemberOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    showRenameOption: Boolean,
-    showDeleteOption: Boolean,
-    onRenameClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onGenerateReportClick: () -> Unit,
+    onChangeRoleClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
@@ -301,62 +278,66 @@ fun ProjectOptionsDropdown(
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
-            text = { Text(stringResource(Res.string.generate_report_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.description_24px), null) },
+            text = { Text(stringResource(Res.string.change_role_label)) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.rule_settings_24px), null) },
             onClick = {
-                onGenerateReportClick()
+                onChangeRoleClick()
                 onDismissRequest()
             }
         )
 
-        if (showRenameOption) {
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.rename_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
-                onClick = {
-                    onRenameClick()
-                    onDismissRequest()
-                }
-            )
-        }
-
-        if (showDeleteOption) {
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.delete_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.delete_24px), null) },
-                onClick = {
-                    onDeleteClick()
-                    onDismissRequest()
-                }
-            )
-        }
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.remove_label)) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.person_remove_24px), null) },
+            onClick = {
+                onRemoveClick()
+                onDismissRequest()
+            }
+        )
     }
 }
 
 @Composable
-fun RenameProjectDialog(
-    projectName: String,
+fun ChangeMemberRoleDialog(
+    currentRole: Role,
     onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (Role) -> Unit
 ) {
+    // TODO: Implement role change UI
+
     TextInputDialog(
-        title = stringResource(Res.string.rename_project_title),
-        initialValue = projectName,
+        title = stringResource(Res.string.change_role_title),
+        initialValue = currentRole.name,
+        onDismissRequest = onDismissRequest,
+        onConfirm = { onConfirm(Role.valueOf(it)) }
+    )
+}
+
+@Composable
+fun RemoveMemberDialog(
+    memberName: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(Res.string.remove_member_title),
+        message = stringResource(Res.string.remove_member_message, memberName),
         onDismissRequest = onDismissRequest,
         onConfirm = onConfirm
     )
 }
 
 @Composable
-fun DeleteProjectDialog(
-    projectName: String,
+fun AddMemberDialog(
     onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (String, Role) -> Unit
 ) {
-    ConfirmationDialog(
-        title = stringResource(Res.string.delete_project_title),
-        message = stringResource(Res.string.delete_project_message, projectName),
+    // TODO: Implement role selection UI
+
+    TextInputDialog(
+        title = stringResource(Res.string.add_member_title),
+        placeholder = stringResource(Res.string.email_label),
         onDismissRequest = onDismissRequest,
-        onConfirm = onConfirm
+        onConfirm = { onConfirm(it, Role.Viewer) }
     )
 }
