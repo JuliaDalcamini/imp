@@ -65,7 +65,7 @@ fun TeamSwitcher(
         onClick = { viewModel.openSwitcher() }
     )
 
-    if (uiState.isSwitcherOpen) {
+    if (uiState.switcherOpen) {
         BasicAlertDialog(
             onDismissRequest = { viewModel.closeSwitcher() }
         ) {
@@ -94,7 +94,7 @@ fun TeamSwitcher(
                             )
                         }
                         
-                        uiState.isLoading -> {
+                        uiState.loading -> {
                             TeamSwitcherListPlaceholder(Modifier.fillMaxWidth())
                         }
 

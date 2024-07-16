@@ -4,9 +4,10 @@ import com.julia.imp.artifact.Artifact
 
 data class ArtifactsUiState(
     val filter: ArtifactFilter = ArtifactFilter.Active,
-    val isLoading: Boolean = false,
+    val loading: Boolean = false,
     val entries: List<ArtifactListEntry>? = null,
-    val isError: Boolean = false,
+    val error: Boolean = false,
     val showCreateButton: Boolean = false,
-    val artifactToArchive: Artifact? = null
+    val artifactToArchive: Artifact? = null,
+    val actionError: Boolean = false
 )

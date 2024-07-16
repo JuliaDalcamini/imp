@@ -41,6 +41,8 @@
     <string name="user_value_weight_label">Peso do valor para o usuário</string>
     <string name="complexity_weight_label">Peso da complexidade</string>
     <string name="impact_weight_label">Peso do impacto</string>
+    <string name="create_project_error_title">Erro ao criar projeto</string>
+    <string name="create_project_error_message">Ocorreu um erro ao criar o projeto. Por favor, tente novamente.</string>
     <string name="artifacts_title">Artefatos</string>
     <string name="filter_active">Ativos</string>
     <string name="filter_assigned_to_me">Atribuídos a mim</string>
@@ -63,4 +65,8 @@
     <string name="new_team_title">Novo time</string>
     <string name="team_name_label">Nome do time</string>
     <string name="create_team_label">Criar time</string>
+    <string name="create_team_error_title">Erro ao criar time</string>
+    <string name="create_team_error_message">Ocorreu um erro ao criar o time. Por favor, tente novamente.</string>
+    <string name="action_error_title">Erro</string>
+    <string name="action_error_message">Ocorreu um erro ao executar a ação. Por favor, tente novamente.</string>
 </resources>

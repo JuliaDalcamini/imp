@@ -18,7 +18,8 @@ fun ConfirmationDialog(
     message: String,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
-    icon: @Composable () -> Unit = { Icon(Icons.Outlined.Warning, null) }
+    icon: @Composable () -> Unit = { Icon(Icons.Outlined.Warning, null) },
+    showDismissButton: Boolean = true
 ) {
     AlertDialog(
         icon = icon,
@@ -26,8 +27,10 @@ fun ConfirmationDialog(
         text = { Text(text = message) },
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(Res.string.cancel_label))
+            if (showDismissButton) {
+                TextButton(onClick = onDismissRequest) {
+                    Text(stringResource(Res.string.cancel_label))
+                }
             }
         },
         confirmButton = {

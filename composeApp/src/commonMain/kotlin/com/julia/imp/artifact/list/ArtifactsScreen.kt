@@ -49,11 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.MoscowPriorityLevel
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.action_error_message
+import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.archive_artifact_message
 import imp.composeapp.generated.resources.archive_artifact_title
 import imp.composeapp.generated.resources.archive_label
@@ -103,7 +106,7 @@ fun ArtifactsScreen(
         }
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
-            if (viewModel.uiState.isLoading) {
+            if (viewModel.uiState.loading) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -123,14 +126,22 @@ fun ArtifactsScreen(
                 onFilterChange = { viewModel.setFilter(it) }
             )
         }
+    }
 
-        viewModel.uiState.artifactToArchive?.let { artifact ->
-            ArchiveArtifactDialog(
-                artifactName = artifact.name,
-                onDismissRequest = { viewModel.dismissArchiving() },
-                onConfirm = { viewModel.archive(artifact) }
-            )
-        }
+    viewModel.uiState.artifactToArchive?.let { artifact ->
+        ArchiveArtifactDialog(
+            artifactName = artifact.name,
+            onDismissRequest = { viewModel.dismissArchiving() },
+            onConfirm = { viewModel.archive(artifact) }
+        )
+    }
+
+    if (viewModel.uiState.actionError) {
+        ErrorDialog(
+            title = stringResource(Res.string.action_error_title),
+            message = stringResource(Res.string.action_error_message),
+            onDismissRequest = { viewModel.dismissActionError() }
+        )
     }
 }
 

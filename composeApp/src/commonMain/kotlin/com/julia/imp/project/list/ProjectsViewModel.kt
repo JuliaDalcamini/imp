@@ -24,7 +24,7 @@ class ProjectsViewModel(
                 val isAdmin = requireSession().isTeamAdmin
 
                 uiState = ProjectsUiState(
-                    isLoading = true,
+                    loading = true,
                     showCreateButton = isAdmin,
                     showRenameOption = isAdmin,
                     showDeleteOption = isAdmin
@@ -36,7 +36,7 @@ class ProjectsViewModel(
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = true)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }
@@ -55,8 +55,7 @@ class ProjectsViewModel(
                 repository.deleteProject(project.id)
                 getProjects()
             } catch (error: Throwable) {
-                // TODO: Handle error
-                error.printStackTrace()
+                uiState = uiState.copy(actionError = true)
             }
         }
     }
@@ -75,8 +74,7 @@ class ProjectsViewModel(
                 repository.renameProject(project.id, newName)
                 getProjects()
             } catch (error: Throwable) {
-                // TODO: Handle error
-                error.printStackTrace()
+                uiState = uiState.copy(actionError = true)
             }
         }
     }
@@ -87,5 +85,9 @@ class ProjectsViewModel(
 
     fun onReportOpened() {
         uiState = uiState.copy(projectToGenerateReport = null)
+    }
+
+    fun dismissActionError() {
+        uiState = uiState.copy(actionError = false)
     }
 }

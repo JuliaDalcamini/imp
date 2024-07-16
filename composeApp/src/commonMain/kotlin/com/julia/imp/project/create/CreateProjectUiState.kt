@@ -7,5 +7,6 @@ data class CreateProjectUiState(
     val name: String = "",
     val prioritizer: Prioritizer = MoscowPrioritizer,
     val loading: Boolean = false,
-    val created: Boolean = false
+    val created: Boolean = false,
+    val error: Boolean = false
 )

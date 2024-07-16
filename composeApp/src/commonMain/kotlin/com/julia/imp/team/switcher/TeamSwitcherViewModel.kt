@@ -24,10 +24,10 @@ class TeamSwitcherViewModel(
 
     fun openSwitcher() {
         uiState = uiState.copy(
-            isLoading = true,
+            loading = true,
             teams = null,
             error = null,
-            isSwitcherOpen = true
+            switcherOpen = true
         )
 
         viewModelScope.launch {
@@ -37,17 +37,17 @@ class TeamSwitcherViewModel(
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = ErrorLoadingTeams)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }
 
     fun closeSwitcher() {
-        uiState = uiState.copy(isSwitcherOpen = false)
+        uiState = uiState.copy(switcherOpen = false)
     }
 
     fun switchToTeam(team: Team) {
-        uiState = uiState.copy(isLoading = true, teams = null)
+        uiState = uiState.copy(loading = true, teams = null)
 
         viewModelScope.launch {
             try {
@@ -61,7 +61,7 @@ class TeamSwitcherViewModel(
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = ErrorSwitchingActiveTeam)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }

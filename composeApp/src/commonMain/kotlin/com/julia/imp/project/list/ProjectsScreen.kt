@@ -49,11 +49,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.RenameDialog
 import com.julia.imp.project.Project
 import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.action_error_message
+import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.created_by_format
 import imp.composeapp.generated.resources.delete_label
 import imp.composeapp.generated.resources.delete_project_message
@@ -101,7 +104,7 @@ fun ProjectsScreen(
         }
     ) { paddingValues ->
         Box(Modifier.fillMaxSize()) {
-            if (viewModel.uiState.isLoading) {
+            if (viewModel.uiState.loading) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -172,30 +175,38 @@ fun ProjectsScreen(
                     }
                 }
             }
-
-            viewModel.uiState.projectToDelete?.let { project ->
-                DeleteProjectDialog(
-                    projectName = project.name,
-                    onDismissRequest = { viewModel.dismissDeletion() },
-                    onConfirm = { viewModel.delete(project) }
-                )
-            }
-
-            viewModel.uiState.projectToRename?.let { project ->
-                RenameProjectDialog(
-                    projectName = project.name,
-                    onDismissRequest = { viewModel.dismissRenaming() },
-                    onConfirm = { newName -> viewModel.rename(project, newName) }
-                )
-            }
-
-            viewModel.uiState.projectToGenerateReport?.let { project ->
-                ProjectReportGenerator { pages ->
-                    onShowReportRequest(pages)
-                    viewModel.onReportOpened()
-                }
-            }
         }
+    }
+
+    viewModel.uiState.projectToDelete?.let { project ->
+        DeleteProjectDialog(
+            projectName = project.name,
+            onDismissRequest = { viewModel.dismissDeletion() },
+            onConfirm = { viewModel.delete(project) }
+        )
+    }
+
+    viewModel.uiState.projectToRename?.let { project ->
+        RenameProjectDialog(
+            projectName = project.name,
+            onDismissRequest = { viewModel.dismissRenaming() },
+            onConfirm = { newName -> viewModel.rename(project, newName) }
+        )
+    }
+
+    viewModel.uiState.projectToGenerateReport?.let { project ->
+        ProjectReportGenerator { pages ->
+            onShowReportRequest(pages)
+            viewModel.onReportOpened()
+        }
+    }
+
+    if (viewModel.uiState.actionError) {
+        ErrorDialog(
+            title = stringResource(Res.string.action_error_title),
+            message = stringResource(Res.string.action_error_message),
+            onDismissRequest = { viewModel.dismissActionError() }
+        )
     }
 }
 

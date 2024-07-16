@@ -17,15 +17,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -39,13 +34,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.auth.UserCredentials
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.button.SecondaryButton
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.create_account_label
 import imp.composeapp.generated.resources.create_account_title
 import imp.composeapp.generated.resources.email_label
 import imp.composeapp.generated.resources.first_name_label
 import imp.composeapp.generated.resources.last_name_label
-import imp.composeapp.generated.resources.ok_label
 import imp.composeapp.generated.resources.password_confirmation_label
 import imp.composeapp.generated.resources.password_label
 import imp.composeapp.generated.resources.register_error_message
@@ -109,7 +104,7 @@ fun RegisterScreen(
                     onPasswordChange = { viewModel.setPassword(it) },
                     onPasswordConfirmationChange = { viewModel.setPasswordConfirmation(it) },
                     passwordMismatch = viewModel.uiState.passwordMismatch,
-                    enabled = !viewModel.uiState.isLoading
+                    enabled = !viewModel.uiState.loading
                 )
 
                 if (compact) Spacer(Modifier.weight(1f))
@@ -119,7 +114,7 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .padding(bottom = 24.dp),
                     compact = compact,
-                    loading = viewModel.uiState.isLoading,
+                    loading = viewModel.uiState.loading,
                     onRegisterClick = { viewModel.register() },
                     onLoginClick = onLoginClick
                 )
@@ -134,16 +129,10 @@ fun RegisterScreen(
 
 @Composable
 fun RegisterErrorDialog(onDismissRequest: () -> Unit) {
-    AlertDialog(
-        icon = { Icon(Icons.Outlined.Warning, null) },
-        title = { Text(text = stringResource(Res.string.register_error_title)) },
-        text = { Text(text = stringResource(Res.string.register_error_message)) },
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(Res.string.ok_label))
-            }
-        }
+    ErrorDialog(
+        title = stringResource(Res.string.register_error_title),
+        message = stringResource(Res.string.register_error_message),
+        onDismissRequest = onDismissRequest
     )
 }
 

@@ -29,12 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.form.FormField
 import com.julia.imp.common.ui.form.SliderFormField
 import com.julia.imp.priority.MoscowPrioritizer
 import com.julia.imp.priority.WiegersPrioritizer
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.complexity_weight_label
+import imp.composeapp.generated.resources.create_project_error_message
+import imp.composeapp.generated.resources.create_project_error_title
 import imp.composeapp.generated.resources.create_project_label
 import imp.composeapp.generated.resources.impact_weight_label
 import imp.composeapp.generated.resources.moscow_label
@@ -161,6 +164,14 @@ fun CreateProjectScreen(
                 enabled = !viewModel.uiState.loading,
                 loading = viewModel.uiState.loading
             )
+
+            if (viewModel.uiState.error) {
+                ErrorDialog(
+                    title = stringResource(Res.string.create_project_error_title),
+                    message = stringResource(Res.string.create_project_error_message),
+                    onDismissRequest = { viewModel.dismissError() }
+                )
+            }
         }
     }
 }

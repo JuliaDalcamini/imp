@@ -5,8 +5,8 @@ import com.julia.imp.team.Team
 
 data class TeamSwitcherUiState(
     val currentTeam: Team,
-    val isSwitcherOpen: Boolean = false,
-    val isLoading: Boolean = false,
+    val switcherOpen: Boolean = false,
+    val loading: Boolean = false,
     val teams: List<Team>? = null,
     val error: TeamSwitcherError? = null,
     val newSession: UserSession? = null

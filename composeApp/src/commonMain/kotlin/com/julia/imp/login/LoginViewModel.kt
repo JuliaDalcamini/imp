@@ -20,7 +20,7 @@ class LoginViewModel(
     
     fun login() {
         viewModelScope.launch {
-            uiState = uiState.copy(showError = false, isLoading = true)
+            uiState = uiState.copy(showError = false, loading = true)
             
             try {
                 val response = repository.login(uiState.email, uiState.password)
@@ -44,7 +44,7 @@ class LoginViewModel(
             } catch (error: Throwable) {
                 uiState = uiState.copy(showError = true)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }

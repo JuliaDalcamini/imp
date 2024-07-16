@@ -38,10 +38,14 @@ class CreateTeamViewModel(
                     roleInTeam = teamMember.role
                 )
             } catch (error: Throwable) {
-                // TODO: Handle error
+                uiState = uiState.copy(error = true)
             } finally {
                 uiState = uiState.copy(loading = false)
             }
         }
+    }
+
+    fun dismissError() {
+        uiState = uiState.copy(error = false)
     }
 }

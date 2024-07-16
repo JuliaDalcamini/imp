@@ -25,7 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.create_team_error_message
+import imp.composeapp.generated.resources.create_team_error_title
 import imp.composeapp.generated.resources.create_team_label
 import imp.composeapp.generated.resources.new_team_title
 import imp.composeapp.generated.resources.team_name_label
@@ -86,5 +89,13 @@ fun CreateTeamScreen(
                 loading = viewModel.uiState.loading
             )
         }
+    }
+
+    if (viewModel.uiState.error) {
+        ErrorDialog(
+            title = stringResource(Res.string.create_team_error_title),
+            message = stringResource(Res.string.create_team_error_message),
+            onDismissRequest = { viewModel.dismissError() }
+        )
     }
 }

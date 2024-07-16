@@ -23,7 +23,7 @@ class ArtifactsViewModel(
                 val isAdmin = requireSession().isTeamAdmin
 
                 uiState = ArtifactsUiState(
-                    isLoading = true,
+                    loading = true,
                     filter = filter,
                     showCreateButton = isAdmin
                 )
@@ -39,9 +39,9 @@ class ArtifactsViewModel(
                     }
                 )
             } catch (error: Throwable) {
-                uiState = uiState.copy(isError = true)
+                uiState = uiState.copy(error = true)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }
@@ -68,9 +68,12 @@ class ArtifactsViewModel(
 
                 getArtifacts(artifact.projectId, uiState.filter)
             } catch (error: Throwable) {
-                // TODO: Handle error
-                error.printStackTrace()
+                uiState = uiState.copy(actionError = true)
             }
         }
+    }
+
+    fun dismissActionError() {
+        uiState = uiState.copy(actionError = false)
     }
 }

@@ -17,7 +17,7 @@ class RegisterViewModel(
 
     fun register() {
         viewModelScope.launch {
-            uiState = uiState.copy(showError = false, isLoading = true)
+            uiState = uiState.copy(showError = false, loading = true)
 
             try {
                 val credentials = UserCredentials(
@@ -35,7 +35,7 @@ class RegisterViewModel(
             } catch (error: Throwable) {
                 uiState = uiState.copy(showError = true)
             } finally {
-                uiState = uiState.copy(isLoading = false)
+                uiState = uiState.copy(loading = false)
             }
         }
     }
