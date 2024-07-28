@@ -14,10 +14,8 @@ import kotlinx.datetime.Clock.System
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSString
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
-import platform.Foundation.stringByAppendingPathComponent
 import platform.UIKit.UIDocumentInteractionController
 import platform.UIKit.UIViewController
 
@@ -53,11 +51,11 @@ private fun createReportDir(): String {
         directory = NSCachesDirectory,
         domainMask = NSUserDomainMask,
         expandTilde = true
-    ).first() as? NSString
+    ).first() as? String
 
     if (cacheDir == null) throw IllegalStateException("Failed to get cache directory")
 
-    val reportsDir = cacheDir.stringByAppendingPathComponent("reports")
+    val reportsDir = cacheDir.appendPathComponent("reports")
 
     NSFileManager().createDirectoryAtPath(
         path = reportsDir,
