@@ -13,7 +13,6 @@ import com.julia.imp.common.pdf.getPdfWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.io.files.Path
 import java.io.File
 
 class MainActivity : ComponentActivity() {
@@ -30,12 +29,12 @@ class MainActivity : ComponentActivity() {
     private fun saveAndOpenReport(images: List<ImageBitmap>) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val imagesFolder = File(cacheDir, "reports").also { it.mkdirs() }
-                val file = File(imagesFolder, "report-${System.currentTimeMillis()}.pdf")
+                val reportsDir = File(cacheDir, "reports").also { it.mkdirs() }
+                val file = File(reportsDir, "report-${System.currentTimeMillis()}.pdf")
 
                 getPdfWriter().createFromImages(
                     images = images,
-                    writeTo = Path(file.path)
+                    writeTo = file.path
                 )
 
                 openPdf(file.getShareableUri(this@MainActivity, "com.julia.imp.fileprovider"))

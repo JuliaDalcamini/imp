@@ -7,7 +7,6 @@ import com.julia.imp.common.pdf.getPdfWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.io.files.Path
 import java.awt.Desktop
 import java.nio.file.Files
 import kotlin.io.path.pathString
@@ -31,7 +30,7 @@ private suspend fun shareReport(images: List<ImageBitmap>) {
 
         getPdfWriter().createFromImages(
             images = images,
-            writeTo = Path(path.pathString)
+            writeTo = path.pathString
         )
 
         Desktop.getDesktop().open(path.toFile())

@@ -3,7 +3,6 @@ package com.julia.imp.common.pdf
 import androidx.compose.ui.graphics.ImageBitmap
 import com.julia.imp.common.image.toUIImage
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.io.files.Path
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.writeToFile
 import platform.UIKit.UIGraphicsPDFRenderer
@@ -11,7 +10,7 @@ import platform.UIKit.UIGraphicsPDFRenderer
 private object IosPdfWriter : PdfWriter {
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: Path) {
+    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: String) {
         val renderer = UIGraphicsPDFRenderer()
 
         val data = renderer.PDFDataWithActions { actions ->
@@ -37,7 +36,7 @@ private object IosPdfWriter : PdfWriter {
         }
 
         data.writeToFile(
-            path = writeTo.toString(),
+            path = writeTo,
             atomically = true
         )
     }

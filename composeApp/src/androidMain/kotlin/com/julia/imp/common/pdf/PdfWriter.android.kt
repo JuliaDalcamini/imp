@@ -5,12 +5,11 @@ import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import kotlinx.io.files.Path
 import java.io.File
 
 private object AndroidPdfWriter : PdfWriter {
 
-    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: Path) {
+    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: String) {
         val document = PdfDocument()
 
         images.forEachIndexed { index, image ->
@@ -22,7 +21,7 @@ private object AndroidPdfWriter : PdfWriter {
             document.finishPage(page)
         }
 
-        val file = File(writeTo.toString())
+        val file = File(writeTo)
 
         document.writeTo(file.outputStream())
         document.close()

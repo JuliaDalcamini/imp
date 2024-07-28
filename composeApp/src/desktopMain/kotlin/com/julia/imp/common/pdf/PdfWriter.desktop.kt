@@ -5,15 +5,14 @@ import androidx.compose.ui.graphics.toAwtImage
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.Rectangle
-import kotlinx.io.files.Path
 import java.io.File
 import com.itextpdf.text.pdf.PdfWriter as ITextPdfWriter
 
 private object DesktopPdfWriter : PdfWriter {
 
-    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: Path) {
+    override suspend fun createFromImages(images: List<ImageBitmap>, writeTo: String) {
         val document = Document()
-        val file = File(writeTo.toString())
+        val file = File(writeTo)
 
         file.outputStream().use { outStream ->
             val writer = ITextPdfWriter.getInstance(document, outStream)
