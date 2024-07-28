@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.dialog.SelectionDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
 import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
@@ -236,7 +237,7 @@ fun TeamMemberListItem(
 
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = stringResource(Res.string.team_member_role_format, member.role.name),
+                    text = stringResource(Res.string.team_member_role_format, member.role.getLabel()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -303,13 +304,13 @@ fun ChangeMemberRoleDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (Role) -> Unit
 ) {
-    // TODO: Implement role change UI
-
-    TextInputDialog(
+    SelectionDialog(
         title = stringResource(Res.string.change_role_title),
-        initialValue = currentRole.name,
+        options = Role.entries,
         onDismissRequest = onDismissRequest,
-        onConfirm = { onConfirm(Role.valueOf(it)) }
+        onConfirm = onConfirm,
+        initialSelection = currentRole,
+        optionLabel = { role -> Text(role.getLabel()) }
     )
 }
 
@@ -332,8 +333,6 @@ fun AddMemberDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (String, Role) -> Unit
 ) {
-    // TODO: Implement role selection UI
-
     TextInputDialog(
         title = stringResource(Res.string.add_member_title),
         placeholder = stringResource(Res.string.email_label),

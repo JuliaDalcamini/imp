@@ -85,4 +85,8 @@
     <string name="remove_member_title">Remover membro</string>
     <string name="remove_member_message">Tem certeza de que deseja remover o membro %1$s? Ele não terá mais acesso ao time.</string>
     <string name="add_member_title">Adicionar membro</string>
+    <string name="confirm_label">Confirmar</string>
+    <string name="admin_label">Administrador</string>
+    <string name="inspector_label">Inspetor</string>
+    <string name="viewer_label">Visualizador</string>
 </resources>
