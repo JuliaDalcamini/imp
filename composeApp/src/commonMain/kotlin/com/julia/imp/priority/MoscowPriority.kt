@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("moscow")
 data class MoscowPriority(
-    val level: MoscowPriorityLevel
+    val level: MoscowPriorityLevel = MoscowPriorityLevel.WontHave
 ) : Priority()

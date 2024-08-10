@@ -48,7 +48,6 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.priority.MoscowPriority
-import com.julia.imp.priority.MoscowPriorityLevel
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
 import imp.composeapp.generated.resources.Res
@@ -73,10 +72,7 @@ import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
 import imp.composeapp.generated.resources.no_artifacts_message
-import imp.composeapp.generated.resources.priority_moscow_could_have
-import imp.composeapp.generated.resources.priority_moscow_must_have
-import imp.composeapp.generated.resources.priority_moscow_should_have
-import imp.composeapp.generated.resources.priority_moscow_wont_have
+import imp.composeapp.generated.resources.priority_moscow_format
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.refresh_24px
 import imp.composeapp.generated.resources.try_again_label
@@ -381,17 +377,8 @@ fun ArtifactListItem(
 @Composable
 private fun getPriorityText(priority: Priority) =
     when (priority) {
-        is MoscowPriority -> getMoscowPriorityText(priority)
+        is MoscowPriority -> stringResource(Res.string.priority_moscow_format, priority.level.getLabel())
         is WiegersPriority -> getWiegersPriorityText(priority)
-    }
-
-@Composable
-private fun getMoscowPriorityText(priority: MoscowPriority) =
-    when (priority.level) {
-        MoscowPriorityLevel.WontHave -> stringResource(Res.string.priority_moscow_wont_have)
-        MoscowPriorityLevel.CouldHave -> stringResource(Res.string.priority_moscow_could_have)
-        MoscowPriorityLevel.ShouldHave -> stringResource(Res.string.priority_moscow_should_have)
-        MoscowPriorityLevel.MustHave -> stringResource(Res.string.priority_moscow_must_have)
     }
 
 @Composable

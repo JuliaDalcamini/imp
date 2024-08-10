@@ -23,12 +23,12 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseDialog(
+private fun BaseDialog(
     title: String,
+    onConfirm: (() -> Unit)?,
+    enableConfirm: Boolean,
     onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
-    enableConfirm: Boolean = true,
     content: @Composable () -> Unit
 ) {
     BasicAlertDialog(
@@ -65,17 +65,55 @@ fun BaseDialog(
                         Text(stringResource(Res.string.cancel_label))
                     }
 
-                    TextButton(
-                        enabled = enableConfirm,
-                        onClick = {
-                            onConfirm()
-                            onDismissRequest()
+                    if (onConfirm != null) {
+                        TextButton(
+                            enabled = enableConfirm,
+                            onClick = {
+                                onConfirm()
+                                onDismissRequest()
+                            }
+                        ) {
+                            Text(stringResource(Res.string.confirm_label))
                         }
-                    ) {
-                        Text(stringResource(Res.string.confirm_label))
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun BaseDialog(
+    title: String,
+    onConfirm: (() -> Unit),
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    enableConfirm: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    BaseDialog(
+        title = title,
+        onConfirm = onConfirm,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier,
+        enableConfirm = enableConfirm,
+        content = content
+    )
+}
+
+@Composable
+fun BaseDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    BaseDialog(
+        title = title,
+        onConfirm = null,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier,
+        enableConfirm = false,
+        content = content
+    )
 }

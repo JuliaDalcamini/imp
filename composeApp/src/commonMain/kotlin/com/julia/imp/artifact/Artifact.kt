@@ -1,6 +1,7 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.priority.Priority
+import com.julia.imp.team.inspector.Inspector
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,5 +11,6 @@ data class Artifact(
     val type: ArtifactType,
     val projectId: String,
     val priority: Priority,
-    val archived: Boolean
+    val archived: Boolean,
+    val inspectors: List<Inspector>
 )

@@ -18,6 +18,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.julia.imp.artifact.create.CreateArtifactRoute
+import com.julia.imp.artifact.create.CreateArtifactScreen
+import com.julia.imp.artifact.edit.EditArtifactRoute
+import com.julia.imp.artifact.edit.EditArtifactScreen
 import com.julia.imp.artifact.list.ArtifactsRoute
 import com.julia.imp.artifact.list.ArtifactsScreen
 import com.julia.imp.common.auth.UserCredentials
@@ -116,7 +120,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                 composable<ProjectsRoute> {
                     ProjectsScreen(
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
-                        onProjectClick = { navController.navigate(ArtifactsRoute(it.id)) },
+                        onProjectClick = { navController.navigate(ArtifactsRoute(it)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
                         onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
@@ -129,20 +133,49 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onBackClick = { navController.popBackStack() },
                         onProjectCreated = {
                             navController.navigate(ProjectsRoute) {
-                                popUpTo(ProjectsRoute) { inclusive = true }
+                                popUpTo<ProjectsRoute> { inclusive = true }
                             }
                         }
                     )
                 }
 
-                composable<ArtifactsRoute> { entry ->
+                composable<ArtifactsRoute>(ArtifactsRoute.typeMap) { entry ->
                     val route = entry.toRoute<ArtifactsRoute>()
 
                     ArtifactsScreen(
-                        projectId = route.projectId,
+                        projectId = route.project.id,
                         onBackClick = { navController.popBackStack() },
-                        onNewArtifactClick = {},
-                        onEditArtifactClick = {}
+                        onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
+                        onEditArtifactClick = { navController.navigate(EditArtifactRoute(route.project, it)) }
+                    )
+                }
+
+                composable<CreateArtifactRoute>(CreateArtifactRoute.typeMap) { entry ->
+                    val route = entry.toRoute<CreateArtifactRoute>()
+
+                    CreateArtifactScreen(
+                        projectId = route.project.id,
+                        prioritizer = route.project.prioritizer,
+                        onBackClick = { navController.popBackStack() },
+                        onArtifactCreated = {
+                            navController.navigate(ArtifactsRoute(route.project)) {
+                                popUpTo<ArtifactsRoute> { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable<EditArtifactRoute>(EditArtifactRoute.typeMap) { entry ->
+                    val route = entry.toRoute<EditArtifactRoute>()
+
+                    EditArtifactScreen(
+                        artifact = route.artifact,
+                        onBackClick = { navController.popBackStack() },
+                        onArtifactSaved = {
+                            navController.navigate(ArtifactsRoute(route.project)) {
+                                popUpTo<ArtifactsRoute> { inclusive = true }
+                            }
+                        }
                     )
                 }
             }
@@ -160,6 +193,3 @@ private fun NavController.navigateToLogin(credentials: UserCredentials) =
     this.navigate(LoginRoute.of(credentials)) {
         popUpTo<LoginRoute> { inclusive = true }
     }
-
-private val NavController.isAtLogin: Boolean
-    get() =  this.currentBackStackEntry?.destination?.route == LoginRoute::class.qualifiedName

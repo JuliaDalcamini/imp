@@ -3,7 +3,6 @@ package com.julia.imp.team.member.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,11 +15,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,6 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.text.getInitials
+import com.julia.imp.common.ui.avatar.Avatar
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.SelectionDialog
@@ -221,30 +222,24 @@ fun TeamMemberListItem(
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(modifier = modifier) {
-        Row(
-            modifier = Modifier.padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = member.fullName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = stringResource(Res.string.team_member_role_format, member.role.getLabel()),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
+    ListItem(
+        modifier = modifier,
+        leadingContent = { Avatar(member.fullName.getInitials()) },
+        headlineContent = {
+            Text(
+                text = member.fullName,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        supportingContent = {
+            Text(
+                text = stringResource(Res.string.team_member_role_format, member.role.getLabel()),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        trailingContent = {
             if (showOptions) {
                 Box {
                     var expandOptions by remember { mutableStateOf(false) }
@@ -262,7 +257,7 @@ fun TeamMemberListItem(
                 }
             }
         }
-    }
+    )
 }
 
 @Composable

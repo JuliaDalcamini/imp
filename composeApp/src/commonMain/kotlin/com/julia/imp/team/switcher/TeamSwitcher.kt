@@ -28,11 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.text.getInitials
+import com.julia.imp.common.ui.avatar.Avatar
+import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.team.Team
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorSwitchingActiveTeam
@@ -46,8 +47,6 @@ import imp.composeapp.generated.resources.switch_team_error
 import imp.composeapp.generated.resources.switch_team_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-
-private val TeamIconSize = 40.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +63,7 @@ fun TeamSwitcher(
         uiState.newSession?.let { onTeamSwitch(it) }
     }
     
-    TeamIcon(
+    Avatar(
         modifier = modifier,
         initials = uiState.currentTeam.name.getInitials(),
         onClick = { viewModel.openSwitcher() }
@@ -169,7 +168,7 @@ private fun TeamSwitcherList(
                     .wrapContentHeight()
                     .animateItem(),
                 headlineContent = { Text(currentTeam.name) },
-                leadingContent = { TeamIcon(currentTeam.name.getInitials()) },
+                leadingContent = { Avatar(currentTeam.name.getInitials()) },
                 supportingContent = { Text(stringResource(Res.string.current_team_label)) },
                 trailingContent = {
                     IconButton(onClick = onManageTeamClick) {
@@ -191,7 +190,7 @@ private fun TeamSwitcherList(
                     .animateItem()
                     .clickable { onTeamClick(team) },
                 headlineContent = { Text(team.name) },
-                leadingContent = { TeamIcon(team.name.getInitials()) }
+                leadingContent = { Avatar(team.name.getInitials()) }
             )
         }
 
@@ -210,57 +209,9 @@ private fun TeamSwitcherList(
 }
 
 @Composable
-private fun TeamIcon(
-    initials: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.size(TeamIconSize),
-        onClick = onClick,
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = initials.uppercase(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
-
-@Composable
-private fun TeamIcon(
-    initials: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.size(TeamIconSize),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = initials.uppercase(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
-
-@Composable
 private fun CreateTeamIcon(modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.size(TeamIconSize),
+        modifier = modifier.size(AvatarSize.Medium.shapeSize),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {

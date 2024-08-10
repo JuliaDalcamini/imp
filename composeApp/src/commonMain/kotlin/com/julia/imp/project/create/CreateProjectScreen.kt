@@ -1,5 +1,6 @@
 package com.julia.imp.project.create
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -123,34 +124,11 @@ fun CreateProjectScreen(
                 }
 
                 if (prioritizer is WiegersPrioritizer) {
-                    WeightSliderFormField(
+                    WiegersPrioritizerFormFields(
                         modifier = Modifier.padding(top = 24.dp),
-                        label = stringResource(Res.string.user_value_weight_label),
-                        enabled = !viewModel.uiState.loading,
-                        value = prioritizer.userValueWeight.toFloat(),
-                        onValueChange = {
-                            viewModel.setPrioritizer(prioritizer.copy(userValueWeight = it.toDouble()))
-                        }
-                    )
-
-                    WeightSliderFormField(
-                        modifier = Modifier.padding(top = 24.dp),
-                        label = stringResource(Res.string.complexity_weight_label),
-                        enabled = !viewModel.uiState.loading,
-                        value = prioritizer.complexityWeight.toFloat(),
-                        onValueChange = {
-                            viewModel.setPrioritizer(prioritizer.copy(complexityWeight = it.toDouble()))
-                        }
-                    )
-
-                    WeightSliderFormField(
-                        modifier = Modifier.padding(top = 24.dp),
-                        label = stringResource(Res.string.impact_weight_label),
-                        enabled = !viewModel.uiState.loading,
-                        value = prioritizer.impactWeight.toFloat(),
-                        onValueChange = {
-                            viewModel.setPrioritizer(prioritizer.copy(impactWeight = it.toDouble()))
-                        }
+                        prioritizer = prioritizer,
+                        onValueChange = { viewModel.setPrioritizer(it) },
+                        enabled = !viewModel.uiState.loading
                     )
                 }
 
@@ -173,6 +151,40 @@ fun CreateProjectScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun WiegersPrioritizerFormFields(
+    prioritizer: WiegersPrioritizer,
+    onValueChange: (WiegersPrioritizer) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        WeightSliderFormField(
+            label = stringResource(Res.string.user_value_weight_label),
+            enabled = enabled,
+            value = prioritizer.userValueWeight.toFloat(),
+            onValueChange = { onValueChange(prioritizer.copy(userValueWeight = it.toDouble())) }
+        )
+
+        WeightSliderFormField(
+            label = stringResource(Res.string.complexity_weight_label),
+            enabled = enabled,
+            value = prioritizer.complexityWeight.toFloat(),
+            onValueChange = { onValueChange(prioritizer.copy(complexityWeight = it.toDouble())) }
+        )
+
+        WeightSliderFormField(
+            label = stringResource(Res.string.impact_weight_label),
+            enabled = enabled,
+            value = prioritizer.impactWeight.toFloat(),
+            onValueChange = { onValueChange(prioritizer.copy(impactWeight = it.toDouble())) }
+        )
     }
 }
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +22,7 @@ fun <T> SelectionDialog(
     onConfirm: (T) -> Unit,
     modifier: Modifier = Modifier,
     initialSelection: T? = null,
-    optionLabel: @Composable (T) -> Unit
+    optionLabel: @Composable (T) -> Unit = { Text(it.toString()) }
 ) {
     var selectedOption by remember { mutableStateOf(initialSelection) }
 
