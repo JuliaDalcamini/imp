@@ -18,7 +18,7 @@ fun FormField(
     Column(modifier) {
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelMedium,
             text = label
         )
 

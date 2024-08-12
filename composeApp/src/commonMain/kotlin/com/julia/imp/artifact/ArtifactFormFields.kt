@@ -2,47 +2,34 @@ package com.julia.imp.artifact
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julia.imp.common.text.getInitials
-import com.julia.imp.common.ui.avatar.Avatar
-import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.common.ui.form.SliderFormField
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.MoscowPriorityLevel
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
-import com.julia.imp.team.inspector.Inspector
+import com.julia.imp.user.User
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.add_20px
-import imp.composeapp.generated.resources.add_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
-import imp.composeapp.generated.resources.close_20px
 import imp.composeapp.generated.resources.complexity_label
 import imp.composeapp.generated.resources.impact_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.priority_label
 import imp.composeapp.generated.resources.select_label
 import imp.composeapp.generated.resources.user_value_label
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ArtifactFormFields(
     name: String,
@@ -51,9 +38,9 @@ fun ArtifactFormFields(
     onTypeChange: (ArtifactType) -> Unit,
     priority: Priority?,
     onPriorityChange: (Priority) -> Unit,
-    inspectors: List<Inspector>,
-    onInspectorsChange: (List<Inspector>) -> Unit,
+    inspectors: List<User>,
     onAddInspectorClick: () -> Unit,
+    onRemoveInspectorClick: (User) -> Unit,
     availableTypes: List<ArtifactType>?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
@@ -82,37 +69,17 @@ fun ArtifactFormFields(
 
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.inspectors_label)
         )
 
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            for (inspector in inspectors) {
-                InputChip(
-                    label = { Text(inspector.fullName) },
-                    onClick = { onInspectorsChange(inspectors - inspector) },
-                    selected = false,
-                    enabled = enabled,
-                    avatar = {
-                        Avatar(
-                            initials = inspector.fullName.getInitials(),
-                            size = AvatarSize.Small
-                        )
-                    },
-                    trailingIcon = { Icon(painterResource(Res.drawable.close_20px), null) }
-                )
-            }
-
-            AssistChip(
-                label = { Text(stringResource(Res.string.add_label)) },
-                onClick = onAddInspectorClick,
-                enabled = enabled,
-                leadingIcon = { Icon(painterResource(Res.drawable.add_20px), null) }
-            )
-        }
+        ArtifactInspectorList(
+            modifier = Modifier.fillMaxWidth(),
+            inspectors = inspectors,
+            onAddClick = onAddInspectorClick,
+            onRemoveClick = onRemoveInspectorClick,
+            enabled = enabled
+        )
 
         when (priority) {
             is MoscowPriority -> MoscowPriorityFormFields(

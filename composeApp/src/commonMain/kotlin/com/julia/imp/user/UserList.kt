@@ -1,4 +1,4 @@
-package com.julia.imp.team.inspector
+package com.julia.imp.user
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,19 +12,19 @@ import com.julia.imp.common.text.getInitials
 import com.julia.imp.common.ui.avatar.Avatar
 
 @Composable
-fun InspectorList(
-    inspectors: List<Inspector>,
-    onInspectorClick: (Inspector) -> Unit,
+fun UserList(
+    users: List<User>,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier) {
-        items(inspectors) { inspector ->
+        items(users) { user ->
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onInspectorClick(inspector) },
-                headlineContent = { Text(inspector.fullName) },
-                leadingContent = { Avatar(inspector.fullName.getInitials()) }
+                    .clickable { onUserClick(user) },
+                headlineContent = { Text(user.fullName) },
+                leadingContent = { Avatar(user.fullName.getInitials()) }
             )
         }
     }

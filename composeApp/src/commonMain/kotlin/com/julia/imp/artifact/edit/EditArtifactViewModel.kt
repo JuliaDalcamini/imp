@@ -10,8 +10,8 @@ import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactType
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.priority.Priority
-import com.julia.imp.team.inspector.Inspector
 import com.julia.imp.team.inspector.InspectorRepository
+import com.julia.imp.user.User
 import kotlinx.coroutines.launch
 
 class EditArtifactViewModel(
@@ -65,8 +65,14 @@ class EditArtifactViewModel(
         updateSaveButtonState()
     }
 
-    fun setInspectors(inspectors: List<Inspector>) {
-        uiState = uiState.copy(inspectors = inspectors)
+    fun addInspector(inspector: User) {
+        uiState = uiState.copy(inspectors = uiState.inspectors + inspector)
+        updateSaveButtonState()
+    }
+
+    fun removeInspector(inspector: User) {
+        uiState = uiState.copy(inspectors = uiState.inspectors - inspector)
+        updateSaveButtonState()
     }
 
     fun createArtifact() {
@@ -74,8 +80,8 @@ class EditArtifactViewModel(
             uiState = uiState.copy(saving = true)
 
             try {
-                repository.updateArtifact(getUpdatedArtifact())
-                uiState = uiState.copy(saved = true)
+                val savedArtifact = repository.updateArtifact(getUpdatedArtifact())
+                uiState = uiState.copy(savedArtifact = savedArtifact)
             } catch (error: Throwable) {
                 uiState = uiState.copy(saveError = true)
             } finally {

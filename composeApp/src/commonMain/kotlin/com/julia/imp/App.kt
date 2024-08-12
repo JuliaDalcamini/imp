@@ -20,11 +20,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.julia.imp.artifact.create.CreateArtifactRoute
 import com.julia.imp.artifact.create.CreateArtifactScreen
+import com.julia.imp.artifact.details.ArtifactDetailsRoute
+import com.julia.imp.artifact.details.ArtifactDetailsScreen
 import com.julia.imp.artifact.edit.EditArtifactRoute
 import com.julia.imp.artifact.edit.EditArtifactScreen
 import com.julia.imp.artifact.list.ArtifactsRoute
 import com.julia.imp.artifact.list.ArtifactsScreen
-import com.julia.imp.common.auth.UserCredentials
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
 import com.julia.imp.login.LoginRoute
@@ -89,8 +90,10 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                 composable<RegisterRoute> {
                     RegisterScreen(
-                        onLoginClick = { navController.popBackStackToLogin() },
-                        onRegistrationComplete = { navController.navigateToLogin(it) }
+                        onLoginClick = { navController.popBackStack() },
+                        onRegistrationComplete = { credentials ->
+                            navController.popUpToAndNavigate(LoginRoute.of(credentials))
+                        }
                     )
                 }
 
@@ -131,11 +134,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                 composable<CreateProjectRoute> {
                     CreateProjectScreen(
                         onBackClick = { navController.popBackStack() },
-                        onProjectCreated = {
-                            navController.navigate(ProjectsRoute) {
-                                popUpTo<ProjectsRoute> { inclusive = true }
-                            }
-                        }
+                        onProjectCreated = { navController.popBackStack() }
                     )
                 }
 
@@ -143,8 +142,9 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     val route = entry.toRoute<ArtifactsRoute>()
 
                     ArtifactsScreen(
-                        projectId = route.project.id,
+                        project = route.project,
                         onBackClick = { navController.popBackStack() },
+                        onArtifactClick = { navController.navigate(ArtifactDetailsRoute(route.project, it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(route.project, it)) }
                     )
@@ -157,9 +157,10 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         projectId = route.project.id,
                         prioritizer = route.project.prioritizer,
                         onBackClick = { navController.popBackStack() },
-                        onArtifactCreated = {
-                            navController.navigate(ArtifactsRoute(route.project)) {
-                                popUpTo<ArtifactsRoute> { inclusive = true }
+                        onArtifactCreated = { artifact ->
+                            navController.run {
+                                popBackStack()
+                                popUpToAndNavigate(ArtifactDetailsRoute(route.project, artifact))
                             }
                         }
                     )
@@ -171,11 +172,22 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     EditArtifactScreen(
                         artifact = route.artifact,
                         onBackClick = { navController.popBackStack() },
-                        onArtifactSaved = {
-                            navController.navigate(ArtifactsRoute(route.project)) {
-                                popUpTo<ArtifactsRoute> { inclusive = true }
+                        onArtifactSaved = { artifact ->
+                            navController.run {
+                                popBackStack()
+                                popUpToAndNavigate(ArtifactDetailsRoute(route.project, artifact))
                             }
                         }
+                    )
+                }
+
+                composable<ArtifactDetailsRoute>(ArtifactDetailsRoute.typeMap) { entry ->
+                    val route = entry.toRoute<ArtifactDetailsRoute>()
+
+                    ArtifactDetailsScreen(
+                        artifact = route.artifact,
+                        onBackClick = { navController.popBackStack() },
+                        onEditClick = { navController.navigate(EditArtifactRoute(route.project, route.artifact)) }
                     )
                 }
             }
@@ -183,13 +195,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
     }
 }
 
-private fun NavController.popBackStackToLogin() =
-    this.popBackStack<LoginRoute>(
-        inclusive = false,
-        saveState = false
-    )
-
-private fun NavController.navigateToLogin(credentials: UserCredentials) =
-    this.navigate(LoginRoute.of(credentials)) {
-        popUpTo<LoginRoute> { inclusive = true }
+private inline fun <reified T : Any> NavController.popUpToAndNavigate(route: T) =
+    this.navigate(route) {
+        popUpTo<T> { inclusive = true }
     }

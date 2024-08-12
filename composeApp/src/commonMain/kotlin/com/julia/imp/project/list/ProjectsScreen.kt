@@ -44,6 +44,7 @@ import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
+import com.julia.imp.common.ui.title.Title
 import com.julia.imp.project.Project
 import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
@@ -89,7 +90,7 @@ fun ProjectsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.projects_title)) },
+                title = { Title(stringResource(Res.string.projects_title)) },
                 actions = {
                     TeamSwitcher(
                         onTeamSwitch = onTeamSwitch,

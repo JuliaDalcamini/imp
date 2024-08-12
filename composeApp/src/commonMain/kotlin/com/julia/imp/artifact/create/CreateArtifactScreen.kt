@@ -13,18 +13,19 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactFormFields
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.title.Title
 import com.julia.imp.priority.Prioritizer
-import com.julia.imp.team.inspector.InspectorPickerDialog
+import com.julia.imp.user.UserPickerDialog
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.create_artifact_error_message
@@ -33,6 +34,7 @@ import imp.composeapp.generated.resources.create_artifact_label
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.new_artifact_title
+import imp.composeapp.generated.resources.select_inspector_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -42,11 +44,11 @@ fun CreateArtifactScreen(
     projectId: String,
     prioritizer: Prioritizer,
     onBackClick: () -> Unit,
-    onArtifactCreated: () -> Unit,
+    onArtifactCreated: (Artifact) -> Unit,
     viewModel: CreateArtifactViewModel = viewModel { CreateArtifactViewModel() }
 ) {
-    LaunchedEffect(viewModel.uiState.created) {
-        if (viewModel.uiState.created) onArtifactCreated()
+    LaunchedEffect(viewModel.uiState.createdArtifact) {
+        viewModel.uiState.createdArtifact?.let { onArtifactCreated(it) }
     }
 
     LaunchedEffect(projectId) {
@@ -62,7 +64,7 @@ fun CreateArtifactScreen(
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 },
-                title = { Text(stringResource(Res.string.new_artifact_title)) }
+                title = { Title(stringResource(Res.string.new_artifact_title)) }
             )
         }
     ) { paddingValues ->
@@ -86,8 +88,8 @@ fun CreateArtifactScreen(
                 priority = viewModel.uiState.priority,
                 onPriorityChange = { viewModel.setPriority(it) },
                 inspectors = viewModel.uiState.inspectors,
-                onInspectorsChange = { viewModel.setInspectors(it) },
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
+                onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 availableTypes = viewModel.uiState.availableTypes,
                 enabled = !viewModel.uiState.loading
             )
@@ -99,33 +101,34 @@ fun CreateArtifactScreen(
                 enabled = !viewModel.uiState.loading && viewModel.uiState.canCreate,
                 loading = viewModel.uiState.loading
             )
-
-            if (viewModel.uiState.showInspectorPicker) {
-                InspectorPickerDialog(
-                    availableInspectors = viewModel.uiState.availableInspectors,
-                    onInspectorSelected = { viewModel.setInspectors(viewModel.uiState.inspectors + it) },
-                    onDismissRequest = { viewModel.dismissInspectorPicker() }
-                )
-            }
-
-            if (viewModel.uiState.createError) {
-                ErrorDialog(
-                    title = stringResource(Res.string.create_artifact_error_title),
-                    message = stringResource(Res.string.create_artifact_error_message),
-                    onDismissRequest = { viewModel.dismissCreateError() }
-                )
-            }
-
-            if (viewModel.uiState.loadError) {
-                ErrorDialog(
-                    title = stringResource(Res.string.load_error_title),
-                    message = stringResource(Res.string.load_error_message),
-                    onDismissRequest = {
-                        viewModel.dismissLoadError()
-                        onBackClick()
-                    }
-                )
-            }
         }
+    }
+
+    if (viewModel.uiState.showInspectorPicker) {
+        UserPickerDialog(
+            title = stringResource(Res.string.select_inspector_label),
+            availableUsers = viewModel.uiState.availableInspectors,
+            onUserSelected = { viewModel.addInspector(it) },
+            onDismissRequest = { viewModel.dismissInspectorPicker() }
+        )
+    }
+
+    if (viewModel.uiState.createError) {
+        ErrorDialog(
+            title = stringResource(Res.string.create_artifact_error_title),
+            message = stringResource(Res.string.create_artifact_error_message),
+            onDismissRequest = { viewModel.dismissCreateError() }
+        )
+    }
+
+    if (viewModel.uiState.loadError) {
+        ErrorDialog(
+            title = stringResource(Res.string.load_error_title),
+            message = stringResource(Res.string.load_error_message),
+            onDismissRequest = {
+                viewModel.dismissLoadError()
+                onBackClick()
+            }
+        )
     }
 }

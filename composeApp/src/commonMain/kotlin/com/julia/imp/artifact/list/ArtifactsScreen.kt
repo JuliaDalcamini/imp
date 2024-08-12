@@ -1,5 +1,6 @@
 package com.julia.imp.artifact.list
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,17 +41,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
+import com.julia.imp.common.text.getInitials
+import com.julia.imp.common.ui.avatar.Avatar
+import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.title.CompoundTitle
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
+import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
@@ -82,20 +89,26 @@ import org.jetbrains.compose.resources.vectorResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtifactsScreen(
-    projectId: String,
+    project: Project,
     onBackClick: () -> Unit,
+    onArtifactClick: (Artifact) -> Unit,
     onNewArtifactClick: () -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
     viewModel: ArtifactsViewModel = viewModel { ArtifactsViewModel() }
 ) {
     LaunchedEffect(viewModel.uiState.filter) {
-        viewModel.getArtifacts(projectId, viewModel.uiState.filter)
+        viewModel.getArtifacts(project.id, viewModel.uiState.filter)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.artifacts_title)) },
+                title = {
+                    CompoundTitle(
+                        title = stringResource(Res.string.artifacts_title),
+                        subtitle = project.name
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
@@ -124,6 +137,7 @@ fun ArtifactsScreen(
                     .fillMaxSize(),
                 contentPadding = paddingValues,
                 entries = viewModel.uiState.entries,
+                onArtifactClick = onArtifactClick,
                 onEditArtifactClick = onEditArtifactClick,
                 onArchiveArtifactClick = { viewModel.askToArchive(it) },
                 selectedFilter = viewModel.uiState.filter,
@@ -212,6 +226,7 @@ fun NewArtifactButton(
 @Composable
 fun ArtifactList(
     entries: List<ArtifactListEntry>?,
+    onArtifactClick: (Artifact) -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
     onArchiveArtifactClick: (Artifact) -> Unit,
     selectedFilter: ArtifactFilter,
@@ -241,6 +256,7 @@ fun ArtifactList(
                         .animateItem(),
                     artifact = entry.artifact,
                     showOptions = entry.showOptions,
+                    onClick = { onArtifactClick(entry.artifact) },
                     onEditClick = { onEditArtifactClick(entry.artifact) },
                     onArchiveClick = { onArchiveArtifactClick(entry.artifact) }
                 )
@@ -287,26 +303,27 @@ private fun getFilterText(filter: ArtifactFilter): String =
 fun ArtifactListItem(
     artifact: Artifact,
     showOptions: Boolean,
+    onClick: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(modifier) {
+    ElevatedCard(
+        modifier = modifier,
+        onClick = onClick
+    ) {
         Row(
             modifier = Modifier.padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val contentModifier =
-                if (artifact.archived) Modifier.alpha(.5f)
-                else Modifier
-
-            Column(contentModifier.weight(1f)) {
+            Column(Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
+                        modifier = Modifier.weight(1f, fill = false),
                         text = artifact.name,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -321,6 +338,25 @@ fun ArtifactListItem(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurface
                         )
+                    } else if (artifact.inspectors.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier.offset(x = (-2).dp),
+                            horizontalArrangement = Arrangement.spacedBy((-8).dp)
+                        ) {
+                            artifact.inspectors.forEachIndexed { index, inspector ->
+                                val zIndex = artifact.inspectors.size - index
+
+                                Avatar(
+                                    modifier = Modifier.zIndex(zIndex.toFloat()),
+                                    initials = inspector.fullName.getInitials(),
+                                    size = AvatarSize.Small,
+                                    border = BorderStroke(
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.surfaceContainerLow
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
 

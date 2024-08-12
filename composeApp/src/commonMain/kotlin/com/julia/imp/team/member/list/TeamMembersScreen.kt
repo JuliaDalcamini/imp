@@ -43,6 +43,7 @@ import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.SelectionDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
+import com.julia.imp.common.ui.title.Title
 import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
 import imp.composeapp.generated.resources.Res
@@ -83,7 +84,7 @@ fun TeamMembersScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.team_members_title)) },
+                title = { Title(stringResource(Res.string.team_members_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)

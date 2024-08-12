@@ -14,8 +14,8 @@ import com.julia.imp.priority.Prioritizer
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPrioritizer
 import com.julia.imp.priority.WiegersPriority
-import com.julia.imp.team.inspector.Inspector
 import com.julia.imp.team.inspector.InspectorRepository
+import com.julia.imp.user.User
 import kotlinx.coroutines.launch
 
 class CreateArtifactViewModel(
@@ -62,8 +62,12 @@ class CreateArtifactViewModel(
         updateCreateButtonState()
     }
 
-    fun setInspectors(inspectors: List<Inspector>) {
-        uiState = uiState.copy(inspectors = inspectors)
+    fun addInspector(inspector: User) {
+        uiState = uiState.copy(inspectors = uiState.inspectors + inspector)
+    }
+
+    fun removeInspector(inspector: User) {
+        uiState = uiState.copy(inspectors = uiState.inspectors - inspector)
     }
 
     fun createArtifact() {
@@ -71,7 +75,7 @@ class CreateArtifactViewModel(
             uiState = uiState.copy(loading = true)
 
             try {
-                repository.createArtifact(
+                val artifact = repository.createArtifact(
                     projectId = projectId,
                     name = uiState.name,
                     inspectors = uiState.inspectors,
@@ -79,7 +83,7 @@ class CreateArtifactViewModel(
                     priority = uiState.priority ?: throw IllegalStateException("Priority not set")
                 )
 
-                uiState = uiState.copy(created = true)
+                uiState = uiState.copy(createdArtifact = artifact)
             } catch (error: Throwable) {
                 uiState = uiState.copy(createError = true)
             } finally {

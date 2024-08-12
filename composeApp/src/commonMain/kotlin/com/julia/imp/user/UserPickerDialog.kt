@@ -1,4 +1,4 @@
-package com.julia.imp.team.inspector
+package com.julia.imp.user
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,35 +11,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julia.imp.common.ui.dialog.BaseDialog
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.no_inspectors_available
-import imp.composeapp.generated.resources.select_inspector_label
+import imp.composeapp.generated.resources.no_users_available
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun InspectorPickerDialog(
-    availableInspectors: List<Inspector>?,
-    onInspectorSelected: (Inspector) -> Unit,
+fun UserPickerDialog(
+    title: String,
+    availableUsers: List<User>?,
+    onUserSelected: (User) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BaseDialog(
         modifier = modifier,
-        title = stringResource(Res.string.select_inspector_label),
+        title = title,
         onDismissRequest = onDismissRequest
     ) {
         when {
-            availableInspectors == null -> Placeholder(Modifier.fillMaxWidth())
+            availableUsers == null -> Placeholder(Modifier.fillMaxWidth())
 
-            availableInspectors.isEmpty() -> Text(
+            availableUsers.isEmpty() -> Text(
                 modifier = Modifier.padding(24.dp),
-                text = stringResource(Res.string.no_inspectors_available)
+                text = stringResource(Res.string.no_users_available)
             )
 
-            else -> InspectorList(
+            else -> UserList(
                 modifier = Modifier.fillMaxWidth(),
-                inspectors = availableInspectors,
-                onInspectorClick = {
-                    onInspectorSelected(it)
+                users = availableUsers,
+                onUserClick = {
+                    onUserSelected(it)
                     onDismissRequest()
                 }
             )

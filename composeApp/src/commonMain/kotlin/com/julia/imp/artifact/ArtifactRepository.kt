@@ -5,7 +5,7 @@ import com.julia.imp.artifact.edit.UpdateArtifactRequest
 import com.julia.imp.artifact.list.ArtifactFilter
 import com.julia.imp.common.network.configuredHttpClient
 import com.julia.imp.priority.Priority
-import com.julia.imp.team.inspector.Inspector
+import com.julia.imp.user.User
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -33,8 +33,8 @@ class ArtifactRepository(
         name: String,
         type: ArtifactType,
         priority: Priority,
-        inspectors: List<Inspector>
-    ) {
+        inspectors: List<User>
+    ): Artifact =
         client.post("projects/$projectId/artifacts") {
             contentType(ContentType.Application.Json)
 
@@ -46,10 +46,9 @@ class ArtifactRepository(
                     inspectorIds = inspectors.map { it.id }
                 )
             )
-        }
-    }
+        }.body()
 
-    suspend fun updateArtifact(artifact: Artifact) {
+    suspend fun updateArtifact(artifact: Artifact): Artifact =
         client.patch("projects/${artifact.projectId}/artifacts/${artifact.id}") {
             contentType(ContentType.Application.Json)
 
@@ -61,6 +60,5 @@ class ArtifactRepository(
                     inspectorIds = artifact.inspectors.map { it.id }
                 )
             )
-        }
-    }
+        }.body()
 }

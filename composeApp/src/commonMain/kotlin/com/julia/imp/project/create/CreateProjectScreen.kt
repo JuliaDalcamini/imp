@@ -31,6 +31,7 @@ import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.form.FormField
 import com.julia.imp.common.ui.form.SliderFormField
+import com.julia.imp.common.ui.title.Title
 import com.julia.imp.priority.MoscowPrioritizer
 import com.julia.imp.priority.WiegersPrioritizer
 import imp.composeapp.generated.resources.Res
@@ -69,7 +70,7 @@ fun CreateProjectScreen(
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                  },
-                title = { Text(stringResource(Res.string.new_project_title)) }
+                title = { Title(stringResource(Res.string.new_project_title)) }
             )
         }
     ) { paddingValues ->

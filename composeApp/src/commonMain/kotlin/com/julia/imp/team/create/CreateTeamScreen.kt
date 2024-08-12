@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.title.Title
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.create_team_error_message
@@ -49,7 +50,7 @@ fun CreateTeamScreen(
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 },
-                title = { Text(stringResource(Res.string.new_team_title)) }
+                title = { Title(stringResource(Res.string.new_team_title)) }
             )
         }
     ) { paddingValues ->

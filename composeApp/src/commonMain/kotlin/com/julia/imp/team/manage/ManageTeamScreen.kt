@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.julia.imp.common.session.requireTeam
+import com.julia.imp.common.ui.title.Title
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.current_name_format
@@ -42,7 +43,7 @@ fun ManageTeamScreen(
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 },
-                title = { Text(stringResource(Res.string.manage_team_title)) }
+                title = { Title(stringResource(Res.string.manage_team_title)) }
             )
         }
     ) { paddingValues ->

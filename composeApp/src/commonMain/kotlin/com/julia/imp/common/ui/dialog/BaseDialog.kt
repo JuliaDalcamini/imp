@@ -23,7 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BaseDialog(
+private fun BaseDialogInternal(
     title: String,
     onConfirm: (() -> Unit)?,
     enableConfirm: Boolean,
@@ -91,7 +91,7 @@ fun BaseDialog(
     enableConfirm: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    BaseDialog(
+    BaseDialogInternal(
         title = title,
         onConfirm = onConfirm,
         onDismissRequest = onDismissRequest,
@@ -108,7 +108,7 @@ fun BaseDialog(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    BaseDialog(
+    BaseDialogInternal(
         title = title,
         onConfirm = null,
         onDismissRequest = onDismissRequest,

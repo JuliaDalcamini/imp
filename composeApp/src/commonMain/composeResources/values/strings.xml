@@ -97,7 +97,7 @@
     <string name="inspectors_label">Inspetores</string>
     <string name="add_label">Adicionar</string>
     <string name="select_inspector_label">Selecionar inspetor</string>
-    <string name="no_inspectors_available">Nenhum inspetor disponível.</string>
+    <string name="no_users_available">Nenhum usuário disponível.</string>
     <string name="priority_label">Prioridade</string>
     <string name="user_value_label">Valor para o usuário</string>
     <string name="complexity_label">Complexidade</string>
@@ -111,4 +111,8 @@
     <string name="save_label">Salvar</string>
     <string name="load_error_title">Erro</string>
     <string name="load_error_message">Ocorreu um erro ao carregar as informações. Por favor, tente novamente.</string>
+    <string name="artifact_details_title">Detalhes do artefato</string>
+    <string name="archived_artifact_alert_message">Esse artefato está arquivado e não pode ser alterado ou inspecionado.</string>
+    <string name="last_inspection_label">Última inspeção</string>
+    <string name="never">Nunca</string>
 </resources>
