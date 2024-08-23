@@ -1,6 +1,5 @@
 package com.julia.imp.login
 
-import com.julia.imp.common.auth.TokenPair
 import com.julia.imp.common.network.configuredHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

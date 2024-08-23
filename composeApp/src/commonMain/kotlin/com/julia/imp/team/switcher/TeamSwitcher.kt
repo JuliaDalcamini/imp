@@ -55,7 +55,7 @@ fun TeamSwitcher(
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
-    viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() },
+    viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() }
 ) {
     val uiState = viewModel.uiState
 

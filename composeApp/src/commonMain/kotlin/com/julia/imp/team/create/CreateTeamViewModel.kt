@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.team.TeamRepository
@@ -24,7 +23,7 @@ class CreateTeamViewModel(
         uiState = uiState.copy(name = name)
     }
 
-    fun createProject() {
+    fun createTeam() {
         viewModelScope.launch {
             uiState = uiState.copy(loading = true)
 
@@ -33,10 +32,12 @@ class CreateTeamViewModel(
                 val userId = requireSession().userId
                 val teamMember = memberRepository.getMember(team.id, userId)
 
-                SessionManager.activeSession = UserSession(
-                    userId = userId,
-                    team = team,
-                    roleInTeam = teamMember.role
+                uiState = uiState.copy(
+                    newSession = UserSession(
+                        userId = userId,
+                        team = team,
+                        roleInTeam = teamMember.role
+                    )
                 )
             } catch (error: Throwable) {
                 uiState = uiState.copy(error = true)

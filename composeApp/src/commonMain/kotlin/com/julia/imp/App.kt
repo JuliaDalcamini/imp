@@ -103,7 +103,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                 composable<CreateTeamRoute> {
                     CreateTeamScreen(
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onTeamCreated = { SessionManager.activeSession = it }
                     )
                 }
 

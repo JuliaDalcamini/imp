@@ -19,9 +19,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.Title
@@ -39,8 +41,13 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun CreateTeamScreen(
     onBackClick: () -> Unit,
+    onTeamCreated: (UserSession) -> Unit,
     viewModel: CreateTeamViewModel = viewModel { CreateTeamViewModel() }
 ) {
+    LaunchedEffect(viewModel.uiState.newSession) {
+        viewModel.uiState.newSession?.let { onTeamCreated(it) }
+    }
+
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -85,7 +92,7 @@ fun CreateTeamScreen(
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.create_team_label),
-                onClick = { viewModel.createProject() },
+                onClick = { viewModel.createTeam() },
                 enabled = !viewModel.uiState.loading,
                 loading = viewModel.uiState.loading
             )
