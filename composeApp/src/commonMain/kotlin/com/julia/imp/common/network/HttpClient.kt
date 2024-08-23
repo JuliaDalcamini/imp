@@ -62,7 +62,7 @@ val configuredHttpClient: HttpClient by lazy {
                         authTokens = client.post("refresh_tokens") {
                             markAsRefreshTokenRequest()
                             contentType(ContentType.Application.Json)
-                            setBody(RefreshTokensRequest(it.refreshToken))
+                            setBody(RefreshTokensRequest(it.refreshToken.orEmpty()))
                         }.body<TokenPair>()
 
                         authTokens?.toBearerTokens()
