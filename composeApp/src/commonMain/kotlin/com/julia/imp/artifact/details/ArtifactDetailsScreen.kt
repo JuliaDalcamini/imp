@@ -64,6 +64,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -266,7 +267,7 @@ fun ArtifactDetails(
 
             Text(
                 style = MaterialTheme.typography.bodyMedium,
-                text = "Duração: ${inspection.duration}"
+                text = "Duração: ${inspection.duration.inWholeSeconds.seconds}"
             )
         }
     }
