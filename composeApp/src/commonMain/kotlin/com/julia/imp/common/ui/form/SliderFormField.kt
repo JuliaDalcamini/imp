@@ -19,7 +19,7 @@ fun SliderFormField(
     enabled: Boolean = true,
     steps: Int = 0,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    valueText: String? = null,
+    valueText: String? = null
 ) {
     FormField(
         modifier = modifier,

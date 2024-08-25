@@ -1,4 +1,4 @@
-package com.julia.imp.artifact.details
+package com.julia.imp.inspection.create
 
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.navigation.serializableNavType
@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
 
 @Serializable
-data class ArtifactDetailsRoute(
+data class CreateInspectionRoute(
     val artifact: Artifact
 ) {
 

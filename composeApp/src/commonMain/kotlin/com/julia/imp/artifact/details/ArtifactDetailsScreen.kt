@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactInspectorList
+import com.julia.imp.common.datetime.DateTimeFormats
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
+import com.julia.imp.inspection.Inspection
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
@@ -43,7 +46,9 @@ import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.artifact_details_title
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
+import imp.composeapp.generated.resources.assignment_24px
 import imp.composeapp.generated.resources.edit_24px
+import imp.composeapp.generated.resources.inspect_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.inventory_2_24px
 import imp.composeapp.generated.resources.last_inspection_label
@@ -54,11 +59,12 @@ import imp.composeapp.generated.resources.priority_label
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.select_inspector_label
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import kotlin.time.DurationUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +72,7 @@ fun ArtifactDetailsScreen(
     artifact: Artifact,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
+    onInspectClick: () -> Unit,
     viewModel: ArtifactDetailsViewModel = viewModel { ArtifactDetailsViewModel() }
 ) {
     LaunchedEffect(artifact) {
@@ -95,6 +102,15 @@ fun ArtifactDetailsScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (viewModel.uiState.canInspect) {
+                ExtendedFloatingActionButton(
+                    text = { Text(stringResource(Res.string.inspect_label)) },
+                    icon = { Icon(vectorResource(Res.drawable.assignment_24px), null) },
+                    onClick = onInspectClick
+                )
+            }
         }
     ) { paddingValues ->
         if (viewModel.uiState.loading) {
@@ -116,11 +132,12 @@ fun ArtifactDetailsScreen(
                     .padding(24.dp)
                     .verticalScroll(rememberScrollState()),
                 artifact = artifact,
-                lastInspection = viewModel.uiState.lastInspection,
                 inspectors = viewModel.uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
-                enableInspectorControls = !viewModel.uiState.updatingInspectors
+                enableInspectorControls = !viewModel.uiState.updatingInspectors,
+                lastInspection = viewModel.uiState.lastInspection,
+                inspections = viewModel.uiState.inspections
             )
         }
     }
@@ -161,15 +178,15 @@ private fun Placeholder(modifier: Modifier = Modifier) {
     }
 }
 
-
 @Composable
 fun ArtifactDetails(
     artifact: Artifact,
-    lastInspection: Instant?,
     inspectors: List<User>,
     onAddInspectorClick: () -> Unit,
     onRemoveInspectorClick: (User) -> Unit,
     enableInspectorControls: Boolean,
+    lastInspection: Instant?,
+    inspections: List<Inspection>?,
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -218,21 +235,10 @@ fun ArtifactDetails(
 
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = lastInspection?.format(
-                DateTimeComponents.Format {
-                    dayOfMonth()
-                    char('/')
-                    monthNumber()
-                    char('/')
-                    year()
-                    char(' ')
-                    hour()
-                    char(':')
-                    minute()
-                    char(':')
-                    second()
-                }
-            ) ?: stringResource(Res.string.never)
+            text = lastInspection
+                ?.toLocalDateTime(TimeZone.currentSystemDefault())
+                ?.format(DateTimeFormats.DEFAULT)
+                ?: stringResource(Res.string.never)
         )
 
         if (!artifact.archived) {
@@ -248,6 +254,20 @@ fun ArtifactDetails(
                 onAddClick = onAddInspectorClick,
                 onRemoveClick = onRemoveInspectorClick,
                 enabled = enableInspectorControls
+            )
+        }
+
+        // TODO: Finish UI
+        inspections?.forEach { inspection ->
+            Text(
+                modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+                style = MaterialTheme.typography.labelMedium,
+                text = "Inspeção"
+            )
+
+            Text(
+                style = MaterialTheme.typography.bodyMedium,
+                text = "Duração: ${inspection.duration.toString(DurationUnit.SECONDS)}"
             )
         }
     }

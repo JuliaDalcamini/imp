@@ -1,5 +1,6 @@
 package com.julia.imp.inspection
 
+import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.user.User
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable

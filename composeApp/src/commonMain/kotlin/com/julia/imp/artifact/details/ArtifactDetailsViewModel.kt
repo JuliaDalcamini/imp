@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
+import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.team.inspector.InspectorRepository
@@ -26,8 +27,24 @@ class ArtifactDetailsViewModel(
 
     fun initialize(artifact: Artifact) {
         this.artifact = artifact
-        uiState = uiState.copy(inspectors = artifact.inspectors)
+
+        uiState = uiState.copy(
+            inspectors = artifact.inspectors
+        )
+
+        updateInspectButtonState()
         loadInspections()
+    }
+
+    private fun updateInspectButtonState() {
+        uiState = uiState.copy(
+            canInspect = !artifact.archived && isUserInInspectorList()
+        )
+    }
+
+    private fun isUserInInspectorList(): Boolean {
+        val userId = requireSession().userId
+        return uiState.inspectors.any { it.id == userId }
     }
 
     private fun loadInspections() {
@@ -78,6 +95,7 @@ class ArtifactDetailsViewModel(
                 )
 
                 uiState = uiState.copy(inspectors = updatedArtifact.inspectors)
+                updateInspectButtonState()
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
             } finally {

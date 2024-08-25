@@ -28,6 +28,8 @@ import com.julia.imp.artifact.list.ArtifactsRoute
 import com.julia.imp.artifact.list.ArtifactsScreen
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
+import com.julia.imp.inspection.create.CreateInspectionRoute
+import com.julia.imp.inspection.create.CreateInspectionScreen
 import com.julia.imp.login.LoginRoute
 import com.julia.imp.login.LoginScreen
 import com.julia.imp.project.ProjectsRoute
@@ -145,9 +147,9 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     ArtifactsScreen(
                         project = route.project,
                         onBackClick = { navController.popBackStack() },
-                        onArtifactClick = { navController.navigate(ArtifactDetailsRoute(route.project, it)) },
+                        onArtifactClick = { navController.navigate(ArtifactDetailsRoute(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
-                        onEditArtifactClick = { navController.navigate(EditArtifactRoute(route.project, it)) }
+                        onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) }
                     )
                 }
 
@@ -161,7 +163,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactCreated = { artifact ->
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(route.project, artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
                             }
                         }
                     )
@@ -176,7 +178,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactSaved = { artifact ->
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(route.project, artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
                             }
                         }
                     )
@@ -188,7 +190,24 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     ArtifactDetailsScreen(
                         artifact = route.artifact,
                         onBackClick = { navController.popBackStack() },
-                        onEditClick = { navController.navigate(EditArtifactRoute(route.project, route.artifact)) }
+                        onEditClick = { navController.navigate(EditArtifactRoute(route.artifact)) },
+                        onInspectClick = { navController.navigate(CreateInspectionRoute(route.artifact)) }
+                    )
+                }
+
+                composable<CreateInspectionRoute>(CreateInspectionRoute.typeMap) { entry ->
+                    val route = entry.toRoute<CreateInspectionRoute>()
+
+                    CreateInspectionScreen(
+                        artifact = route.artifact,
+                        onBackClick = { navController.popBackStack() },
+                        onInspectionCreated = {
+                            // TODO: Redirect to inspection details
+                            navController.run {
+                                popBackStack()
+                                popUpToAndNavigate(ArtifactDetailsRoute(route.artifact))
+                            }
+                        }
                     )
                 }
             }
