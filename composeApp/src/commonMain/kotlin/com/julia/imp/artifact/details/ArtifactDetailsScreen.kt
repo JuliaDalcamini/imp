@@ -312,7 +312,9 @@ fun ArtifactDetails(
 
                         ElevatedCard(
                             modifier = Modifier.widthIn(max = maxWidth - 48.dp),
-                            onClick = {}
+                            onClick = {
+                                // TODO: Redirect to inspection details
+                            }
                         ) {
                             Column(Modifier.padding(24.dp)) {
                                 Row(
