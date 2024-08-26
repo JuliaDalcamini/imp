@@ -115,6 +115,9 @@
     <string name="archived_artifact_alert_message">Esse artefato está arquivado e não pode ser alterado ou inspecionado.</string>
     <string name="last_inspection_label">Última inspeção</string>
     <string name="never">Nunca</string>
+    <string name="inspections_label">Inspeções</string>
+    <string name="made_on_format">Feito em: %1$s</string>
+    <string name="duration_format">Duração: %1$s</string>
     <string name="inspect_label">Inspecionar</string>
     <string name="new_inspection_title">Nova inspeção</string>
     <string name="answer_option_yes_label">Sim</string>

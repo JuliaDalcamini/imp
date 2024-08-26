@@ -1,6 +1,8 @@
 package com.julia.imp.artifact.details
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,11 +31,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactInspectorList
 import com.julia.imp.common.datetime.DateTimeFormats
+import com.julia.imp.common.text.getInitials
+import com.julia.imp.common.ui.avatar.Avatar
+import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
 import com.julia.imp.inspection.Inspection
@@ -47,13 +57,16 @@ import imp.composeapp.generated.resources.artifact_details_title
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.assignment_24px
+import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.inspect_label
+import imp.composeapp.generated.resources.inspections_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.inventory_2_24px
 import imp.composeapp.generated.resources.last_inspection_label
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
+import imp.composeapp.generated.resources.made_on_format
 import imp.composeapp.generated.resources.never
 import imp.composeapp.generated.resources.priority_label
 import imp.composeapp.generated.resources.priority_wiegers_format
@@ -127,9 +140,9 @@ fun ArtifactDetailsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .consumeWindowInsets(paddingValues)
-                    .consumeWindowInsets(PaddingValues(24.dp))
+                    .consumeWindowInsets(PaddingValues(vertical = 24.dp))
                     .padding(paddingValues)
-                    .padding(24.dp)
+                    .padding(vertical = 24.dp)
                     .verticalScroll(rememberScrollState()),
                 artifact = artifact,
                 inspectors = viewModel.uiState.inspectors,
@@ -191,49 +204,65 @@ fun ArtifactDetails(
 ) {
     Column(modifier) {
         if (artifact.archived) {
-            ArchivedArtifactAlert(Modifier.padding(bottom = 24.dp))
+            ArchivedArtifactAlert(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp)
+            )
         }
 
         Text(
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 4.dp),
             style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.artifact_name_label)
         )
 
         Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             text = artifact.name
         )
 
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
             style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.artifact_type_label)
         )
 
         Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             text = artifact.type.name
         )
 
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
             style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.priority_label)
         )
 
         Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             text = getPriorityText(artifact.priority)
         )
 
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
             style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.last_inspection_label)
         )
 
         Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             text = lastInspection
                 ?.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -243,13 +272,17 @@ fun ArtifactDetails(
 
         if (!artifact.archived) {
             Text(
-                modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 4.dp),
                 style = MaterialTheme.typography.labelMedium,
                 text = stringResource(Res.string.inspectors_label)
             )
 
             ArtifactInspectorList(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
                 inspectors = inspectors,
                 onAddClick = onAddInspectorClick,
                 onRemoveClick = onRemoveInspectorClick,
@@ -257,18 +290,78 @@ fun ArtifactDetails(
             )
         }
 
-        // TODO: Finish UI
-        inspections?.forEach { inspection ->
+        if (inspections != null) {
             Text(
-                modifier = Modifier.padding(top = 24.dp, bottom = 4.dp),
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 12.dp),
                 style = MaterialTheme.typography.labelMedium,
-                text = "Inspeção"
+                text = stringResource(Res.string.inspections_label)
             )
 
-            Text(
-                style = MaterialTheme.typography.bodyMedium,
-                text = "Duração: ${inspection.duration.inWholeSeconds.seconds}"
-            )
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(inspections) { inspection ->
+                        val formattedDateTime = inspection.createdAt
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                            .format(DateTimeFormats.DEFAULT)
+
+                        ElevatedCard(
+                            modifier = Modifier.widthIn(max = maxWidth - 48.dp),
+                            onClick = {}
+                        ) {
+                            Column(Modifier.padding(24.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Avatar(
+                                        initials = inspection.inspector.fullName.getInitials(),
+                                        size = AvatarSize.Small,
+                                    )
+
+                                    Text(
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        text = inspection.inspector.fullName,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                Text(
+                                    modifier = Modifier.padding(top = 12.dp),
+                                    text = stringResource(
+                                        Res.string.made_on_format,
+                                        formattedDateTime
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+
+                                Text(
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    text = stringResource(
+                                        Res.string.duration_format,
+                                        inspection.duration.inWholeSeconds.seconds.toString()
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
