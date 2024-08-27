@@ -16,8 +16,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.requireTeam
+import com.julia.imp.common.ui.dialog.TextInputDialog
 import com.julia.imp.common.ui.title.Title
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
@@ -26,6 +32,8 @@ import imp.composeapp.generated.resources.manage_team_members_description
 import imp.composeapp.generated.resources.manage_team_members_label
 import imp.composeapp.generated.resources.manage_team_title
 import imp.composeapp.generated.resources.rename_label
+import imp.composeapp.generated.resources.rename_project_title
+import imp.composeapp.generated.resources.rename_team_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -33,7 +41,8 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun ManageTeamScreen(
     onBackClick: () -> Unit,
-    onManageMembersClick: () -> Unit
+    onManageMembersClick: () -> Unit,
+    viewModel: ManageTeamViewModel = viewModel { ManageTeamViewModel() }
 ) {
     Scaffold(
         topBar = {
@@ -59,7 +68,7 @@ fun ManageTeamScreen(
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {},
+                    .clickable { viewModel.showRenameDialog() },
                 headlineContent = { Text(stringResource(Res.string.rename_label)) },
                 supportingContent = { Text(stringResource(Res.string.current_name_format, requireTeam().name)) }
             )
@@ -73,4 +82,26 @@ fun ManageTeamScreen(
             )
         }
     }
+
+    if (viewModel.uiState.showRenameDialog) {
+        RenameTeamDialog(
+            teamName = requireTeam().name,
+            onDismissRequest = { viewModel.dismissRenameDialog() },
+            onConfirm = { }
+        )
+    }
+}
+
+@Composable
+fun RenameTeamDialog(
+    teamName: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    TextInputDialog(
+        title = stringResource(Res.string.rename_team_title),
+        initialValue = teamName,
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
 }

@@ -126,4 +126,5 @@
     <string name="finish_inspection_label">Finalizar inspeção</string>
     <string name="finish_inspection_error_title">Erro ao finalizar inspeção</string>
     <string name="finish_inspection_error_message">Ocorreu um erro ao finalizar a inspeção. Por favor, tente novamente.</string>
+    <string name="rename_team_title">Renomear time</string>
 </resources>
