@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">Imp</string>
-    <string name="welcome_to_format">Bem-vindx ao %1$s</string>
+    <string name="welcome_to_format">Bem-vindo ao %1$s</string>
     <string name="login_error_title">Erro no login</string>
     <string name="login_error_message">Ocorreu um erro ao entrar na sua conta. Por favor, tente novamente.</string>
     <string name="ok_label">Ok</string>

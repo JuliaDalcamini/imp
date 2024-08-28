@@ -107,6 +107,7 @@ fun TeamSwitcher(
                                 modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
                                 teams = uiState.teams.orEmpty(),
                                 currentTeam = uiState.currentTeam,
+                                showManageTeamOption = viewModel.uiState.showManageOption,
                                 onTeamClick = { viewModel.switchToTeam(it) },
                                 onManageTeamClick = {
                                     onManageTeamClick()
@@ -153,6 +154,7 @@ private fun TeamSwitcherErrorMessage(
 private fun TeamSwitcherList(
     teams: List<Team>,
     currentTeam: Team,
+    showManageTeamOption: Boolean,
     onTeamClick: (Team) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
@@ -171,8 +173,10 @@ private fun TeamSwitcherList(
                 leadingContent = { Avatar(currentTeam.name.getInitials()) },
                 supportingContent = { Text(stringResource(Res.string.current_team_label)) },
                 trailingContent = {
-                    IconButton(onClick = onManageTeamClick) {
-                        Icon(vectorResource(Res.drawable.settings_24px), null)
+                    if (showManageTeamOption) {
+                        IconButton(onClick = onManageTeamClick) {
+                            Icon(vectorResource(Res.drawable.settings_24px), null)
+                        }
                     }
                 }
             )

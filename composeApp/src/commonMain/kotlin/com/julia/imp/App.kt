@@ -113,7 +113,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                 composable<ManageTeamRoute> {
                     ManageTeamScreen(
                         onBackClick = { navController.popBackStack() },
-                        onManageMembersClick = { navController.navigate(TeamMembersRoute) }
+                        onManageMembersClick = { navController.navigate(TeamMembersRoute) },
+                        onTeamUpdate = { SessionManager.activeSession = session?.copy(team = it) }
                     )
                 }
 

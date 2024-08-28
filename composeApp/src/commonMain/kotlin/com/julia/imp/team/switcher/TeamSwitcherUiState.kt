@@ -9,7 +9,8 @@ data class TeamSwitcherUiState(
     val loading: Boolean = false,
     val teams: List<Team>? = null,
     val error: TeamSwitcherError? = null,
-    val newSession: UserSession? = null
+    val newSession: UserSession? = null,
+    val showManageOption: Boolean = false
 ) {
 
     val currentTeam: Team

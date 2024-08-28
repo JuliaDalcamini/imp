@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.common.ui.dialog.TextInputDialog
 import com.julia.imp.common.ui.title.Title
+import com.julia.imp.team.Team
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.current_name_format
@@ -42,8 +44,15 @@ import org.jetbrains.compose.resources.vectorResource
 fun ManageTeamScreen(
     onBackClick: () -> Unit,
     onManageMembersClick: () -> Unit,
+    onTeamUpdate: (Team) -> Unit,
     viewModel: ManageTeamViewModel = viewModel { ManageTeamViewModel() }
 ) {
+    LaunchedEffect(viewModel.uiState.updatedTeam) {
+        viewModel.uiState.updatedTeam?.let {
+            onTeamUpdate(it)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,7 +96,7 @@ fun ManageTeamScreen(
         RenameTeamDialog(
             teamName = requireTeam().name,
             onDismissRequest = { viewModel.dismissRenameDialog() },
-            onConfirm = { }
+            onConfirm = { newName -> viewModel.renameTeam(requireTeam(), newName) }
         )
     }
 }

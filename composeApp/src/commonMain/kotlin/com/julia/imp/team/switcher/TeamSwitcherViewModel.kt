@@ -9,6 +9,7 @@ import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.team.Team
 import com.julia.imp.team.TeamRepository
+import com.julia.imp.team.manage.ManageTeamUiState
 import com.julia.imp.team.member.TeamMember
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.switcher.TeamSwitcherError.ErrorLoadingTeams
@@ -33,6 +34,12 @@ class TeamSwitcherViewModel(
 
         viewModelScope.launch {
             try {
+                val isAdmin = requireSession().isTeamAdmin
+
+                uiState = uiState.copy(
+                    showManageOption = isAdmin
+                )
+
                 val teams = repository.getTeams()
                 uiState = uiState.copy(teams = teams)
             } catch (error: Throwable) {
