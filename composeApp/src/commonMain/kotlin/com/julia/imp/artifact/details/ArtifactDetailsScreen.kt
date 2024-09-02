@@ -247,11 +247,13 @@ fun ArtifactDetails(
             text = stringResource(Res.string.priority_label)
         )
 
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            text = getPriorityText(artifact.priority)
-        )
+        if (artifact.priority != null) {
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                text = getPriorityText(artifact.priority)
+            )
+        }
 
         Text(
             modifier = Modifier

@@ -71,15 +71,17 @@ import imp.composeapp.generated.resources.artifacts_error_message
 import imp.composeapp.generated.resources.artifacts_title
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.edit_label
-import imp.composeapp.generated.resources.filter_active
 import imp.composeapp.generated.resources.filter_all
 import imp.composeapp.generated.resources.filter_archived
 import imp.composeapp.generated.resources.filter_assigned_to_me
+import imp.composeapp.generated.resources.filter_not_prioritized
+import imp.composeapp.generated.resources.filter_prioritized
 import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
 import imp.composeapp.generated.resources.no_artifacts_message
 import imp.composeapp.generated.resources.priority_moscow_format
+import imp.composeapp.generated.resources.priority_null_message
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.refresh_24px
 import imp.composeapp.generated.resources.try_again_label
@@ -293,8 +295,9 @@ fun ArtifactListFilters(
 @Composable
 private fun getFilterText(filter: ArtifactFilter): String =
     when (filter) {
-        ArtifactFilter.Active -> stringResource(Res.string.filter_active)
         ArtifactFilter.AssignedToMe -> stringResource(Res.string.filter_assigned_to_me)
+        ArtifactFilter.Prioritized -> stringResource(Res.string.filter_prioritized)
+        ArtifactFilter.NotPrioritized -> stringResource(Res.string.filter_not_prioritized)
         ArtifactFilter.Archived -> stringResource(Res.string.filter_archived)
         ArtifactFilter.All -> stringResource(Res.string.filter_all)
     }
@@ -411,10 +414,11 @@ fun ArtifactListItem(
 }
 
 @Composable
-private fun getPriorityText(priority: Priority) =
+private fun getPriorityText(priority: Priority?) =
     when (priority) {
         is MoscowPriority -> stringResource(Res.string.priority_moscow_format, priority.level.getLabel())
         is WiegersPriority -> getWiegersPriorityText(priority)
+        null -> stringResource(Res.string.priority_null_message)
     }
 
 @Composable

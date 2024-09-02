@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("wiegers")
 data class WiegersPrioritizer(
-    @FloatRange(1.0, 5.0) val userValueWeight: Double = 3.0,
-    @FloatRange(1.0, 5.0) val complexityWeight: Double = 3.0,
-    @FloatRange(1.0, 5.0) val impactWeight: Double = 3.0
+    @FloatRange(0.0, 1.0) val userValueWeight: Float = 0.1f,
+    @FloatRange(0.0, 1.0) val complexityWeight: Float = 0.1f,
+    @FloatRange(0.0, 1.0) val impactWeight: Float = 0.1f
 ) : Prioritizer()

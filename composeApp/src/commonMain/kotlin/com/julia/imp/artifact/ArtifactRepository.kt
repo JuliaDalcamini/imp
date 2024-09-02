@@ -32,7 +32,7 @@ class ArtifactRepository(
         projectId: String,
         name: String,
         type: ArtifactType,
-        priority: Priority,
+        priority: Priority?,
         inspectors: List<User>
     ): Artifact =
         client.post("projects/$projectId/artifacts") {

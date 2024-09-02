@@ -7,8 +7,9 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 enum class ArtifactFilter {
-    @SerialName("active") Active,
     @SerialName("assignedToMe") AssignedToMe,
+    @SerialName("prioritized") Prioritized,
+    @SerialName("notPrioritized") NotPrioritized,
     @SerialName("archived") Archived,
     @SerialName("all") All;
 

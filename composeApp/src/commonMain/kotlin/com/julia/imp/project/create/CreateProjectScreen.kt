@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.form.FormField
@@ -136,11 +137,13 @@ fun CreateProjectScreen(
                 Spacer(Modifier.height(24.dp))
             }
 
+            val isSumValid = viewModel.isWiegersSumValid()
+
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.create_project_label),
                 onClick = { viewModel.createProject() },
-                enabled = !viewModel.uiState.loading,
+                enabled = isSumValid && !viewModel.uiState.loading,
                 loading = viewModel.uiState.loading
             )
 
@@ -166,25 +169,45 @@ fun WiegersPrioritizerFormFields(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        val totalWeight = prioritizer.userValueWeight + prioritizer.complexityWeight + prioritizer.impactWeight
+
         WeightSliderFormField(
             label = stringResource(Res.string.user_value_weight_label),
             enabled = enabled,
-            value = prioritizer.userValueWeight.toFloat(),
-            onValueChange = { onValueChange(prioritizer.copy(userValueWeight = it.toDouble())) }
+            value = prioritizer.userValueWeight,
+            onValueChange = {
+                val newTotalWeight = totalWeight - prioritizer.userValueWeight + it
+
+                if (newTotalWeight <= 1 && it >= 0.1f) {
+                    onValueChange(prioritizer.copy(userValueWeight = it))
+                }
+            }
         )
 
         WeightSliderFormField(
             label = stringResource(Res.string.complexity_weight_label),
             enabled = enabled,
-            value = prioritizer.complexityWeight.toFloat(),
-            onValueChange = { onValueChange(prioritizer.copy(complexityWeight = it.toDouble())) }
+            value = prioritizer.complexityWeight,
+            onValueChange = {
+                val newTotalWeight = totalWeight - prioritizer.complexityWeight + it
+
+                if (newTotalWeight <= 1 && it >= 0.1f) {
+                    onValueChange(prioritizer.copy(complexityWeight = it))
+                }
+            }
         )
 
         WeightSliderFormField(
             label = stringResource(Res.string.impact_weight_label),
             enabled = enabled,
-            value = prioritizer.impactWeight.toFloat(),
-            onValueChange = { onValueChange(prioritizer.copy(impactWeight = it.toDouble())) }
+            value = prioritizer.impactWeight,
+            onValueChange = {
+                val newTotalWeight = totalWeight - prioritizer.impactWeight + it
+                
+                if (newTotalWeight <= 1 && it >= 0.1f) {
+                    onValueChange(prioritizer.copy(impactWeight = it))
+                }
+            }
         )
     }
 }
@@ -203,8 +226,8 @@ fun WeightSliderFormField(
         value = value,
         onValueChange = onValueChange,
         enabled = enabled,
-        steps = 3,
-        valueRange = 1f..5f,
-        valueText = value.toInt().toString()
+        steps = 9,
+        valueRange = 0f..1f,
+        valueText = String.format("%.1f", value)
     )
 }

@@ -28,9 +28,8 @@ class CreateArtifactViewModel(
     var uiState by mutableStateOf(CreateArtifactUiState())
         private set
 
-    fun initialize(projectId: String, prioritizer: Prioritizer) {
+    fun initialize(projectId: String) {
         this.projectId = projectId
-        setPriority(getInitialPriority(prioritizer))
         loadArtifactTypes()
     }
 
@@ -57,11 +56,6 @@ class CreateArtifactViewModel(
         updateCreateButtonState()
     }
 
-    fun setPriority(priority: Priority) {
-        uiState = uiState.copy(priority = priority)
-        updateCreateButtonState()
-    }
-
     fun addInspector(inspector: User) {
         uiState = uiState.copy(inspectors = uiState.inspectors + inspector)
     }
@@ -80,7 +74,7 @@ class CreateArtifactViewModel(
                     name = uiState.name,
                     inspectors = uiState.inspectors,
                     type = uiState.type ?: throw IllegalStateException("Type not set"),
-                    priority = uiState.priority ?: throw IllegalStateException("Priority not set")
+                    priority = uiState.priority
                 )
 
                 uiState = uiState.copy(createdArtifact = artifact)
@@ -129,14 +123,9 @@ class CreateArtifactViewModel(
         )
     }
 
-    private fun getInitialPriority(prioritizer: Prioritizer) = when (prioritizer) {
-        is MoscowPrioritizer -> MoscowPriority()
-        is WiegersPrioritizer -> WiegersPriority()
-    }
-
     private fun updateCreateButtonState() {
         uiState = uiState.copy(
-            canCreate = uiState.run { name.isNotBlank() && type != null && priority != null }
+            canCreate = uiState.run { name.isNotBlank() && type != null }
         )
     }
 }

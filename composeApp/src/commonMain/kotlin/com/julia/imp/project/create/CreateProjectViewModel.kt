@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.priority.Prioritizer
+import com.julia.imp.priority.WiegersPrioritizer
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
 
@@ -43,6 +44,12 @@ class CreateProjectViewModel(
                 uiState = uiState.copy(loading = false)
             }
         }
+    }
+
+    fun isWiegersSumValid(): Boolean {
+        val prioritizer = uiState.prioritizer as? WiegersPrioritizer ?: return true
+        val totalWeight = prioritizer.userValueWeight + prioritizer.complexityWeight + prioritizer.impactWeight
+        return totalWeight == 1.0f
     }
 
     fun dismissError() {

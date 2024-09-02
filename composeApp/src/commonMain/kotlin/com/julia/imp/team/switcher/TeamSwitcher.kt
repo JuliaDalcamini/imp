@@ -107,7 +107,7 @@ fun TeamSwitcher(
                                 modifier = Modifier.weight(1f, fill = false).fillMaxWidth(),
                                 teams = uiState.teams.orEmpty(),
                                 currentTeam = uiState.currentTeam,
-                                showManageTeamOption = viewModel.uiState.showManageOption,
+                                showManageTeamOption = uiState.showManageOption,
                                 onTeamClick = { viewModel.switchToTeam(it) },
                                 onManageTeamClick = {
                                     onManageTeamClick()

@@ -10,7 +10,7 @@ data class Artifact(
     val name: String,
     val type: ArtifactType,
     val projectId: String,
-    val priority: Priority,
+    val priority: Priority?,
     val archived: Boolean,
     val inspectors: List<User>
 )

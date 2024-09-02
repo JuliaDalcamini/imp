@@ -52,7 +52,7 @@ fun CreateArtifactScreen(
     }
 
     LaunchedEffect(projectId) {
-        viewModel.initialize(projectId, prioritizer)
+        viewModel.initialize(projectId)
     }
 
     Scaffold(
@@ -85,8 +85,8 @@ fun CreateArtifactScreen(
                 onNameChange = { viewModel.setName(it) },
                 type = viewModel.uiState.type,
                 onTypeChange = { viewModel.setType(it) },
-                priority = viewModel.uiState.priority,
-                onPriorityChange = { viewModel.setPriority(it) },
+                //priority = viewModel.uiState.priority,
+                //onPriorityChange = { viewModel.setPriority(it) },
                 inspectors = viewModel.uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },

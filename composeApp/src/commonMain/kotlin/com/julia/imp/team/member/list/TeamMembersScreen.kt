@@ -3,6 +3,7 @@ package com.julia.imp.team.member.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -241,22 +242,30 @@ fun TeamMemberListItem(
             )
         },
         trailingContent = {
-            if (showOptions) {
-                Box {
-                    var expandOptions by remember { mutableStateOf(false) }
+            var expandOptions by remember { mutableStateOf(false) }
 
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconButton(
+                    onClick = onChangeRoleClick,
+                ) {
+                    Icon(vectorResource(Res.drawable.rule_settings_24px), contentDescription = stringResource(Res.string.change_role_label))
+                }
+
+                if (showOptions) {
                     IconButton(onClick = { expandOptions = true }) {
                         Icon(vectorResource(Res.drawable.more_vert_24px), null)
                     }
-
-                    TeamMemberOptionsDropdown(
-                        expanded = expandOptions,
-                        onDismissRequest = { expandOptions = false },
-                        onChangeRoleClick = onChangeRoleClick,
-                        onRemoveClick = onRemoveClick
-                    )
                 }
             }
+
+            TeamMemberOptionsDropdown(
+                expanded = expandOptions,
+                onDismissRequest = { expandOptions = false },
+                onRemoveClick = onRemoveClick
+            )
         }
     )
 }
@@ -265,7 +274,6 @@ fun TeamMemberListItem(
 fun TeamMemberOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onChangeRoleClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -274,14 +282,6 @@ fun TeamMemberOptionsDropdown(
         expanded = expanded,
         onDismissRequest = onDismissRequest
     ) {
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.change_role_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.rule_settings_24px), null) },
-            onClick = {
-                onChangeRoleClick()
-                onDismissRequest()
-            }
-        )
 
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.remove_label)) },
