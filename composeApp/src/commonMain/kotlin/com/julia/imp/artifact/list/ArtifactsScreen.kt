@@ -55,6 +55,7 @@ import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.Priority
+import com.julia.imp.priority.WiegersPrioritizer
 import com.julia.imp.priority.WiegersPriority
 import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res
@@ -391,7 +392,7 @@ fun ArtifactListItem(
                 } else {
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
-                        text = getPriorityText(artifact.priority),
+                        text = getPriorityText(artifact),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -408,7 +409,7 @@ fun ArtifactListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        IconButton(onClick = onPrioritizeClick,) {
+                        IconButton(onClick = onPrioritizeClick) {
                             Icon(vectorResource(Res.drawable.swap_vert_24px), null)
                         }
 
@@ -432,21 +433,24 @@ fun ArtifactListItem(
 }
 
 @Composable
-private fun getPriorityText(priority: Priority?) =
-    when (priority) {
-        is MoscowPriority -> stringResource(Res.string.priority_moscow_format, priority.level.getLabel())
-        is WiegersPriority -> getWiegersPriorityText(priority)
+private fun getPriorityText(artifact: Artifact) =
+    when (artifact.priority) {
+        is MoscowPriority -> stringResource(
+            Res.string.priority_moscow_format,
+            artifact.priority.level.getLabel()
+        )
+
+        is WiegersPriority -> getWiegersPriorityText(artifact.calculatedPriority)
         null -> stringResource(Res.string.not_prioritized_label)
     }
 
 @Composable
-private fun getWiegersPriorityText(priority: WiegersPriority) =
-    stringResource(
-        Res.string.priority_wiegers_format,
-        priority.userValue,
-        priority.complexity,
-        priority.impact
-    )
+private fun getWiegersPriorityText(priority: Double?): String =
+    if (priority == null) {
+        stringResource(Res.string.not_prioritized_label)
+    } else {
+        stringResource(Res.string.priority_wiegers_format, priority)
+    }
 
 @Composable
 fun ArtifactOptionsDropdown(

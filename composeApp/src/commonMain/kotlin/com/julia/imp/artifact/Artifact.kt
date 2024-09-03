@@ -13,5 +13,6 @@ data class Artifact(
     val projectId: String,
     val priority: Priority?,
     val archived: Boolean,
-    val inspectors: List<User>
+    val inspectors: List<User>,
+    val calculatedPriority: Double?
 )

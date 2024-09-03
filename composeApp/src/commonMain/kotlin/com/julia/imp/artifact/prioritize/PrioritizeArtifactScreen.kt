@@ -1,5 +1,6 @@
 package com.julia.imp.artifact.prioritize
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,10 +25,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.details.ArchivedArtifactAlert
+import com.julia.imp.common.text.toLink
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
@@ -37,9 +40,10 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.arrow_back_24px
+import imp.composeapp.generated.resources.artifact_external_link_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
-import imp.composeapp.generated.resources.create_artifact_label
+import imp.composeapp.generated.resources.conclude_label
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.prioritize_artifact_error_message
@@ -54,10 +58,15 @@ fun PrioritizeArtifactScreen(
     artifact: Artifact,
     prioritizer: Prioritizer,
     onBackClick: () -> Unit,
+    onArtifactSaved: (Artifact) -> Unit,
     viewModel: PrioritizeArtifactViewModel = viewModel { PrioritizeArtifactViewModel() }
 ) {
+    LaunchedEffect(viewModel.uiState.savedArtifact) {
+        viewModel.uiState.savedArtifact?.let { onArtifactSaved(it) }
+    }
+
     LaunchedEffect(artifact) {
-        viewModel.initialize(artifact.id, prioritizer)
+        viewModel.initialize(artifact, prioritizer)
     }
 
     Scaffold(
@@ -89,27 +98,33 @@ fun PrioritizeArtifactScreen(
                     .padding(24.dp)
             )
         } else {
-            ScreenContents(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .consumeWindowInsets(paddingValues)
                     .consumeWindowInsets(PaddingValues(vertical = 24.dp))
                     .padding(paddingValues)
                     .padding(vertical = 24.dp)
-                    .verticalScroll(rememberScrollState()),
-                artifact = artifact,
-                priority = viewModel.uiState.priority,
-                onPriorityChange = { viewModel.setPriority(it) },
-                enabled = !viewModel.uiState.loading
-            )
+            ) {
+                ScreenContents(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    artifact = artifact,
+                    priority = viewModel.uiState.priority,
+                    onPriorityChange = { viewModel.setPriority(it) },
+                    enabled = !viewModel.uiState.saving
+                )
 
-            PrimaryButton(
-                modifier = Modifier.fillMaxWidth(),
-                label = stringResource(Res.string.create_artifact_label),
-                onClick = { viewModel.prioritizeArtifact() },
-                enabled = !viewModel.uiState.loading && viewModel.uiState.canPrioritize,
-                loading = viewModel.uiState.loading
-            )
+                PrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(Res.string.conclude_label),
+                    onClick = { viewModel.prioritizeArtifact() },
+                    enabled = !viewModel.uiState.saving,
+                    loading = viewModel.uiState.saving
+                )
+            }
         }
     }
 
@@ -193,6 +208,19 @@ private fun ScreenContents(
             text = artifact.type.name
         )
 
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.artifact_external_link_label)
+        )
+
+        ExternalLink(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            url = artifact.externalLink
+        )
+
         PriorityFormFields(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
@@ -205,4 +233,18 @@ private fun ScreenContents(
 
         Spacer(Modifier.height(24.dp))
     }
+}
+
+@Composable
+private fun ExternalLink(
+    url: String,
+    modifier: Modifier = Modifier
+) {
+    val uriHandler = LocalUriHandler.current
+
+    Text(
+        modifier = modifier.clickable { uriHandler.openUri(url) },
+        style = MaterialTheme.typography.bodyMedium,
+        text = url.toLink()
+    )
 }

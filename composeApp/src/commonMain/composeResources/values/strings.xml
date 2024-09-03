@@ -57,7 +57,7 @@
     <string name="priority_moscow_could_have">Poderia ter</string>
     <string name="priority_moscow_should_have">Deveria ter</string>
     <string name="priority_moscow_must_have">Deve ter</string>
-    <string name="priority_wiegers_format">Prioridade: Valor: %1$d · Complexidade: %2$d · Impacto: %3$d</string>
+    <string name="priority_wiegers_format">Prioridade: %1$d</string>
     <string name="not_prioritized_label">Não priorizado</string>
     <string name="archived_label">Arquivado</string>
     <string name="new_artifact_label">Novo artefato</string>
@@ -107,6 +107,7 @@
     <string name="user_value_label">Valor para o usuário</string>
     <string name="complexity_label">Complexidade</string>
     <string name="impact_label">Impacto</string>
+    <string name="conclude_label">Concluir</string>
     <string name="create_artifact_label">Criar artefato</string>
     <string name="create_artifact_error_title">Erro ao criar artefato</string>
     <string name="create_artifact_error_message">Ocorreu um erro ao criar o artefato. Por favor, tente novamente.</string>

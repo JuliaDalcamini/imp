@@ -26,14 +26,14 @@ import com.julia.imp.artifact.edit.EditArtifactRoute
 import com.julia.imp.artifact.edit.EditArtifactScreen
 import com.julia.imp.artifact.list.ArtifactsRoute
 import com.julia.imp.artifact.list.ArtifactsScreen
+import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
+import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
 import com.julia.imp.inspection.create.CreateInspectionRoute
 import com.julia.imp.inspection.create.CreateInspectionScreen
 import com.julia.imp.login.LoginRoute
 import com.julia.imp.login.LoginScreen
-import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
-import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.project.ProjectsRoute
 import com.julia.imp.project.create.CreateProjectRoute
 import com.julia.imp.project.create.CreateProjectScreen
@@ -153,7 +153,14 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
-                        onPrioritizeArtifactClick = { navController.navigate(PrioritizeArtifactRoute(it, route.project)) }
+                        onPrioritizeArtifactClick = {
+                            navController.navigate(
+                                PrioritizeArtifactRoute(
+                                    it,
+                                    route.project
+                                )
+                            )
+                        }
                     )
                 }
 
@@ -162,7 +169,6 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                     CreateArtifactScreen(
                         projectId = route.project.id,
-                        prioritizer = route.project.prioritizer,
                         onBackClick = { navController.popBackStack() },
                         onArtifactCreated = { artifact ->
                             navController.run {
@@ -194,7 +200,13 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     PrioritizeArtifactScreen(
                         artifact = route.artifact,
                         prioritizer = route.project.prioritizer,
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onArtifactSaved = { artifact ->
+                            navController.run {
+                                popBackStack()
+                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
+                            }
+                        }
                     )
                 }
 

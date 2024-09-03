@@ -42,7 +42,6 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun CreateArtifactScreen(
     projectId: String,
-    prioritizer: Prioritizer,
     onBackClick: () -> Unit,
     onArtifactCreated: (Artifact) -> Unit,
     viewModel: CreateArtifactViewModel = viewModel { CreateArtifactViewModel() }
