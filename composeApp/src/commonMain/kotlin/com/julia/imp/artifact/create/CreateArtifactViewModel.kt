@@ -8,12 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactType
 import com.julia.imp.common.session.requireTeam
-import com.julia.imp.priority.MoscowPrioritizer
-import com.julia.imp.priority.MoscowPriority
-import com.julia.imp.priority.Prioritizer
-import com.julia.imp.priority.Priority
-import com.julia.imp.priority.WiegersPrioritizer
-import com.julia.imp.priority.WiegersPriority
 import com.julia.imp.team.inspector.InspectorRepository
 import com.julia.imp.user.User
 import kotlinx.coroutines.launch
@@ -56,6 +50,11 @@ class CreateArtifactViewModel(
         updateCreateButtonState()
     }
 
+    fun setExternalLink(externalLink: String) {
+        uiState = uiState.copy(externalLink = externalLink)
+        updateCreateButtonState()
+    }
+
     fun addInspector(inspector: User) {
         uiState = uiState.copy(inspectors = uiState.inspectors + inspector)
     }
@@ -72,6 +71,7 @@ class CreateArtifactViewModel(
                 val artifact = repository.createArtifact(
                     projectId = projectId,
                     name = uiState.name,
+                    externalLink = uiState.externalLink,
                     inspectors = uiState.inspectors,
                     type = uiState.type ?: throw IllegalStateException("Type not set"),
                     priority = uiState.priority

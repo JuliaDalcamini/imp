@@ -2,6 +2,8 @@ package com.julia.imp.common.navigation
 
 import androidx.core.bundle.Bundle
 import androidx.navigation.NavType
+import io.ktor.http.decodeURLPart
+import io.ktor.http.encodeURLPathPart
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.reflect.KType
@@ -12,9 +14,11 @@ class SerializableNavType<T>(type: KType) : NavType<T>(type.isMarkedNullable) {
     private val serializer = serializer(type)
 
     @Suppress("UNCHECKED_CAST")
-    override fun parseValue(value: String): T = Json.decodeFromString(serializer, value) as T
+    override fun parseValue(value: String): T =
+        Json.decodeFromString(serializer, value.decodeURLPart()) as T
 
-    override fun serializeAsValue(value: T): String = Json.encodeToString(serializer, value)
+    override fun serializeAsValue(value: T): String =
+        Json.encodeToString(serializer, value).encodeURLPathPart()
 
     override fun get(bundle: Bundle, key: String): T? {
         return bundle.getString(key)?.let { parseValue(it) }

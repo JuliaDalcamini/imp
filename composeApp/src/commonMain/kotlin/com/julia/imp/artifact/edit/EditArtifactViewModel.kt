@@ -29,6 +29,7 @@ class EditArtifactViewModel(
 
         uiState = uiState.copy(
             name = artifact.name,
+            externalLink = artifact.externalLink,
             type = artifact.type,
             priority = artifact.priority,
             inspectors = artifact.inspectors
@@ -52,6 +53,11 @@ class EditArtifactViewModel(
 
     fun setName(name: String) {
         uiState = uiState.copy(name = name)
+        updateSaveButtonState()
+    }
+
+    fun setExternalLink(externalLink: String) {
+        uiState = uiState.copy(externalLink = externalLink)
         updateSaveButtonState()
     }
 
@@ -92,6 +98,7 @@ class EditArtifactViewModel(
 
     private fun getUpdatedArtifact() = artifact.copy(
         name = uiState.name,
+        externalLink = uiState.externalLink,
         type = uiState.type ?: throw IllegalStateException("Type not set"),
         priority = uiState.priority ?: throw IllegalStateException("Priority not set"),
         inspectors = uiState.inspectors

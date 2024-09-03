@@ -1,5 +1,6 @@
 package com.julia.imp.artifact.details
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,6 +40,7 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactInspectorList
 import com.julia.imp.common.datetime.DateTimeFormats
 import com.julia.imp.common.text.getInitials
+import com.julia.imp.common.text.toLink
 import com.julia.imp.common.ui.avatar.Avatar
 import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.common.ui.dialog.ErrorDialog
@@ -54,6 +57,7 @@ import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.archived_artifact_alert_message
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.artifact_details_title
+import imp.composeapp.generated.resources.artifact_external_link_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.assignment_24px
@@ -239,6 +243,19 @@ fun ArtifactDetails(
             text = artifact.type.name
         )
 
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.artifact_external_link_label)
+        )
+
+        ExternalLink(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            url = artifact.externalLink
+        )
+
         if (artifact.priority != null) {
             Text(
                 modifier = Modifier
@@ -405,4 +422,18 @@ fun ArchivedArtifactAlert(modifier: Modifier = Modifier) {
             )
         }
     }
+}
+
+@Composable
+private fun ExternalLink(
+    url: String,
+    modifier: Modifier = Modifier
+) {
+    val uriHandler = LocalUriHandler.current
+
+    Text(
+        modifier = modifier.clickable { uriHandler.openUri(url) },
+        style = MaterialTheme.typography.bodyMedium,
+        text = url.toLink()
+    )
 }

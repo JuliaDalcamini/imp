@@ -85,12 +85,12 @@ fun CreateArtifactScreen(
                 onNameChange = { viewModel.setName(it) },
                 type = viewModel.uiState.type,
                 onTypeChange = { viewModel.setType(it) },
-                //priority = viewModel.uiState.priority,
-                //onPriorityChange = { viewModel.setPriority(it) },
                 inspectors = viewModel.uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 availableTypes = viewModel.uiState.availableTypes,
+                externalLink = viewModel.uiState.externalLink,
+                onExternalLinkChange = { viewModel.setExternalLink(it) },
                 enabled = !viewModel.uiState.loading
             )
 

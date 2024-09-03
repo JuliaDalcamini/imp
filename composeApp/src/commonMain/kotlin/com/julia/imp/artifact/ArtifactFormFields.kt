@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.user.User
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.artifact_external_link_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.inspectors_label
@@ -30,6 +31,8 @@ fun ArtifactFormFields(
     onAddInspectorClick: () -> Unit,
     onRemoveInspectorClick: (User) -> Unit,
     availableTypes: List<ArtifactType>?,
+    externalLink: String,
+    onExternalLinkChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
@@ -40,6 +43,15 @@ fun ArtifactFormFields(
             onValueChange = onNameChange,
             enabled = enabled,
             label = { Text(stringResource(Res.string.artifact_name_label)) },
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            modifier = Modifier,
+            value = externalLink,
+            onValueChange = onExternalLinkChange,
+            enabled = enabled,
+            label = { Text(stringResource(Res.string.artifact_external_link_label)) },
             singleLine = true
         )
 

@@ -31,6 +31,7 @@ class ArtifactRepository(
     suspend fun createArtifact(
         projectId: String,
         name: String,
+        externalLink: String,
         type: ArtifactType,
         priority: Priority?,
         inspectors: List<User>
@@ -41,6 +42,7 @@ class ArtifactRepository(
             setBody(
                 CreateArtifactRequest(
                     name = name,
+                    externalLink = externalLink,
                     artifactTypeId = type.id,
                     priority = priority,
                     inspectorIds = inspectors.map { it.id }
@@ -55,6 +57,7 @@ class ArtifactRepository(
             setBody(
                 UpdateArtifactRequest(
                     name = artifact.name,
+                    externalLink = artifact.externalLink,
                     artifactTypeId = artifact.type.id,
                     priority = artifact.priority,
                     inspectorIds = artifact.inspectors.map { it.id }

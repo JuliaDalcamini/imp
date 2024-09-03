@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class Artifact(
     val id: String,
     val name: String,
+    val externalLink: String,
     val type: ArtifactType,
     val projectId: String,
     val priority: Priority?,
