@@ -10,4 +10,6 @@ data class UserSession(
 ) {
 
     val isTeamAdmin: Boolean by lazy { roleInTeam == Role.Admin }
+
+    val isInspector: Boolean by lazy { roleInTeam == Role.Inspector }
 }

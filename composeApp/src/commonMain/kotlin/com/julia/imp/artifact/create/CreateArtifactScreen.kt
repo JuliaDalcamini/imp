@@ -24,7 +24,6 @@ import com.julia.imp.artifact.ArtifactFormFields
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.Title
-import com.julia.imp.priority.Prioritizer
 import com.julia.imp.user.UserPickerDialog
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
@@ -82,6 +81,8 @@ fun CreateArtifactScreen(
                     .verticalScroll(rememberScrollState()),
                 name = viewModel.uiState.name,
                 onNameChange = { viewModel.setName(it) },
+                currentVersion = viewModel.uiState.currentVersion,
+                onVersionChange = { viewModel.setCurrentVersion(it) },
                 type = viewModel.uiState.type,
                 onTypeChange = { viewModel.setType(it) },
                 inspectors = viewModel.uiState.inspectors,

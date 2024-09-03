@@ -81,6 +81,8 @@ fun EditArtifactScreen(
                     .verticalScroll(rememberScrollState()),
                 name = viewModel.uiState.name,
                 onNameChange = { viewModel.setName(it) },
+                currentVersion = viewModel.uiState.currentVersion,
+                onVersionChange = { viewModel.setCurrentVersion(it) },
                 type = viewModel.uiState.type,
                 onTypeChange = { viewModel.setType(it) },
                 inspectors = viewModel.uiState.inspectors,
@@ -95,7 +97,7 @@ fun EditArtifactScreen(
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.save_label),
-                onClick = { viewModel.createArtifact() },
+                onClick = { viewModel.updateArtifact() },
                 enabled = !viewModel.uiState.saving && viewModel.uiState.canSave,
                 loading = viewModel.uiState.saving
             )

@@ -50,6 +50,11 @@ class CreateArtifactViewModel(
         updateCreateButtonState()
     }
 
+    fun setCurrentVersion(currentVersion: String) {
+        uiState = uiState.copy(currentVersion = currentVersion)
+        updateCreateButtonState()
+    }
+
     fun setExternalLink(externalLink: String) {
         uiState = uiState.copy(externalLink = externalLink)
         updateCreateButtonState()
@@ -71,6 +76,7 @@ class CreateArtifactViewModel(
                 val artifact = repository.createArtifact(
                     projectId = projectId,
                     name = uiState.name,
+                    currentVersion = uiState.currentVersion,
                     externalLink = uiState.externalLink,
                     inspectors = uiState.inspectors,
                     type = uiState.type ?: throw IllegalStateException("Type not set"),
@@ -109,7 +115,8 @@ class CreateArtifactViewModel(
 
             try {
                 val inspectors = inspectorRepository.getInspectors(requireTeam().id)
-                uiState = uiState.copy(availableInspectors = inspectors - uiState.inspectors.toSet())
+                uiState =
+                    uiState.copy(availableInspectors = inspectors - uiState.inspectors.toSet())
             } catch (error: Throwable) {
                 uiState = uiState.copy(loadError = true, showInspectorPicker = false)
             }

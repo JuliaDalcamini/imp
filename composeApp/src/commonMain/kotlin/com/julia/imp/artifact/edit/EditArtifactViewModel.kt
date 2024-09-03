@@ -9,7 +9,6 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactType
 import com.julia.imp.common.session.requireTeam
-import com.julia.imp.priority.Priority
 import com.julia.imp.team.inspector.InspectorRepository
 import com.julia.imp.user.User
 import kotlinx.coroutines.launch
@@ -29,6 +28,7 @@ class EditArtifactViewModel(
 
         uiState = uiState.copy(
             name = artifact.name,
+            currentVersion = artifact.currentVersion,
             externalLink = artifact.externalLink,
             type = artifact.type,
             inspectors = artifact.inspectors
@@ -55,6 +55,11 @@ class EditArtifactViewModel(
         updateSaveButtonState()
     }
 
+    fun setCurrentVersion(currentVersion: String) {
+        uiState = uiState.copy(currentVersion = currentVersion)
+        updateSaveButtonState()
+    }
+
     fun setExternalLink(externalLink: String) {
         uiState = uiState.copy(externalLink = externalLink)
         updateSaveButtonState()
@@ -62,11 +67,6 @@ class EditArtifactViewModel(
 
     fun setType(type: ArtifactType) {
         uiState = uiState.copy(type = type)
-        updateSaveButtonState()
-    }
-
-    fun setPriority(priority: Priority) {
-        uiState = uiState.copy(priority = priority)
         updateSaveButtonState()
     }
 
@@ -80,7 +80,7 @@ class EditArtifactViewModel(
         updateSaveButtonState()
     }
 
-    fun createArtifact() {
+    fun updateArtifact() {
         viewModelScope.launch {
             uiState = uiState.copy(saving = true)
 
@@ -97,6 +97,7 @@ class EditArtifactViewModel(
 
     private fun getUpdatedArtifact() = artifact.copy(
         name = uiState.name,
+        currentVersion = uiState.currentVersion,
         externalLink = uiState.externalLink,
         type = uiState.type ?: throw IllegalStateException("Type not set"),
         inspectors = uiState.inspectors

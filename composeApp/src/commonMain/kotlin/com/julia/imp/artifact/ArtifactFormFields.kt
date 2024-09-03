@@ -17,6 +17,7 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.artifact_external_link_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
+import imp.composeapp.generated.resources.artifact_version_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.select_label
 import org.jetbrains.compose.resources.stringResource
@@ -25,6 +26,8 @@ import org.jetbrains.compose.resources.stringResource
 fun ArtifactFormFields(
     name: String,
     onNameChange: (String) -> Unit,
+    currentVersion: String,
+    onVersionChange: (String) -> Unit,
     type: ArtifactType?,
     onTypeChange: (ArtifactType) -> Unit,
     inspectors: List<User>,
@@ -47,7 +50,16 @@ fun ArtifactFormFields(
         )
 
         OutlinedTextField(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+            value = currentVersion,
+            onValueChange = onVersionChange,
+            enabled = enabled,
+            label = { Text(stringResource(Res.string.artifact_version_label)) },
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
             value = externalLink,
             onValueChange = onExternalLinkChange,
             enabled = enabled,

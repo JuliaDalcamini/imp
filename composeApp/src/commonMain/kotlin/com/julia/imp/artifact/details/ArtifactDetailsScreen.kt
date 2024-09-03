@@ -58,12 +58,15 @@ import imp.composeapp.generated.resources.archived_artifact_alert_message
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.artifact_details_title
 import imp.composeapp.generated.resources.artifact_external_link_label
+import imp.composeapp.generated.resources.artifact_last_modification_label
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
+import imp.composeapp.generated.resources.artifact_version_label
 import imp.composeapp.generated.resources.assignment_24px
 import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.inspect_label
+import imp.composeapp.generated.resources.inspection_title
 import imp.composeapp.generated.resources.inspections_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.inventory_2_24px
@@ -73,6 +76,7 @@ import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.made_on_format
 import imp.composeapp.generated.resources.never
 import imp.composeapp.generated.resources.priority_label
+import imp.composeapp.generated.resources.priority_moscow_format
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.select_inspector_label
 import kotlinx.datetime.Instant
@@ -248,6 +252,36 @@ fun ArtifactDetails(
                 .padding(horizontal = 24.dp)
                 .padding(top = 24.dp, bottom = 4.dp),
             style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.artifact_version_label)
+        )
+
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            text = artifact.currentVersion
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.artifact_last_modification_label)
+        )
+
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            text = artifact.lastModification
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .format(DateTimeFormats.DEFAULT)
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
             text = stringResource(Res.string.artifact_external_link_label)
         )
 
@@ -309,6 +343,7 @@ fun ArtifactDetails(
             )
         }
 
+        //TODO inspetores podem visualizar apenas as proprias inspeções
         if (!inspections.isNullOrEmpty()) {
             Text(
                 modifier = Modifier
@@ -347,7 +382,10 @@ fun ArtifactDetails(
 
                                     Text(
                                         modifier = Modifier.padding(start = 8.dp),
-                                        text = inspection.inspector.fullName,
+                                        text = stringResource(
+                                            Res.string.inspection_title,
+                                            inspection.inspector.fullName
+                                        ),
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onSurface,
                                         maxLines = 1,

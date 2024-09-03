@@ -96,6 +96,8 @@
     <string name="viewer_label">Visualizador</string>
     <string name="new_artifact_title">Novo artefato</string>
     <string name="artifact_name_label">Nome do artefato</string>
+    <string name="artifact_version_label">Versão</string>
+    <string name="artifact_last_modification_label">Última Modificação</string>
     <string name="artifact_type_label">Tipo de artefato</string>
     <string name="artifact_external_link_label">Link externo para o Artefato</string>
     <string name="select_label">Selecionar</string>
@@ -136,4 +138,5 @@
     <string name="finish_inspection_error_title">Erro ao finalizar inspeção</string>
     <string name="finish_inspection_error_message">Ocorreu um erro ao finalizar a inspeção. Por favor, tente novamente.</string>
     <string name="rename_team_title">Renomear time</string>
+    <string name="inspection_title">Inspecionado por: %1$s</string>
 </resources>

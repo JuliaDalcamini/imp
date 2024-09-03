@@ -52,6 +52,12 @@ class ArtifactDetailsViewModel(
             uiState = uiState.copy(loading = true)
 
             try {
+                val isInspector = requireSession().isInspector
+
+                uiState = uiState.copy(
+                    showOnlyMyInspections = isInspector
+                )
+
                 val inspections = inspectionRepository.getInspections(
                     projectId = artifact.projectId,
                     artifactId = artifact.id

@@ -7,6 +7,7 @@ import com.julia.imp.user.User
 
 data class CreateArtifactUiState(
     val name: String = "",
+    val currentVersion: String = "",
     val externalLink: String = "",
     val type: ArtifactType? = null,
     val priority: Priority? = null,

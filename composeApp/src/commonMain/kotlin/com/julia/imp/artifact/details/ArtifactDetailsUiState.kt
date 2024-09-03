@@ -14,5 +14,6 @@ data class ArtifactDetailsUiState(
     val availableInspectors: List<User>? = null,
     val inspectors: List<User> = emptyList(),
     val updatingInspectors: Boolean = false,
-    val actionError: Boolean = false
+    val actionError: Boolean = false,
+    val showOnlyMyInspections: Boolean = false
 )

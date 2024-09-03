@@ -2,6 +2,7 @@ package com.julia.imp.artifact
 
 import com.julia.imp.priority.Priority
 import com.julia.imp.user.User
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,5 +15,7 @@ data class Artifact(
     val priority: Priority?,
     val archived: Boolean,
     val inspectors: List<User>,
-    val calculatedPriority: Double?
+    val calculatedPriority: Double?,
+    val lastModification: Instant,
+    val currentVersion: String
 )
