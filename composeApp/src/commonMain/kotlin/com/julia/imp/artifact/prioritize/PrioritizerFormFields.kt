@@ -1,17 +1,18 @@
-package com.julia.imp.priority
+package com.julia.imp.artifact.prioritize
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.common.ui.form.SliderFormField
+import com.julia.imp.priority.MoscowPriority
+import com.julia.imp.priority.MoscowPriorityLevel
+import com.julia.imp.priority.Priority
+import com.julia.imp.priority.WiegersPriority
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.complexity_label
 import imp.composeapp.generated.resources.impact_label
@@ -20,7 +21,7 @@ import imp.composeapp.generated.resources.user_value_label
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun PrioritizerFormFields(
+fun PriorityFormFields(
     priority: Priority?,
     onPriorityChange: (Priority) -> Unit,
     modifier: Modifier = Modifier,
@@ -29,14 +30,14 @@ fun PrioritizerFormFields(
     Column(modifier) {
         when (priority) {
             is MoscowPriority -> MoscowPriorityFormFields(
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                modifier = Modifier.fillMaxWidth(),
                 priority = priority,
                 onValueChange = onPriorityChange,
                 enabled = enabled
             )
 
             is WiegersPriority -> WiegersPriorityFormFields(
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                modifier = Modifier.fillMaxWidth(),
                 priority = priority,
                 onValueChange = onPriorityChange,
                 enabled = enabled
@@ -44,8 +45,6 @@ fun PrioritizerFormFields(
 
             null -> {}
         }
-
-        Spacer(Modifier.height(24.dp))
     }
 }
 

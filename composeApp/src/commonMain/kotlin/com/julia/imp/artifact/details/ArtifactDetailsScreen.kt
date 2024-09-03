@@ -239,15 +239,15 @@ fun ArtifactDetails(
             text = artifact.type.name
         )
 
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.priority_label)
-        )
-
         if (artifact.priority != null) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 4.dp),
+                style = MaterialTheme.typography.labelMedium,
+                text = stringResource(Res.string.priority_label)
+            )
+
             Text(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
@@ -292,7 +292,7 @@ fun ArtifactDetails(
             )
         }
 
-        if (inspections != null) {
+        if (!inspections.isNullOrEmpty()) {
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)

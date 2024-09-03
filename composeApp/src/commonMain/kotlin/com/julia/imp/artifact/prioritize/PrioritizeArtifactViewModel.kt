@@ -1,18 +1,24 @@
-package com.julia.imp.priority
+package com.julia.imp.artifact.prioritize
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.julia.imp.artifact.ArtifactRepository
+import com.julia.imp.priority.MoscowPrioritizer
+import com.julia.imp.priority.MoscowPriority
+import com.julia.imp.priority.Prioritizer
+import com.julia.imp.priority.Priority
+import com.julia.imp.priority.WiegersPrioritizer
+import com.julia.imp.priority.WiegersPriority
 
-class PrioritizerViewModel(
+class PrioritizeArtifactViewModel(
     private val repository: ArtifactRepository = ArtifactRepository()
 ) : ViewModel() {
 
     private lateinit var artifactId: String
 
-    var uiState by mutableStateOf(PrioritizerUiState())
+    var uiState by mutableStateOf(PrioritizeArtifactUiState())
         private set
 
     fun initialize(artifactId: String, prioritizer: Prioritizer) {

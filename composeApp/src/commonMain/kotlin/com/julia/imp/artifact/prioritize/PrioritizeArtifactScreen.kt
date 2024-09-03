@@ -1,11 +1,13 @@
-package com.julia.imp.priority
+package com.julia.imp.artifact.prioritize
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,40 +25,39 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.details.ArchivedArtifactAlert
-import com.julia.imp.artifact.details.ArtifactDetailsViewModel
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
+import com.julia.imp.priority.Prioritizer
+import com.julia.imp.priority.Priority
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.arrow_back_24px
-import imp.composeapp.generated.resources.artifact_details_title
 import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.create_artifact_label
-import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.prioritize_artifact_error_message
 import imp.composeapp.generated.resources.prioritize_artifact_error_title
+import imp.composeapp.generated.resources.prioritize_artifact_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrioritizerScreen(
-    prioritizer: Prioritizer,
+fun PrioritizeArtifactScreen(
     artifact: Artifact,
+    prioritizer: Prioritizer,
     onBackClick: () -> Unit,
-    onEditClick: () -> Unit,
-    detailsViewModel: ArtifactDetailsViewModel = androidx.lifecycle.viewmodel.compose.viewModel { ArtifactDetailsViewModel() },
-    viewModel: PrioritizerViewModel
+    viewModel: PrioritizeArtifactViewModel = viewModel { PrioritizeArtifactViewModel() }
 ) {
     LaunchedEffect(artifact) {
-        detailsViewModel.initialize(artifact)
+        viewModel.initialize(artifact.id, prioritizer)
     }
 
     Scaffold(
@@ -70,21 +71,15 @@ fun PrioritizerScreen(
                 },
                 title = {
                     CompoundTitle(
-                        title = stringResource(Res.string.artifact_details_title),
+                        title = stringResource(Res.string.prioritize_artifact_title),
                         subtitle = artifact.name
                     )
                 },
-                actions = {
-                    if (!artifact.archived) {
-                        IconButton(onClick = onEditClick) {
-                            Icon(vectorResource(Res.drawable.edit_24px), null)
-                        }
-                    }
-                }
+                actions = { }
             )
         },
     ) { paddingValues ->
-        if (detailsViewModel.uiState.loading) {
+        if (viewModel.uiState.loading) {
             Placeholder(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,7 +89,7 @@ fun PrioritizerScreen(
                     .padding(24.dp)
             )
         } else {
-            ArtifactDetails(
+            ScreenContents(
                 modifier = Modifier
                     .fillMaxSize()
                     .consumeWindowInsets(paddingValues)
@@ -102,16 +97,10 @@ fun PrioritizerScreen(
                     .padding(paddingValues)
                     .padding(vertical = 24.dp)
                     .verticalScroll(rememberScrollState()),
-                artifact = artifact
-            )
-
-            PrioritizerFormFields(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                artifact = artifact,
                 priority = viewModel.uiState.priority,
                 onPriorityChange = { viewModel.setPriority(it) },
-                enabled = !detailsViewModel.uiState.loading
+                enabled = !viewModel.uiState.loading
             )
 
             PrimaryButton(
@@ -160,8 +149,11 @@ private fun Placeholder(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ArtifactDetails(
+private fun ScreenContents(
     artifact: Artifact,
+    priority: Priority?,
+    onPriorityChange: (Priority) -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -200,5 +192,17 @@ fun ArtifactDetails(
             style = MaterialTheme.typography.bodyMedium,
             text = artifact.type.name
         )
+
+        PriorityFormFields(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp)
+                .fillMaxWidth(),
+            priority = priority,
+            onPriorityChange = onPriorityChange,
+            enabled = enabled
+        )
+
+        Spacer(Modifier.height(24.dp))
     }
 }

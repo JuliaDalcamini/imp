@@ -80,10 +80,11 @@ import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
 import imp.composeapp.generated.resources.no_artifacts_message
+import imp.composeapp.generated.resources.not_prioritized_label
 import imp.composeapp.generated.resources.priority_moscow_format
-import imp.composeapp.generated.resources.priority_null_message
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.refresh_24px
+import imp.composeapp.generated.resources.swap_vert_24px
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -96,6 +97,8 @@ fun ArtifactsScreen(
     onArtifactClick: (Artifact) -> Unit,
     onNewArtifactClick: () -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
+    onPrioritizeArtifactClick: (Artifact) -> Unit,
+
     viewModel: ArtifactsViewModel = viewModel { ArtifactsViewModel() }
 ) {
     LaunchedEffect(viewModel.uiState.filter) {
@@ -142,6 +145,7 @@ fun ArtifactsScreen(
                 onArtifactClick = onArtifactClick,
                 onEditArtifactClick = onEditArtifactClick,
                 onArchiveArtifactClick = { viewModel.askToArchive(it) },
+                onPrioritizeArtifactClick = onPrioritizeArtifactClick,
                 selectedFilter = viewModel.uiState.filter,
                 onFilterChange = { viewModel.setFilter(it) }
             )
@@ -231,6 +235,7 @@ fun ArtifactList(
     onArtifactClick: (Artifact) -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
     onArchiveArtifactClick: (Artifact) -> Unit,
+    onPrioritizeArtifactClick: (Artifact) -> Unit,
     selectedFilter: ArtifactFilter,
     onFilterChange: (ArtifactFilter) -> Unit,
     modifier: Modifier = Modifier,
@@ -260,7 +265,8 @@ fun ArtifactList(
                     showOptions = entry.showOptions,
                     onClick = { onArtifactClick(entry.artifact) },
                     onEditClick = { onEditArtifactClick(entry.artifact) },
-                    onArchiveClick = { onArchiveArtifactClick(entry.artifact) }
+                    onArchiveClick = { onArchiveArtifactClick(entry.artifact) },
+                    onPrioritizeClick = { onPrioritizeArtifactClick(entry.artifact) }
                 )
             }
         }
@@ -309,6 +315,7 @@ fun ArtifactListItem(
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
+    onPrioritizeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -397,8 +404,19 @@ fun ArtifactListItem(
                 Box {
                     var expandOptions by remember { mutableStateOf(false) }
 
-                    IconButton(onClick = { expandOptions = true }) {
-                        Icon(vectorResource(Res.drawable.more_vert_24px), null)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(onClick = onPrioritizeClick,) {
+                            Icon(vectorResource(Res.drawable.swap_vert_24px), null)
+                        }
+
+                        if (showOptions) {
+                            IconButton(onClick = { expandOptions = true }) {
+                                Icon(vectorResource(Res.drawable.more_vert_24px), null)
+                            }
+                        }
                     }
 
                     ArtifactOptionsDropdown(
@@ -418,7 +436,7 @@ private fun getPriorityText(priority: Priority?) =
     when (priority) {
         is MoscowPriority -> stringResource(Res.string.priority_moscow_format, priority.level.getLabel())
         is WiegersPriority -> getWiegersPriorityText(priority)
-        null -> stringResource(Res.string.priority_null_message)
+        null -> stringResource(Res.string.not_prioritized_label)
     }
 
 @Composable

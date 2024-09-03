@@ -56,7 +56,7 @@
     <string name="priority_moscow_should_have">Deveria ter</string>
     <string name="priority_moscow_must_have">Deve ter</string>
     <string name="priority_wiegers_format">Prioridade: Valor: %1$d · Complexidade: %2$d · Impacto: %3$d</string>
-    <string name="priority_null_message">Este artefatoa ainda não foi priorizado.</string>
+    <string name="not_prioritized_label">Não priorizado</string>
     <string name="archived_label">Arquivado</string>
     <string name="new_artifact_label">Novo artefato</string>
     <string name="edit_label">Editar</string>
@@ -110,6 +110,7 @@
     <string name="edit_artifact_title">Editar artefato</string>
     <string name="save_artifact_error_title">Erro ao salvar artefato</string>
     <string name="save_artifact_error_message">Ocorreu um erro ao salvar o artefato. Por favor, tente novamente.</string>
+    <string name="prioritize_artifact_title">Priorizar Artefato</string>
     <string name="prioritize_artifact_error_title">Erro ao priorizar artefato</string>
     <string name="prioritize_artifact_error_message">Ocorreu um erro ao priorizar o artefato. Por favor, tente novamente.</string>
     <string name="save_label">Salvar</string>

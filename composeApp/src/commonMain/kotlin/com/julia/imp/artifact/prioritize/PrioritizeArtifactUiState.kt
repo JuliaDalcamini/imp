@@ -1,10 +1,12 @@
-package com.julia.imp.priority
+package com.julia.imp.artifact.prioritize
 
-data class PrioritizerUiState (
+import com.julia.imp.priority.Priority
+
+data class PrioritizeArtifactUiState (
     val priority: Priority? = null,
     val canPrioritize: Boolean = false,
     val prioritizeError: Boolean = false,
     val loadError: Boolean = false,
     val actionError: Boolean = false,
-    val loading: Boolean = true,
+    val loading: Boolean = false,
 )

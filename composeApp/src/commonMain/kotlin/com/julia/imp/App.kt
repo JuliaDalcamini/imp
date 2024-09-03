@@ -32,6 +32,8 @@ import com.julia.imp.inspection.create.CreateInspectionRoute
 import com.julia.imp.inspection.create.CreateInspectionScreen
 import com.julia.imp.login.LoginRoute
 import com.julia.imp.login.LoginScreen
+import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
+import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.project.ProjectsRoute
 import com.julia.imp.project.create.CreateProjectRoute
 import com.julia.imp.project.create.CreateProjectScreen
@@ -150,7 +152,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onBackClick = { navController.popBackStack() },
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
-                        onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) }
+                        onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
+                        onPrioritizeArtifactClick = { navController.navigate(PrioritizeArtifactRoute(it, route.project)) }
                     )
                 }
 
@@ -182,6 +185,16 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                                 popUpToAndNavigate(ArtifactDetailsRoute(artifact))
                             }
                         }
+                    )
+                }
+
+                composable<PrioritizeArtifactRoute>(PrioritizeArtifactRoute.typeMap) { entry ->
+                    val route = entry.toRoute<PrioritizeArtifactRoute>()
+
+                    PrioritizeArtifactScreen(
+                        artifact = route.artifact,
+                        prioritizer = route.project.prioritizer,
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
 
