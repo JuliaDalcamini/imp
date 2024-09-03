@@ -13,5 +13,6 @@ data class Project(
     val creationDateTime: Instant,
     val creator: User,
     val prioritizer: Prioritizer,
+    val totalInspectors: Int,
     val team: Team
 )

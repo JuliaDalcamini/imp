@@ -22,6 +22,10 @@ class CreateProjectViewModel(
         uiState = uiState.copy(name = name)
     }
 
+    fun setInspectorCount(count: Int) {
+        uiState = uiState.copy(totalInspectors = count)
+    }
+
     fun setPrioritizer(prioritizer: Prioritizer) {
         uiState = uiState.copy(prioritizer = prioritizer)
     }
@@ -33,6 +37,7 @@ class CreateProjectViewModel(
             try {
                 repository.createProject(
                     name = uiState.name,
+                    totalInspectors = uiState.totalInspectors,
                     prioritizer = uiState.prioritizer,
                     teamId = requireTeam().id
                 )

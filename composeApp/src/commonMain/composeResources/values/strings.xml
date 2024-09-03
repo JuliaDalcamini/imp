@@ -34,6 +34,8 @@
     <string name="delete_project_message">Tem certeza de que deseja excluir o projeto %1$s? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
     <string name="rename_project_title">Renomear projeto</string>
     <string name="new_project_title">Novo projeto</string>
+    <string name="inspectors_number_label">Número de inspetores necessários por inspeção</string>
+    <string name="inspectors_number_select">Selecione o número de inspetores</string>
     <string name="project_name_label">Nome do projeto</string>
     <string name="prioritization_method_label">Método de priorização</string>
     <string name="create_project_label">Criar projeto</string>
@@ -95,6 +97,7 @@
     <string name="new_artifact_title">Novo artefato</string>
     <string name="artifact_name_label">Nome do artefato</string>
     <string name="artifact_type_label">Tipo de artefato</string>
+    <string name="artifact_external_link_label">Link externo para o Artefato</string>
     <string name="select_label">Selecionar</string>
     <string name="inspectors_label">Inspetores</string>
     <string name="add_label">Adicionar</string>

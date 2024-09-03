@@ -27,9 +27,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.common.ui.form.FormField
 import com.julia.imp.common.ui.form.SliderFormField
 import com.julia.imp.common.ui.title.Title
@@ -42,6 +42,7 @@ import imp.composeapp.generated.resources.create_project_error_message
 import imp.composeapp.generated.resources.create_project_error_title
 import imp.composeapp.generated.resources.create_project_label
 import imp.composeapp.generated.resources.impact_weight_label
+import imp.composeapp.generated.resources.inspectors_number_label
 import imp.composeapp.generated.resources.moscow_label
 import imp.composeapp.generated.resources.new_project_title
 import imp.composeapp.generated.resources.prioritization_method_label
@@ -70,7 +71,7 @@ fun CreateProjectScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
-                 },
+                },
                 title = { Title(stringResource(Res.string.new_project_title)) }
             )
         }
@@ -100,6 +101,18 @@ fun CreateProjectScreen(
                     enabled = !viewModel.uiState.loading,
                     label = { Text(stringResource(Res.string.project_name_label)) },
                     singleLine = true
+                )
+
+                val inspectorOptions = listOf(2, 3, 4, 5)
+
+                DropdownFormField(
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    text = viewModel.uiState.totalInspectors.toString(),
+                    label = stringResource(Res.string.inspectors_number_label),
+                    options = inspectorOptions,
+                    onOptionSelected = { viewModel.setInspectorCount(it) },
+                    enabled = !viewModel.uiState.loading,
+                    optionLabel = { optionNumber -> Text(optionNumber.toString()) }
                 )
 
                 FormField(
@@ -169,7 +182,8 @@ fun WiegersPrioritizerFormFields(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        val totalWeight = prioritizer.userValueWeight + prioritizer.complexityWeight + prioritizer.impactWeight
+        val totalWeight =
+            prioritizer.userValueWeight + prioritizer.complexityWeight + prioritizer.impactWeight
 
         WeightSliderFormField(
             label = stringResource(Res.string.user_value_weight_label),
@@ -203,7 +217,7 @@ fun WiegersPrioritizerFormFields(
             value = prioritizer.impactWeight,
             onValueChange = {
                 val newTotalWeight = totalWeight - prioritizer.impactWeight + it
-                
+
                 if (newTotalWeight <= 1 && it >= 0.1f) {
                     onValueChange(prioritizer.copy(impactWeight = it))
                 }

@@ -30,13 +30,14 @@ class ProjectRepository(private val client: HttpClient = configuredHttpClient) {
         }
     }
 
-    suspend fun createProject(name: String, prioritizer: Prioritizer, teamId: String) {
+    suspend fun createProject(name: String, prioritizer: Prioritizer, totalInspectors: Int, teamId: String) {
         client.post("projects") {
             contentType(ContentType.Application.Json)
 
             setBody(
                 CreateProjectRequest(
                     name = name,
+                    totalInspectors = totalInspectors,
                     prioritizer = prioritizer,
                     teamId = teamId
                 )
