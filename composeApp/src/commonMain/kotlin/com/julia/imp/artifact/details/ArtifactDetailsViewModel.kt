@@ -42,8 +42,10 @@ class ArtifactDetailsViewModel(
         )
     }
 
-    private fun isUserInInspectorList(): Boolean {
-        val userId = requireSession().userId
+    fun getLoggedUserId(): String = requireSession().userId
+
+    fun isUserInInspectorList(): Boolean {
+        val userId = getLoggedUserId()
         return uiState.inspectors.any { it.id == userId }
     }
 
@@ -55,7 +57,7 @@ class ArtifactDetailsViewModel(
                 val isInspector = requireSession().isInspector
 
                 uiState = uiState.copy(
-                    showOnlyMyInspections = isInspector
+                    isInspector = isInspector
                 )
 
                 val inspections = inspectionRepository.getInspections(

@@ -76,7 +76,6 @@ import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.made_on_format
 import imp.composeapp.generated.resources.never
 import imp.composeapp.generated.resources.priority_label
-import imp.composeapp.generated.resources.priority_moscow_format
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.select_inspector_label
 import kotlinx.datetime.Instant
@@ -158,7 +157,9 @@ fun ArtifactDetailsScreen(
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 enableInspectorControls = !viewModel.uiState.updatingInspectors,
                 lastInspection = viewModel.uiState.lastInspection,
-                inspections = viewModel.uiState.inspections
+                inspections = viewModel.uiState.inspections,
+                isInspector = viewModel.uiState.isInspector,
+                loggedUserId = { viewModel.getLoggedUserId() }
             )
         }
     }
@@ -208,6 +209,8 @@ fun ArtifactDetails(
     enableInspectorControls: Boolean,
     lastInspection: Instant?,
     inspections: List<Inspection>?,
+    isInspector: Boolean,
+    loggedUserId: () -> String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -343,80 +346,92 @@ fun ArtifactDetails(
             )
         }
 
-        //TODO inspetores podem visualizar apenas as proprias inspeções
-        if (!inspections.isNullOrEmpty()) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 12.dp),
-                style = MaterialTheme.typography.labelMedium,
-                text = stringResource(Res.string.inspections_label)
-            )
+        val filteredInspections =
+            if (isInspector) inspections?.filter { it.inspector.id == loggedUserId.invoke() }
+            else inspections
 
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(inspections) { inspection ->
-                        val formattedDateTime = inspection.createdAt
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
-                            .format(DateTimeFormats.DEFAULT)
+        getInspections(filteredInspections)
 
-                        ElevatedCard(
-                            modifier = Modifier.widthIn(max = maxWidth - 48.dp),
-                            onClick = {
-                                // TODO: Redirect to inspection details
-                            }
-                        ) {
-                            Column(Modifier.padding(24.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Avatar(
-                                        initials = inspection.inspector.fullName.getInitials(),
-                                        size = AvatarSize.Small,
-                                    )
+    }
+}
 
-                                    Text(
-                                        modifier = Modifier.padding(start = 8.dp),
-                                        text = stringResource(
-                                            Res.string.inspection_title,
-                                            inspection.inspector.fullName
-                                        ),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
+@Composable
+private fun getInspections(
+    inspections: List<Inspection>?,
+    modifier: Modifier = Modifier
+) {
+    if (!inspections.isNullOrEmpty()) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 12.dp),
+            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.inspections_label)
+        )
 
-                                Text(
-                                    modifier = Modifier.padding(top = 12.dp),
-                                    text = stringResource(
-                                        Res.string.made_on_format,
-                                        formattedDateTime
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(inspections) { inspection ->
+                    val formattedDateTime = inspection.createdAt
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                        .format(DateTimeFormats.DEFAULT)
+
+                    ElevatedCard(
+                        modifier = Modifier.widthIn(max = maxWidth - 48.dp),
+                        onClick = {
+                            // TODO: Redirect to inspection details
+                        }
+                    ) {
+                        Column(Modifier.padding(24.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Avatar(
+                                    initials = inspection.inspector.fullName.getInitials(),
+                                    size = AvatarSize.Small,
                                 )
 
                                 Text(
-                                    modifier = Modifier.padding(top = 4.dp),
+                                    modifier = Modifier.padding(start = 8.dp),
                                     text = stringResource(
-                                        Res.string.duration_format,
-                                        inspection.duration.inWholeSeconds.seconds.toString()
+                                        Res.string.inspection_title,
+                                        inspection.inspector.fullName
                                     ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }
+
+                            Text(
+                                modifier = Modifier.padding(top = 12.dp),
+                                text = stringResource(
+                                    Res.string.made_on_format,
+                                    formattedDateTime
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Text(
+                                modifier = Modifier.padding(top = 4.dp),
+                                text = stringResource(
+                                    Res.string.duration_format,
+                                    inspection.duration.inWholeSeconds.seconds.toString()
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 }
