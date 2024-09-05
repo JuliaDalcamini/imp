@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdateTeamMemberRequest(
-    val role: Role
+    val role: Role,
+    val hourlyCost: Double
 )

@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateTeamRequest(
-    val name: String
+    val name: String,
+    val defaultHourlyCost: Double
 )

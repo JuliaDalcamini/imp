@@ -30,10 +30,14 @@ class TeamMemberRepository(private val client: HttpClient = configuredHttpClient
         client.delete("teams/$teamId/members/$userId")
     }
 
-    suspend fun updateMemberRole(teamId: String, userId: String, newRole: Role) {
+    suspend fun updateMember(teamId: String, userId: String, newRole: Role, newHourlyCost: Double) {
         client.patch("teams/$teamId/members/$userId") {
             contentType(ContentType.Application.Json)
-            setBody(UpdateTeamMemberRequest(role = newRole))
+            setBody(
+                UpdateTeamMemberRequest(
+                    role = newRole,
+                    hourlyCost = newHourlyCost
+                ))
         }
     }
 }

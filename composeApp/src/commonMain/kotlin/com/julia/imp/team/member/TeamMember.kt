@@ -8,7 +8,8 @@ data class TeamMember(
     val teamId: String,
     val role: Role,
     val firstName: String,
-    val lastName: String
+    val lastName: String,
+    val hourlyCost: Double
 ) {
     val fullName by lazy { "$firstName $lastName" }
 }

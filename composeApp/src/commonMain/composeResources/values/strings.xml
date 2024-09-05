@@ -79,6 +79,7 @@
     <string name="action_error_message">Ocorreu um erro ao executar a ação. Por favor, tente novamente.</string>
     <string name="manage_team_title">Gerenciar time</string>
     <string name="current_name_format">Nome atual: %1$s</string>
+    <string name="current_hourly_cost_format">Valor atual: R$ %1$d</string>
     <string name="manage_team_members_label">Gerenciar membros</string>
     <string name="manage_team_members_description">Adicionar, remover ou alterar membros do time</string>
     <string name="team_members_title">Membros do time</string>
@@ -138,5 +139,7 @@
     <string name="finish_inspection_error_title">Erro ao finalizar inspeção</string>
     <string name="finish_inspection_error_message">Ocorreu um erro ao finalizar a inspeção. Por favor, tente novamente.</string>
     <string name="rename_team_title">Renomear time</string>
+    <string name="update_cost_default_title">Alterar custo/hora padrão</string>
+    <string name="update_cost_label">Alterar custo/hora individual</string>
     <string name="inspection_title">Inspecionado por: %1$s</string>
 </resources>

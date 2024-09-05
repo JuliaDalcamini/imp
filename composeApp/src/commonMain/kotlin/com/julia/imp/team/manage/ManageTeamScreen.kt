@@ -17,10 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.requireTeam
@@ -29,13 +25,14 @@ import com.julia.imp.common.ui.title.Title
 import com.julia.imp.team.Team
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
+import imp.composeapp.generated.resources.current_hourly_cost_format
 import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.manage_team_members_description
 import imp.composeapp.generated.resources.manage_team_members_label
 import imp.composeapp.generated.resources.manage_team_title
 import imp.composeapp.generated.resources.rename_label
-import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.rename_team_title
+import imp.composeapp.generated.resources.update_cost_default_title
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -85,6 +82,14 @@ fun ManageTeamScreen(
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { viewModel.showUpdateDefaultCostDialog() },
+                headlineContent = { Text(stringResource(Res.string.update_cost_default_title)) },
+                supportingContent = { Text(stringResource(Res.string.current_hourly_cost_format, requireTeam().defaultHourlyCost)) }
+            )
+
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable { onManageMembersClick() },
                 headlineContent = { Text(stringResource(Res.string.manage_team_members_label)) },
                 supportingContent = { Text(stringResource(Res.string.manage_team_members_description)) }
@@ -99,6 +104,14 @@ fun ManageTeamScreen(
             onConfirm = { newName -> viewModel.renameTeam(requireTeam(), newName) }
         )
     }
+
+    if (viewModel.uiState.showUpdateDefaultCostDialog) {
+        UpdateDefaultCostDialog(
+            defaultHourlyCost = requireTeam().defaultHourlyCost,
+            onDismissRequest = { viewModel.dismissDefaultCostDialog() },
+            onConfirm = { newDefaultHourlyCost -> viewModel.updateDefaultHourlyCost(requireTeam(), newDefaultHourlyCost.toDouble()) }
+        )
+    }
 }
 
 @Composable
@@ -110,6 +123,20 @@ fun RenameTeamDialog(
     TextInputDialog(
         title = stringResource(Res.string.rename_team_title),
         initialValue = teamName,
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
+}
+
+@Composable
+fun UpdateDefaultCostDialog(
+    defaultHourlyCost: Double,
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    TextInputDialog(
+        title = stringResource(Res.string.update_cost_default_title),
+        initialValue = defaultHourlyCost.toString(),
         onDismissRequest = onDismissRequest,
         onConfirm = onConfirm
     )

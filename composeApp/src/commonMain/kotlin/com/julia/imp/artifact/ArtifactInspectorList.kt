@@ -37,6 +37,7 @@ fun ArtifactInspectorList(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.Top
     ) {
+
         for (inspector in inspectors) {
             InputChip(
                 label = { Text(inspector.fullName) },

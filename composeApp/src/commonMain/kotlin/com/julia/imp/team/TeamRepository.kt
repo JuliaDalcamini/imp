@@ -1,7 +1,6 @@
 package com.julia.imp.team
 
 import com.julia.imp.common.network.configuredHttpClient
-import com.julia.imp.project.list.UpdateProjectRequest
 import com.julia.imp.team.create.CreateTeamRequest
 import com.julia.imp.team.manage.UpdateTeamRequest
 import io.ktor.client.HttpClient
@@ -14,19 +13,33 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
 class TeamRepository(private val client: HttpClient = configuredHttpClient) {
-    
+
     suspend fun getTeams(): List<Team> =
         client.get("teams").body()
 
-    suspend fun createTeam(name: String): Team =
+    suspend fun createTeam(name: String, defaultHourlyCost: Double): Team =
         client.post("teams") {
             contentType(ContentType.Application.Json)
-            setBody(CreateTeamRequest(name = name))
+            setBody(
+                CreateTeamRequest(
+                    name = name,
+                    defaultHourlyCost = defaultHourlyCost
+                )
+            )
         }.body()
 
-    suspend fun renameTeam(teamId: String, newName: String): Team =
+    suspend fun updateTeam(
+        teamId: String,
+        newName: String,
+        newDefaultHourlyCost: Double
+    ): Team =
         client.patch("teams/$teamId") {
             contentType(ContentType.Application.Json)
-            setBody(UpdateTeamRequest(name = newName))
+            setBody(
+                UpdateTeamRequest(
+                    name = newName,
+                    defaultHourlyCost = newDefaultHourlyCost
+                )
+            )
         }.body()
 }

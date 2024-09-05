@@ -27,10 +27,38 @@ class ManageTeamViewModel(
         uiState = uiState.copy(showRenameDialog = false)
     }
 
+    fun showUpdateDefaultCostDialog() {
+        uiState = uiState.copy(showUpdateDefaultCostDialog = true)
+    }
+
+    fun dismissDefaultCostDialog() {
+        uiState = uiState.copy(showUpdateDefaultCostDialog = false)
+    }
+
     fun renameTeam(team: Team, newName: String) {
         viewModelScope.launch {
             try {
-                val updatedTeam = repository.renameTeam(team.id, newName)
+                val updatedTeam = repository.updateTeam(
+                    teamId = team.id,
+                    newName = newName,
+                    newDefaultHourlyCost = team.defaultHourlyCost
+                )
+
+                uiState = uiState.copy(updatedTeam = updatedTeam)
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            }
+        }
+    }
+
+    fun updateDefaultHourlyCost(team: Team, newDefaultHourlyCost: Double) {
+        viewModelScope.launch {
+            try {
+                val updatedTeam = repository.updateTeam(
+                    teamId = team.id,
+                    newName = team.name,
+                    newDefaultHourlyCost = newDefaultHourlyCost
+                )
                 uiState = uiState.copy(updatedTeam = updatedTeam)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)

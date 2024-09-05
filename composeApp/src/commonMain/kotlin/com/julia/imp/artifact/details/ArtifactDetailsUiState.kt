@@ -10,9 +10,11 @@ data class ArtifactDetailsUiState(
     val lastInspection: Instant? = null,
     val canInspect: Boolean = false,
     val loadError: Boolean = false,
+    val showEditButton: Boolean = false,
     val showInspectorPicker: Boolean = false,
     val availableInspectors: List<User>? = null,
     val inspectors: List<User> = emptyList(),
+    val canEditInspectors: Boolean = false,
     val updatingInspectors: Boolean = false,
     val actionError: Boolean = false,
     val isInspector: Boolean = false

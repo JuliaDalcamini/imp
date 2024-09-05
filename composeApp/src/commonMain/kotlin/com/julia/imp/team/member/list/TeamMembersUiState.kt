@@ -11,5 +11,7 @@ data class TeamMembersUiState(
     val showAddDialog: Boolean = false,
     val memberToChangeRole: TeamMember? = null,
     val memberToRemove: TeamMember? = null,
-    val actionError: Boolean = false
+    val memberToUpdateHourlyCost: TeamMember? = null,
+    val actionError: Boolean = false,
+    val showUpdateHourlyCostDialog: Boolean = false
 )

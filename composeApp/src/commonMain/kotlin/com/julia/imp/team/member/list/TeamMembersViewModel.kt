@@ -87,10 +87,29 @@ class TeamMembersViewModel(
         uiState = uiState.copy(memberToChangeRole = null)
     }
 
+    fun askToUpdatetHourlyCostDialog(member: TeamMember) {
+        uiState = uiState.copy(memberToUpdateHourlyCost = member)
+    }
+
+    fun dismissHourlyCostDialog() {
+        uiState = uiState.copy(memberToUpdateHourlyCost = null)
+    }
+
     fun changeRole(member: TeamMember, newRole: Role) {
         viewModelScope.launch {
             try {
-                repository.updateMemberRole(member.teamId, member.userId, newRole)
+                repository.updateMember(member.teamId, member.userId, newRole, member.hourlyCost)
+                getMembers()
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            }
+        }
+    }
+
+    fun updateHourlyCost(member: TeamMember, newHourlyCost: Double) {
+        viewModelScope.launch {
+            try {
+                repository.updateMember(member.teamId, member.userId, member.role, newHourlyCost)
                 getMembers()
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)

@@ -115,7 +115,7 @@ fun ArtifactDetailsScreen(
                     )
                 },
                 actions = {
-                    if (!artifact.archived) {
+                    if (viewModel.uiState.showEditButton) {
                         IconButton(onClick = onEditClick) {
                             Icon(vectorResource(Res.drawable.edit_24px), null)
                         }
@@ -133,7 +133,9 @@ fun ArtifactDetailsScreen(
             }
         }
     ) { paddingValues ->
-        if (viewModel.uiState.loading) {
+        val uiState = viewModel.uiState
+
+        if (uiState.loading) {
             Placeholder(
                 modifier = Modifier
                     .fillMaxSize()
@@ -152,13 +154,13 @@ fun ArtifactDetailsScreen(
                     .padding(vertical = 24.dp)
                     .verticalScroll(rememberScrollState()),
                 artifact = artifact,
-                inspectors = viewModel.uiState.inspectors,
+                inspectors = uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
-                enableInspectorControls = !viewModel.uiState.updatingInspectors,
-                lastInspection = viewModel.uiState.lastInspection,
-                inspections = viewModel.uiState.inspections,
-                isInspector = viewModel.uiState.isInspector,
+                enableInspectorControls = uiState.canEditInspectors && !uiState.updatingInspectors,
+                lastInspection = uiState.lastInspection,
+                inspections = uiState.inspections,
+                isInspector = uiState.isInspector,
                 loggedUserId = { viewModel.getLoggedUserId() }
             )
         }

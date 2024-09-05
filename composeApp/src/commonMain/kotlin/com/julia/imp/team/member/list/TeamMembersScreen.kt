@@ -56,6 +56,8 @@ import imp.composeapp.generated.resources.add_member_title
 import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.change_role_label
 import imp.composeapp.generated.resources.change_role_title
+import imp.composeapp.generated.resources.currency_exchange_24px
+import imp.composeapp.generated.resources.current_hourly_cost_format
 import imp.composeapp.generated.resources.email_label
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.no_projects_message
@@ -69,6 +71,7 @@ import imp.composeapp.generated.resources.rule_settings_24px
 import imp.composeapp.generated.resources.team_member_role_format
 import imp.composeapp.generated.resources.team_members_title
 import imp.composeapp.generated.resources.try_again_label
+import imp.composeapp.generated.resources.update_cost_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -126,6 +129,11 @@ fun TeamMembersScreen(
                                 member = member,
                                 showOptions = viewModel.uiState.showOptions,
                                 onChangeRoleClick = { viewModel.askToChangeRole(member) },
+                                onUpdateHourlyCostClick = {
+                                    viewModel.askToUpdatetHourlyCostDialog(
+                                        member
+                                    )
+                                },
                                 onRemoveClick = { viewModel.askToRemove(member) }
                             )
                         }
@@ -194,6 +202,19 @@ fun TeamMembersScreen(
         )
     }
 
+    viewModel.uiState.memberToUpdateHourlyCost?.let { member ->
+        UpdateHourlyCostDialog(
+            hourlyCost = member.hourlyCost,
+            onDismissRequest = { viewModel.dismissHourlyCostDialog() },
+            onConfirm = { newHourlyCost ->
+                viewModel.updateHourlyCost(
+                    member,
+                    newHourlyCost.toDouble()
+                )
+            }
+        )
+    }
+
     if (viewModel.uiState.actionError) {
         ErrorDialog(
             title = stringResource(Res.string.action_error_title),
@@ -221,6 +242,7 @@ fun TeamMemberListItem(
     member: TeamMember,
     showOptions: Boolean,
     onChangeRoleClick: () -> Unit,
+    onUpdateHourlyCostClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -235,11 +257,30 @@ fun TeamMemberListItem(
             )
         },
         supportingContent = {
-            Text(
-                text = stringResource(Res.string.team_member_role_format, member.role.getLabel()),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Column(
+                modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(
+                        Res.string.team_member_role_format,
+                        member.role.getLabel()
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (member.role != Role.Viewer) {
+                    Text(
+                        text = stringResource(
+                            Res.string.current_hourly_cost_format,
+                            member.hourlyCost.toString()
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         },
         trailingContent = {
             var expandOptions by remember { mutableStateOf(false) }
@@ -251,7 +292,10 @@ fun TeamMemberListItem(
                 IconButton(
                     onClick = onChangeRoleClick,
                 ) {
-                    Icon(vectorResource(Res.drawable.rule_settings_24px), contentDescription = stringResource(Res.string.change_role_label))
+                    Icon(
+                        vectorResource(Res.drawable.rule_settings_24px),
+                        contentDescription = stringResource(Res.string.change_role_label)
+                    )
                 }
 
                 if (showOptions) {
@@ -262,8 +306,10 @@ fun TeamMemberListItem(
             }
 
             TeamMemberOptionsDropdown(
+                role = member.role,
                 expanded = expandOptions,
                 onDismissRequest = { expandOptions = false },
+                onUpdateHourlyCostClick = onUpdateHourlyCostClick,
                 onRemoveClick = onRemoveClick
             )
         }
@@ -272,8 +318,10 @@ fun TeamMemberListItem(
 
 @Composable
 fun TeamMemberOptionsDropdown(
+    role: Role,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    onUpdateHourlyCostClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -282,6 +330,17 @@ fun TeamMemberOptionsDropdown(
         expanded = expanded,
         onDismissRequest = onDismissRequest
     ) {
+
+        if (role != Role.Viewer) {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.update_cost_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.currency_exchange_24px), null) },
+                onClick = {
+                    onUpdateHourlyCostClick()
+                    onDismissRequest()
+                }
+            )
+        }
 
         DropdownMenuItem(
             text = { Text(stringResource(Res.string.remove_label)) },
@@ -334,5 +393,19 @@ fun AddMemberDialog(
         placeholder = stringResource(Res.string.email_label),
         onDismissRequest = onDismissRequest,
         onConfirm = { onConfirm(it, Role.Viewer) }
+    )
+}
+
+@Composable
+fun UpdateHourlyCostDialog(
+    hourlyCost: Double,
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    TextInputDialog(
+        title = stringResource(Res.string.update_cost_label),
+        initialValue = hourlyCost.toString(),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
     )
 }

@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
+import com.julia.imp.artifact.list.ArtifactListEntry
+import com.julia.imp.artifact.list.ArtifactsUiState
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.inspection.InspectionRepository
@@ -27,9 +29,12 @@ class ArtifactDetailsViewModel(
 
     fun initialize(artifact: Artifact) {
         this.artifact = artifact
+        val isAdmin = requireSession().isTeamAdmin
 
         uiState = uiState.copy(
-            inspectors = artifact.inspectors
+            inspectors = artifact.inspectors,
+            canEditInspectors = isAdmin,
+            showEditButton = isAdmin && !artifact.archived
         )
 
         updateInspectButtonState()
@@ -44,7 +49,7 @@ class ArtifactDetailsViewModel(
 
     fun getLoggedUserId(): String = requireSession().userId
 
-    fun isUserInInspectorList(): Boolean {
+    private fun isUserInInspectorList(): Boolean {
         val userId = getLoggedUserId()
         return uiState.inspectors.any { it.id == userId }
     }
@@ -127,7 +132,8 @@ class ArtifactDetailsViewModel(
 
             try {
                 val inspectors = inspectorRepository.getInspectors(requireTeam().id)
-                uiState = uiState.copy(availableInspectors = inspectors - uiState.inspectors.toSet())
+                uiState =
+                    uiState.copy(availableInspectors = inspectors - uiState.inspectors.toSet())
             } catch (error: Throwable) {
                 uiState = uiState.copy(loadError = true, showInspectorPicker = false)
             }
