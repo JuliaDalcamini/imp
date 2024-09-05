@@ -107,7 +107,7 @@ fun CreateProjectScreen(
 
                 DropdownFormField(
                     modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                    text = viewModel.uiState.totalInspectors.toString(),
+                    text = viewModel.uiState.minInspectors.toString(),
                     label = stringResource(Res.string.inspectors_number_label),
                     options = inspectorOptions,
                     onOptionSelected = { viewModel.setInspectorCount(it) },

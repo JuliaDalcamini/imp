@@ -10,6 +10,7 @@ import com.julia.imp.common.session.requireTeam
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 class ProjectsViewModel(
     private val repository: ProjectRepository = ProjectRepository()
@@ -71,7 +72,29 @@ class ProjectsViewModel(
     fun rename(project: Project, newName: String) {
         viewModelScope.launch {
             try {
-                repository.renameProject(project.id, newName)
+                repository.updateProject(project.id, newName, project.targetDate, project.minInspectors)
+                getProjects()
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            }
+        }
+    }
+
+    fun changeTargetDate(project: Project, newTargetDate: LocalDate) {
+        viewModelScope.launch {
+            try {
+                repository.updateProject(project.id, project.name, newTargetDate, project.minInspectors)
+                getProjects()
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            }
+        }
+    }
+
+    fun changeMinInspectors(project: Project, newMinInspectors: Int) {
+        viewModelScope.launch {
+            try {
+                repository.updateProject(project.id, project.name, project.targetDate, newMinInspectors)
                 getProjects()
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)

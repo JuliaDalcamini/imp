@@ -60,6 +60,7 @@ import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.generate_report_label
+import imp.composeapp.generated.resources.manage_project_label
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_project_label
 import imp.composeapp.generated.resources.no_projects_message
@@ -68,6 +69,7 @@ import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.refresh_24px
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
+import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -76,6 +78,7 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun ProjectsScreen(
     onNewProjectClick: () -> Unit,
+    onManageProjectClick: (Project) -> Unit,
     onProjectClick: (Project) -> Unit,
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
@@ -131,10 +134,9 @@ fun ProjectsScreen(
                                     .padding(bottom = 8.dp)
                                     .animateItem(),
                                 project = project,
-                                showRenameOption = viewModel.uiState.showRenameOption,
                                 showDeleteOption = viewModel.uiState.showDeleteOption,
                                 onClick = { onProjectClick(project) },
-                                onRenameClick = { viewModel.askToRename(project) },
+                                onManageProjectClick = { onManageProjectClick(project) },
                                 onDeleteClick = { viewModel.askToDelete(project) },
                                 onGenerateReportClick = { viewModel.generateReport(project) }
                             )
@@ -229,10 +231,9 @@ fun NewProjectButton(
 @Composable
 fun ProjectListItem(
     project: Project,
-    showRenameOption: Boolean,
     showDeleteOption: Boolean,
     onClick: () -> Unit,
-    onRenameClick: () -> Unit,
+    onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -274,9 +275,8 @@ fun ProjectListItem(
                 ProjectOptionsDropdown(
                     expanded = expandOptions,
                     onDismissRequest = { expandOptions = false },
-                    showRenameOption = showRenameOption,
                     showDeleteOption = showDeleteOption,
-                    onRenameClick = onRenameClick,
+                    onManageProjectClick = onManageProjectClick,
                     onDeleteClick = onDeleteClick,
                     onGenerateReportClick = onGenerateReportClick
                 )
@@ -289,9 +289,8 @@ fun ProjectListItem(
 fun ProjectOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    showRenameOption: Boolean,
     showDeleteOption: Boolean,
-    onRenameClick: () -> Unit,
+    onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -310,16 +309,25 @@ fun ProjectOptionsDropdown(
             }
         )
 
-        if (showRenameOption) {
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.rename_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
-                onClick = {
-                    onRenameClick()
-                    onDismissRequest()
-                }
-            )
-        }
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.manage_project_label)) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.settings_24px), null) },
+            onClick = {
+                onManageProjectClick()
+                onDismissRequest()
+            }
+        )
+
+//        if (showRenameOption) {
+//            DropdownMenuItem(
+//                text = { Text(stringResource(Res.string.rename_label)) },
+//                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
+//                onClick = {
+//                    onRenameClick()
+//                    onDismissRequest()
+//                }
+//            )
+//        }
 
         if (showDeleteOption) {
             DropdownMenuItem(

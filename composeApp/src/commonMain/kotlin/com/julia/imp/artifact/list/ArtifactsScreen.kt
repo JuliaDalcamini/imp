@@ -54,8 +54,6 @@ import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
 import com.julia.imp.priority.MoscowPriority
-import com.julia.imp.priority.Priority
-import com.julia.imp.priority.WiegersPrioritizer
 import com.julia.imp.priority.WiegersPriority
 import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res

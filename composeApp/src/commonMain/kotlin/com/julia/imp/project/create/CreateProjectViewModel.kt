@@ -10,6 +10,7 @@ import com.julia.imp.priority.Prioritizer
 import com.julia.imp.priority.WiegersPrioritizer
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 class CreateProjectViewModel(
     private val repository: ProjectRepository = ProjectRepository()
@@ -23,7 +24,7 @@ class CreateProjectViewModel(
     }
 
     fun setInspectorCount(count: Int) {
-        uiState = uiState.copy(totalInspectors = count)
+        uiState = uiState.copy(minInspectors = count)
     }
 
     fun setPrioritizer(prioritizer: Prioritizer) {
@@ -37,9 +38,10 @@ class CreateProjectViewModel(
             try {
                 repository.createProject(
                     name = uiState.name,
-                    totalInspectors = uiState.totalInspectors,
+                    minInspectors = uiState.minInspectors,
                     prioritizer = uiState.prioritizer,
-                    teamId = requireTeam().id
+                    teamId = requireTeam().id,
+                    targetDate = LocalDate.parse(uiState.targetDate)
                 )
 
                 uiState = uiState.copy(created = true)

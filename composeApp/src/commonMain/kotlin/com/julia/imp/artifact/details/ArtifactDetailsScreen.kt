@@ -47,7 +47,6 @@ import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.title.CompoundTitle
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.priority.MoscowPriority
-import com.julia.imp.priority.Priority
 import com.julia.imp.priority.WiegersPriority
 import com.julia.imp.user.User
 import com.julia.imp.user.UserPickerDialog
@@ -77,8 +76,8 @@ import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.made_on_format
 import imp.composeapp.generated.resources.never
+import imp.composeapp.generated.resources.not_prioritized_label
 import imp.composeapp.generated.resources.priority_label
-import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.select_inspector_label
 import imp.composeapp.generated.resources.total_cost_label
 import kotlinx.datetime.Instant
@@ -310,7 +309,7 @@ fun ArtifactDetails(
             Text(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                text = getPriorityText(artifact.priority)
+                text = getPriorityText(artifact)
             )
         }
 
@@ -472,20 +471,12 @@ private fun getInspections(
 }
 
 @Composable
-private fun getPriorityText(priority: Priority) =
-    when (priority) {
-        is MoscowPriority -> priority.level.getLabel()
-        is WiegersPriority -> getWiegersPriorityText(priority)
+private fun getPriorityText(artifact: Artifact) =
+    when (artifact.priority) {
+        is MoscowPriority -> artifact.priority.level.getLabel()
+        is WiegersPriority -> artifact.calculatedPriority.toString()
+        null -> stringResource(Res.string.not_prioritized_label)
     }
-
-@Composable
-private fun getWiegersPriorityText(priority: WiegersPriority) =
-    stringResource(
-        Res.string.priority_wiegers_format,
-        priority.userValue,
-        priority.complexity,
-        priority.impact
-    )
 
 @Composable
 fun ArchivedArtifactAlert(modifier: Modifier = Modifier) {

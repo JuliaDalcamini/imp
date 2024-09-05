@@ -78,6 +78,7 @@
     <string name="action_error_title">Erro</string>
     <string name="action_error_message">Ocorreu um erro ao executar a ação. Por favor, tente novamente.</string>
     <string name="manage_team_title">Gerenciar time</string>
+    <string name="current_min_inspectors_format">Número mínimo de inspetores atual: %1$s</string>
     <string name="current_name_format">Nome atual: %1$s</string>
     <string name="current_hourly_cost_format">Valor atual: R$ %1$d</string>
     <string name="manage_team_members_label">Gerenciar membros</string>
@@ -146,4 +147,8 @@
     <string name="inspection_title">Inspecionado por: %1$s</string>
     <string name="never_inspected">Nunca inspecionado</string>"
     <string name="cash_format">R$ %1$d</string>
+    <string name="target_date_label">Data limite</string>
+    <string name="target_date_format">%1$s</string>
+    <string name="manage_project_label">Gerenciar projeto</string>
+    <string name="new_target_date_title">Selecione a nova data limite</string>
 </resources>

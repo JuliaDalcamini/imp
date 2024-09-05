@@ -38,6 +38,8 @@ import com.julia.imp.project.ProjectsRoute
 import com.julia.imp.project.create.CreateProjectRoute
 import com.julia.imp.project.create.CreateProjectScreen
 import com.julia.imp.project.list.ProjectsScreen
+import com.julia.imp.project.manage.ManageProjectRoute
+import com.julia.imp.project.manage.ManageProjectScreen
 import com.julia.imp.register.RegisterRoute
 import com.julia.imp.register.RegisterScreen
 import com.julia.imp.team.NoTeamsRoute
@@ -129,6 +131,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                 composable<ProjectsRoute> {
                     ProjectsScreen(
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
+                        onManageProjectClick = { navController.navigate(ManageProjectRoute(it)) },
                         onProjectClick = { navController.navigate(ArtifactsRoute(it)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
@@ -141,6 +144,16 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     CreateProjectScreen(
                         onBackClick = { navController.popBackStack() },
                         onProjectCreated = { navController.popBackStack() }
+                    )
+                }
+
+                composable<ManageProjectRoute>(ManageProjectRoute.typeMap) { entry ->
+                    val route = entry.toRoute<ManageProjectRoute>()
+
+                    ManageProjectScreen(
+                        project = route.project,
+                        onBackClick = { navController.popBackStack() },
+                        onProjectUpdate = {  }
                     )
                 }
 
