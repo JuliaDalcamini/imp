@@ -63,6 +63,8 @@ import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.artifact_version_label
 import imp.composeapp.generated.resources.assignment_24px
+import imp.composeapp.generated.resources.cash_format
+import imp.composeapp.generated.resources.cost_format
 import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.inspect_label
@@ -78,6 +80,7 @@ import imp.composeapp.generated.resources.never
 import imp.composeapp.generated.resources.priority_label
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.select_inspector_label
+import imp.composeapp.generated.resources.total_cost_label
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -328,6 +331,20 @@ fun ArtifactDetails(
                 ?: stringResource(Res.string.never)
         )
 
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
+            text = stringResource(Res.string.total_cost_label)
+        )
+
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            text = stringResource(Res.string.cash_format, artifact.totalCost.toString())
+        )
+
         if (!artifact.archived) {
             Text(
                 modifier = Modifier
@@ -428,6 +445,18 @@ private fun getInspections(
                                 text = stringResource(
                                     Res.string.duration_format,
                                     inspection.duration.inWholeSeconds.seconds.toString()
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Text(
+                                modifier = Modifier.padding(top = 4.dp),
+                                text = stringResource(
+                                    Res.string.cost_format,
+                                    inspection.cost.toString()
                                 ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

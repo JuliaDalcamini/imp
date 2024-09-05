@@ -12,5 +12,6 @@ data class Inspection(
     val inspector: User,
     val duration: Duration,
     val createdAt: Instant,
-    val answers: List<InspectionAnswer>
+    val answers: List<InspectionAnswer>,
+    val cost: Double
 )

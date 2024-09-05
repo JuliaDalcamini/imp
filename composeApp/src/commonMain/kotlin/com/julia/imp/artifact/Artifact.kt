@@ -17,5 +17,6 @@ data class Artifact(
     val inspectors: List<User>,
     val calculatedPriority: Double?,
     val lastModification: Instant,
-    val currentVersion: String
+    val currentVersion: String,
+    val totalCost: Double
 )

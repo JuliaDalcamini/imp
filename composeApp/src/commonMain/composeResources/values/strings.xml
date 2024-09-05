@@ -126,10 +126,12 @@
     <string name="artifact_details_title">Detalhes do artefato</string>
     <string name="archived_artifact_alert_message">Esse artefato está arquivado e não pode ser alterado ou inspecionado.</string>
     <string name="last_inspection_label">Última inspeção</string>
+    <string name="total_cost_label">Custo total</string>"
     <string name="never">Nunca</string>
     <string name="inspections_label">Inspeções</string>
     <string name="made_on_format">Feito em: %1$s</string>
     <string name="duration_format">Duração: %1$s</string>
+    <string name="cost_format">Custo: R$ %1$d</string>
     <string name="inspect_label">Inspecionar</string>
     <string name="new_inspection_title">Nova inspeção</string>
     <string name="answer_option_yes_label">Sim</string>
@@ -142,4 +144,6 @@
     <string name="update_cost_default_title">Alterar custo/hora padrão</string>
     <string name="update_cost_label">Alterar custo/hora individual</string>
     <string name="inspection_title">Inspecionado por: %1$s</string>
+    <string name="never_inspected">Nunca inspecionado</string>"
+    <string name="cash_format">R$ %1$d</string>
 </resources>
