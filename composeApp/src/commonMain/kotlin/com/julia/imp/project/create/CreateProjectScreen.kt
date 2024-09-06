@@ -1,5 +1,6 @@
 package com.julia.imp.project.create
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +16,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -26,9 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.datetime.DateFormats
 import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.dialog.DatePickerDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
+import com.julia.imp.common.ui.form.DateFormField
 import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.common.ui.form.FormField
 import com.julia.imp.common.ui.form.SliderFormField
@@ -37,6 +44,7 @@ import com.julia.imp.priority.MoscowPrioritizer
 import com.julia.imp.priority.WiegersPrioritizer
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.arrow_back_24px
+import imp.composeapp.generated.resources.calendar_month_24px
 import imp.composeapp.generated.resources.complexity_weight_label
 import imp.composeapp.generated.resources.create_project_error_message
 import imp.composeapp.generated.resources.create_project_error_title
@@ -47,8 +55,16 @@ import imp.composeapp.generated.resources.moscow_label
 import imp.composeapp.generated.resources.new_project_title
 import imp.composeapp.generated.resources.prioritization_method_label
 import imp.composeapp.generated.resources.project_name_label
+import imp.composeapp.generated.resources.target_date_format
+import imp.composeapp.generated.resources.target_date_label
 import imp.composeapp.generated.resources.user_value_weight_label
 import imp.composeapp.generated.resources.wiegers_label
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -113,6 +129,15 @@ fun CreateProjectScreen(
                     onOptionSelected = { viewModel.setInspectorCount(it) },
                     enabled = !viewModel.uiState.loading,
                     optionLabel = { optionNumber -> Text(optionNumber.toString()) }
+                )
+
+                DateFormField(
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    date = viewModel.uiState.targetDate,
+                    label = stringResource(Res.string.target_date_label),
+                    onDateSelected = { viewModel.setTargetDate(it) },
+                    enabled = !viewModel.uiState.loading,
+                    minDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 )
 
                 FormField(
@@ -242,6 +267,7 @@ fun WeightSliderFormField(
         enabled = enabled,
         steps = 9,
         valueRange = 0f..1f,
+        // TODO: Use multiplatform solution
         valueText = String.format("%.1f", value)
     )
 }

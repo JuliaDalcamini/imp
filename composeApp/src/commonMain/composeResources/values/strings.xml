@@ -34,7 +34,7 @@
     <string name="delete_project_message">Tem certeza de que deseja excluir o projeto %1$s? Isso também apagará todos os artefatos e inspeções realizados dentro dele.</string>
     <string name="rename_project_title">Renomear projeto</string>
     <string name="new_project_title">Novo projeto</string>
-    <string name="inspectors_number_label">Número de inspetores necessários por inspeção</string>
+    <string name="inspectors_number_label">Número min. de inspetores por artefato</string>
     <string name="inspectors_number_select">Selecione o número de inspetores</string>
     <string name="project_name_label">Nome do projeto</string>
     <string name="prioritization_method_label">Método de priorização</string>
@@ -78,7 +78,7 @@
     <string name="action_error_title">Erro</string>
     <string name="action_error_message">Ocorreu um erro ao executar a ação. Por favor, tente novamente.</string>
     <string name="manage_team_title">Gerenciar time</string>
-    <string name="current_min_inspectors_format">Número mínimo de inspetores atual: %1$s</string>
+    <string name="current_min_inspectors_format">Número atual: %1$s</string>
     <string name="current_name_format">Nome atual: %1$s</string>
     <string name="current_hourly_cost_format">Valor atual: R$ %1$d</string>
     <string name="manage_team_members_label">Gerenciar membros</string>
@@ -150,5 +150,4 @@
     <string name="target_date_label">Data limite</string>
     <string name="target_date_format">%1$s</string>
     <string name="manage_project_label">Gerenciar projeto</string>
-    <string name="new_target_date_title">Selecione a nova data limite</string>
 </resources>

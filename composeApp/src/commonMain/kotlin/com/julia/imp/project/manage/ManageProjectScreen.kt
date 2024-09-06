@@ -18,10 +18,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.datetime.DateFormats
+import com.julia.imp.common.ui.dialog.DatePickerDialog
+import com.julia.imp.common.ui.dialog.SelectionDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.common.ui.form.DropdownFormField
 import com.julia.imp.common.ui.title.Title
 import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res
@@ -31,14 +32,14 @@ import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.inspectors_number_label
 import imp.composeapp.generated.resources.inspectors_number_select
 import imp.composeapp.generated.resources.manage_team_title
-import imp.composeapp.generated.resources.new_target_date_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
-import imp.composeapp.generated.resources.rename_team_title
 import imp.composeapp.generated.resources.target_date_format
 import imp.composeapp.generated.resources.target_date_label
-import imp.composeapp.generated.resources.update_cost_default_title
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -82,7 +83,14 @@ fun ManageProjectScreen(
                     .fillMaxWidth()
                     .clickable { viewModel.showRenameDialog() },
                 headlineContent = { Text(stringResource(Res.string.rename_label)) },
-                supportingContent = { Text(stringResource(Res.string.current_name_format, project.name)) }
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            Res.string.current_name_format,
+                            project.name
+                        )
+                    )
+                }
             )
 
             ListItem(
@@ -90,7 +98,14 @@ fun ManageProjectScreen(
                     .fillMaxWidth()
                     .clickable { viewModel.showChangeMinInspectorsDialog() },
                 headlineContent = { Text(stringResource(Res.string.inspectors_number_label)) },
-                supportingContent = { Text(stringResource(Res.string.current_min_inspectors_format, project.minInspectors)) }
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            Res.string.current_min_inspectors_format,
+                            project.minInspectors
+                        )
+                    )
+                }
             )
 
             ListItem(
@@ -98,7 +113,14 @@ fun ManageProjectScreen(
                     .fillMaxWidth()
                     .clickable { viewModel.showChangeTargetDateDialog() },
                 headlineContent = { Text(stringResource(Res.string.target_date_label)) },
-                supportingContent = { Text(stringResource(Res.string.target_date_format, project.targetDate.toString())) }
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            Res.string.target_date_format,
+                            project.targetDate.format(DateFormats.DEFAULT)
+                        )
+                    )
+                }
             )
         }
     }
@@ -116,16 +138,19 @@ fun ManageProjectScreen(
             minInspectors = project.minInspectors,
             onDismissRequest = { viewModel.dismissChangeMinInspectorsDialog() },
             onConfirm = { newMinInspectors ->
-                viewModel.changeMinInspectors(project, newMinInspectors.toInt()) }
+                viewModel.changeMinInspectors(project, newMinInspectors)
+            }
         )
     }
 
     if (viewModel.uiState.showChangeTargetDateDialog) {
-        ChangeTargetDateDialog(
-            targetDate = project.targetDate,
+        DatePickerDialog(
+            initialDate = project.targetDate,
+            minDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
             onDismissRequest = { viewModel.dismissChangeTargetDateDialog() },
             onConfirm = { newTargetDate ->
-                viewModel.changeTargetDate(project, LocalDate.parse(newTargetDate)) }
+                viewModel.changeTargetDate(project, newTargetDate)
+            }
         )
     }
 }
@@ -148,40 +173,13 @@ fun RenameProjectDialog(
 fun ChangeMinInspectorsDialog(
     minInspectors: Int,
     onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (Int) -> Unit
 ) {
-    TextInputDialog(
+    SelectionDialog(
         title = stringResource(Res.string.inspectors_number_select),
-        initialValue = minInspectors.toString(),
+        options = (2..5).toList(),
         onDismissRequest = onDismissRequest,
-        onConfirm = onConfirm
-    )
-
-//    val inspectorOptions = listOf(2, 3, 4, 5)
-//
-//    DropdownFormField(
-//        modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-//        text = minInspectors.toString(),
-//        label = stringResource(Res.string.inspectors_number_label),
-//        options = inspectorOptions,
-//        onOptionSelected = onSetInspectorCount(it),
-//        enabled = !viewModel.uiState.loading,
-//        optionLabel = { optionNumber -> Text(optionNumber.toString()) },
-//        onDismissRequest = onDismissRequest,
-//        onConfirm = onConfirm
-//    )
-}
-
-@Composable
-fun ChangeTargetDateDialog(
-    targetDate: LocalDate,
-    onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
-    TextInputDialog(
-        title = stringResource(Res.string.new_target_date_title),
-        initialValue = targetDate.toString(),
-        onDismissRequest = onDismissRequest,
+        initialSelection = minInspectors,
         onConfirm = onConfirm
     )
 }
