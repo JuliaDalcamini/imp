@@ -159,7 +159,8 @@ fun ArtifactDetailsScreen(
                 inspectors = uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
-                enableInspectorControls = uiState.canEditInspectors && !uiState.updatingInspectors,
+                enableInspectors = !uiState.updatingInspectors,
+                readOnlyInspectors = !uiState.canEditInspectors,
                 lastInspection = uiState.lastInspection,
                 inspections = uiState.inspections,
                 isInspector = uiState.isInspector,
@@ -210,7 +211,8 @@ fun ArtifactDetails(
     inspectors: List<User>,
     onAddInspectorClick: () -> Unit,
     onRemoveInspectorClick: (User) -> Unit,
-    enableInspectorControls: Boolean,
+    enableInspectors: Boolean,
+    readOnlyInspectors: Boolean,
     lastInspection: Instant?,
     inspections: List<Inspection>?,
     isInspector: Boolean,
@@ -360,7 +362,8 @@ fun ArtifactDetails(
                 inspectors = inspectors,
                 onAddClick = onAddInspectorClick,
                 onRemoveClick = onRemoveInspectorClick,
-                enabled = enableInspectorControls
+                enabled = enableInspectors,
+                readOnly = readOnlyInspectors
             )
         }
 

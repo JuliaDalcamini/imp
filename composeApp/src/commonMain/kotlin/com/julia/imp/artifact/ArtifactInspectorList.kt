@@ -30,18 +30,18 @@ fun ArtifactInspectorList(
     onAddClick: () -> Unit,
     onRemoveClick: (User) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    readOnly: Boolean = false
 ) {
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.Top
     ) {
-
         for (inspector in inspectors) {
             InputChip(
                 label = { Text(inspector.fullName) },
-                onClick = { onRemoveClick(inspector) },
+                onClick = { if (!readOnly) onRemoveClick(inspector) },
                 selected = true,
                 enabled = enabled,
                 shape = RoundedCornerShape(16.dp),
@@ -53,16 +53,20 @@ fun ArtifactInspectorList(
                     )
                 },
                 trailingIcon = {
-                    Icon(vectorResource(Res.drawable.close_20px), null)
+                    if (!readOnly) {
+                        Icon(vectorResource(Res.drawable.close_20px), null)
+                    }
                 }
             )
         }
 
-        AssistChip(
-            label = { Text(stringResource(Res.string.add_label)) },
-            onClick = onAddClick,
-            enabled = enabled,
-            leadingIcon = { Icon(vectorResource(Res.drawable.add_20px), null) }
-        )
+        if (!readOnly) {
+            AssistChip(
+                label = { Text(stringResource(Res.string.add_label)) },
+                onClick = onAddClick,
+                enabled = enabled,
+                leadingIcon = { Icon(vectorResource(Res.drawable.add_20px), null) }
+            )
+        }
     }
 }
