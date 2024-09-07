@@ -31,7 +31,7 @@ import imp.composeapp.generated.resources.current_min_inspectors_format
 import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.inspectors_number_label
 import imp.composeapp.generated.resources.inspectors_number_select
-import imp.composeapp.generated.resources.manage_team_title
+import imp.composeapp.generated.resources.manage_project_label
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.target_date_format
@@ -65,7 +65,7 @@ fun ManageProjectScreen(
                         Icon(vectorResource(Res.drawable.arrow_back_24px), null)
                     }
                 },
-                title = { Title(stringResource(Res.string.manage_team_title)) }
+                title = { Title(stringResource(Res.string.manage_project_label)) }
             )
         }
     ) { paddingValues ->

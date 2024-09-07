@@ -58,7 +58,6 @@ import imp.composeapp.generated.resources.delete_label
 import imp.composeapp.generated.resources.delete_project_message
 import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.description_24px
-import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.generate_report_label
 import imp.composeapp.generated.resources.manage_project_label
 import imp.composeapp.generated.resources.more_vert_24px
@@ -67,7 +66,6 @@ import imp.composeapp.generated.resources.no_projects_message
 import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.refresh_24px
-import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.try_again_label
@@ -135,6 +133,7 @@ fun ProjectsScreen(
                                     .animateItem(),
                                 project = project,
                                 showDeleteOption = viewModel.uiState.showDeleteOption,
+                                showManageOption = viewModel.uiState.showManageOption,
                                 onClick = { onProjectClick(project) },
                                 onManageProjectClick = { onManageProjectClick(project) },
                                 onDeleteClick = { viewModel.askToDelete(project) },
@@ -232,6 +231,7 @@ fun NewProjectButton(
 fun ProjectListItem(
     project: Project,
     showDeleteOption: Boolean,
+    showManageOption: Boolean,
     onClick: () -> Unit,
     onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -276,6 +276,7 @@ fun ProjectListItem(
                     expanded = expandOptions,
                     onDismissRequest = { expandOptions = false },
                     showDeleteOption = showDeleteOption,
+                    showManageOption = showManageOption,
                     onManageProjectClick = onManageProjectClick,
                     onDeleteClick = onDeleteClick,
                     onGenerateReportClick = onGenerateReportClick
@@ -290,6 +291,7 @@ fun ProjectOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     showDeleteOption: Boolean,
+    showManageOption: Boolean,
     onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
@@ -309,25 +311,16 @@ fun ProjectOptionsDropdown(
             }
         )
 
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.manage_project_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.settings_24px), null) },
-            onClick = {
-                onManageProjectClick()
-                onDismissRequest()
-            }
-        )
-
-//        if (showRenameOption) {
-//            DropdownMenuItem(
-//                text = { Text(stringResource(Res.string.rename_label)) },
-//                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
-//                onClick = {
-//                    onRenameClick()
-//                    onDismissRequest()
-//                }
-//            )
-//        }
+        if (showManageOption) {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.manage_project_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.settings_24px), null) },
+                onClick = {
+                    onManageProjectClick()
+                    onDismissRequest()
+                }
+            )
+        }
 
         if (showDeleteOption) {
             DropdownMenuItem(

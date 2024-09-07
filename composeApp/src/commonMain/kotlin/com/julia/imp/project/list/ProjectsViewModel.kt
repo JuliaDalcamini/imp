@@ -27,7 +27,7 @@ class ProjectsViewModel(
                 uiState = ProjectsUiState(
                     loading = true,
                     showCreateButton = isAdmin,
-                    showRenameOption = isAdmin,
+                    showManageOption = isAdmin,
                     showDeleteOption = isAdmin
                 )
 
