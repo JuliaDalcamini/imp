@@ -100,7 +100,9 @@ fun PrioritizeArtifactScreen(
                 )
 
                 PrimaryButton(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
                     label = stringResource(Res.string.conclude_label),
                     onClick = { viewModel.prioritizeArtifact() },
                     enabled = !viewModel.uiState.saving,
