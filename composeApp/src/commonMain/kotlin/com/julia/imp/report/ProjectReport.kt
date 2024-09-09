@@ -1,22 +1,16 @@
 package com.julia.imp.report
 
 import androidx.compose.animation.core.snap
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -92,24 +86,47 @@ fun ProjectReportPage1(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onBackground
         )
 
+        val rowContents = listOf(
+            listOf("Item de teste número 1", "Artefato de inspeção de software", "R$ 1.000,00"),
+            listOf("Item número 2", "Artefato que faz alguma coisa", "R$ 1.200,00"),
+            listOf("Esse item é o terceiro", "Artefato que faz outra coisa", "R$ 1.500,00"),
+            listOf("Acho que esse é o quarto", "Artefato que faz outra coisa", "R$ 1.500,00"),
+            listOf("E esse é o quinto", "Artefato que faz outra coisa", "R$ 1.500,00"),
+            listOf("Mas esse outro é o sexto", "Artefato que faz mais alguma outra coisa", "R$ 1.700,00"),
+            listOf("Já esse aqui é o sétimo", "Artefato que faz uma coisa diferente", "R$ 1.860,00"),
+            listOf("Esse eu acredito que seja o oitavo", "Será que esse artefato faz algo?", "R$ 102.563,00"),
+            listOf("Artefato 9", "Esse aqui acho que é igual aos outros", "R$ 1.540,21"),
+        )
+
         Table(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            headers = listOf("Nome", "Tipo", "Valor"),
-            rows = listOf(
-                listOf("Item de teste número 1", "Artefato de inspeção de software", "R$ 1.000,00"),
-                listOf("Item número 2", "Artefato que faz alguma coisa", "R$ 1.200,00"),
-                listOf("Esse item é o terceiro", "Artefato que faz outra coisa", "R$ 1.500,00"),
-                listOf("Acho que esse é o quarto", "Artefato que faz outra coisa", "R$ 1.500,00"),
-                listOf("E esse é o quinto", "Artefato que faz outra coisa", "R$ 1.500,00"),
-                listOf("Mas esse outro é o sexto", "Artefato que faz mais alguma outra coisa", "R$ 1.700,00"),
-                listOf("Já esse aqui é o sétimo", "Artefato que faz uma coisa diferente", "R$ 1.860,00"),
-                listOf("Esse eu acredito que seja o oitavo", "Será que esse artefato faz algo?", "R$ 102.563,00"),
-                listOf("Artefato 9", "Esse aqui acho que é igual aos outros", "R$ 1.540,21"),
-            ),
-            columnWeights = listOf(1f, 1f, .5f)
-        )
+                .padding(top = 24.dp)
+        ) {
+            val costColumnWeight = .5f
+
+            TableRow {
+                TableHeader("Nome")
+                TableHeader("Tipo")
+
+                TableHeader(
+                    modifier = Modifier.weight(costColumnWeight),
+                    text = "Valor"
+                )
+            }
+
+            rowContents.forEach { row ->
+                TableRow {
+                    TableCell(row[0])
+                    TableCell(row[1])
+
+                    TableCell(
+                        modifier = Modifier.weight(costColumnWeight),
+                        text = row[2]
+                    )
+                }
+            }
+        }
 
         Row(
             modifier = Modifier
@@ -156,89 +173,45 @@ fun ProjectReportPage2(modifier: Modifier = Modifier) {
             ExampleChart()
         }
 
+        val rowContents = listOf(
+            listOf("Item de teste número 1", "Artefato de inspeção de software", "R$ 1.000,00"),
+            listOf("Item número 2", "Artefato que faz alguma coisa", "R$ 1.200,00"),
+            listOf("Esse item é o terceiro", "Artefato que faz outra coisa", "R$ 1.500,00"),
+            listOf("Acho que esse é o quarto", "Artefato que faz outra coisa", "R$ 1.500,00")
+        )
+
         Table(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            headers = listOf("Nome", "Tipo", "Valor"),
-            rows = listOf(
-                listOf("Item de teste número 1", "Artefato de inspeção de software", "R$ 1.000,00"),
-                listOf("Item número 2", "Artefato que faz alguma coisa", "R$ 1.200,00"),
-                listOf("Esse item é o terceiro", "Artefato que faz outra coisa", "R$ 1.500,00"),
-                listOf("Acho que esse é o quarto", "Artefato que faz outra coisa", "R$ 1.500,00")
-            ),
-            columnWeights = listOf(1f, 1f, .5f)
-        )
-    }
-}
-
-@Composable
-fun Table(
-    headers: List<String>,
-    rows: List<List<String>>,
-    columnWeights: List<Float> = List(headers.size) { 1f },
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.border(
-            width = 2.dp,
-            color = MaterialTheme.colorScheme.outline
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Max)
+                .padding(top = 24.dp)
         ) {
-            headers.forEachIndexed { index, header ->
-                Box(Modifier.weight(columnWeights[index])) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        text = header,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+            val typeHeaderWeight = 2f
+            val costColumnWeight = .5f
 
-                if (index < headers.lastIndex) {
-                    VerticalDivider(
-                        modifier = Modifier.fillMaxHeight(),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
+            TableRow {
+                TableHeader("Nome")
+
+                TableHeader(
+                    modifier = Modifier.weight(typeHeaderWeight),
+                    text = "Tipo"
+                )
+
+                TableHeader(
+                    modifier = Modifier.weight(costColumnWeight),
+                    text = "Valor"
+                )
             }
-        }
 
-        rows.forEach { columns ->
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline
-            )
+            rowContents.forEach { row ->
+                TableRow {
+                    TableCell(row[0])
+                    TableCell(row[1])
+                    TableCell(row[1])
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max)
-            ) {
-                columns.forEachIndexed { index, text ->
-                    Box(Modifier.weight(columnWeights[index])) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            text = text,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-
-                    if (index < headers.lastIndex) {
-                        VerticalDivider(
-                            modifier = Modifier.fillMaxHeight(),
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
+                    TableCell(
+                        modifier = Modifier.weight(costColumnWeight),
+                        text = row[2]
+                    )
                 }
             }
         }
