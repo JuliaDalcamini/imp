@@ -37,6 +37,8 @@ import com.julia.imp.login.LoginScreen
 import com.julia.imp.project.ProjectsRoute
 import com.julia.imp.project.create.CreateProjectRoute
 import com.julia.imp.project.create.CreateProjectScreen
+import com.julia.imp.project.dashboard.DashboardRoute
+import com.julia.imp.project.dashboard.DashboardScreen
 import com.julia.imp.project.list.ProjectsScreen
 import com.julia.imp.project.manage.ManageProjectRoute
 import com.julia.imp.project.manage.ManageProjectScreen
@@ -130,9 +132,10 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                 composable<ProjectsRoute> {
                     ProjectsScreen(
-                        onNewProjectClick = { navController.navigate(CreateProjectRoute) },
-                        onManageProjectClick = { navController.navigate(ManageProjectRoute(it)) },
                         onProjectClick = { navController.navigate(ArtifactsRoute(it)) },
+                        onNewProjectClick = { navController.navigate(CreateProjectRoute) },
+                        onViewProjectStatsClick = { navController.navigate(DashboardRoute(it)) },
+                        onManageProjectClick = { navController.navigate(ManageProjectRoute(it)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
                         onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
@@ -144,6 +147,15 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     CreateProjectScreen(
                         onBackClick = { navController.popBackStack() },
                         onProjectCreated = { navController.popBackStack() }
+                    )
+                }
+
+                composable<DashboardRoute>(DashboardRoute.typeMap) { entry ->
+                    val route = entry.toRoute<DashboardRoute>()
+
+                    DashboardScreen(
+                        project = route.project,
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
 

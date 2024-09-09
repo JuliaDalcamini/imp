@@ -17,15 +17,10 @@ class TeamRepository(private val client: HttpClient = configuredHttpClient) {
     suspend fun getTeams(): List<Team> =
         client.get("teams").body()
 
-    suspend fun createTeam(name: String, defaultHourlyCost: Double): Team =
+    suspend fun createTeam(name: String): Team =
         client.post("teams") {
             contentType(ContentType.Application.Json)
-            setBody(
-                CreateTeamRequest(
-                    name = name,
-                    defaultHourlyCost = defaultHourlyCost
-                )
-            )
+            setBody(CreateTeamRequest(name = name))
         }.body()
 
     suspend fun updateTeam(

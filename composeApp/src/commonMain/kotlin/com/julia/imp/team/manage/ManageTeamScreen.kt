@@ -8,23 +8,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.requireTeam
+import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.common.ui.title.Title
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.team.Team
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.current_hourly_cost_format
 import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.manage_team_members_description
@@ -34,9 +30,7 @@ import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_team_title
 import imp.composeapp.generated.resources.update_cost_default_title
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageTeamScreen(
     onBackClick: () -> Unit,
@@ -52,24 +46,18 @@ fun ManageTeamScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                },
-                title = { Title(stringResource(Res.string.manage_team_title)) }
+            TopBar(
+                title = stringResource(Res.string.manage_team_title),
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->
-        val scrollState = rememberScrollState()
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues)
-                .verticalScroll(scrollState)
+                .verticalScroll(rememberScrollState())
         ) {
             ListItem(
                 modifier = Modifier
@@ -84,7 +72,14 @@ fun ManageTeamScreen(
                     .fillMaxWidth()
                     .clickable { viewModel.showUpdateDefaultCostDialog() },
                 headlineContent = { Text(stringResource(Res.string.update_cost_default_title)) },
-                supportingContent = { Text(stringResource(Res.string.current_hourly_cost_format, requireTeam().defaultHourlyCost)) }
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            Res.string.current_hourly_cost_format,
+                            requireTeam().defaultHourlyCost.formatAsCurrency()
+                        )
+                    )
+                }
             )
 
             ListItem(

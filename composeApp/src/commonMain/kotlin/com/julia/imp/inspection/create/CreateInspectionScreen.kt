@@ -14,12 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -31,7 +27,7 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.ui.button.PrimaryButton
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.form.RadioGroupFormField
-import com.julia.imp.common.ui.title.CompoundTitle
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.question.Question
@@ -39,7 +35,6 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.answer_option_no_label
 import imp.composeapp.generated.resources.answer_option_not_applicable_label
 import imp.composeapp.generated.resources.answer_option_yes_label
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.finish_inspection_error_message
 import imp.composeapp.generated.resources.finish_inspection_error_title
 import imp.composeapp.generated.resources.finish_inspection_label
@@ -47,9 +42,7 @@ import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
 import imp.composeapp.generated.resources.new_inspection_title
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateInspectionScreen(
     artifact: Artifact,
@@ -68,18 +61,10 @@ fun CreateInspectionScreen(
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                },
-                title = {
-                    CompoundTitle(
-                        title = stringResource(Res.string.new_inspection_title),
-                        subtitle = artifact.name
-                    )
-                }
+            TopBar(
+                title = stringResource(Res.string.new_inspection_title),
+                subtitle = artifact.name,
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->

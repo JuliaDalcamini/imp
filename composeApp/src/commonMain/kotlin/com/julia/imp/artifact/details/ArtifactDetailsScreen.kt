@@ -1,6 +1,5 @@
 package com.julia.imp.artifact.details
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,24 +25,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactInspectorList
 import com.julia.imp.common.datetime.DateTimeFormats
+import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.text.getInitials
-import com.julia.imp.common.text.toLink
 import com.julia.imp.common.ui.avatar.Avatar
 import com.julia.imp.common.ui.avatar.AvatarSize
+import com.julia.imp.common.ui.details.Property
+import com.julia.imp.common.ui.details.TextProperty
 import com.julia.imp.common.ui.dialog.ErrorDialog
-import com.julia.imp.common.ui.title.CompoundTitle
+import com.julia.imp.common.ui.text.ExternalLink
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.WiegersPriority
@@ -54,7 +53,6 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.archived_artifact_alert_message
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.artifact_details_title
 import imp.composeapp.generated.resources.artifact_external_link_label
 import imp.composeapp.generated.resources.artifact_last_modification_label
@@ -62,7 +60,6 @@ import imp.composeapp.generated.resources.artifact_name_label
 import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.artifact_version_label
 import imp.composeapp.generated.resources.assignment_24px
-import imp.composeapp.generated.resources.cash_format
 import imp.composeapp.generated.resources.cost_format
 import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
@@ -88,7 +85,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtifactDetailsScreen(
     artifact: Artifact,
@@ -104,18 +100,10 @@ fun ArtifactDetailsScreen(
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                },
-                title = {
-                    CompoundTitle(
-                        title = stringResource(Res.string.artifact_details_title),
-                        subtitle = artifact.name
-                    )
-                },
+            TopBar(
+                title = stringResource(Res.string.artifact_details_title),
+                subtitle = artifact.name,
+                onBackClick = onBackClick,
                 actions = {
                     if (viewModel.uiState.showEditButton) {
                         IconButton(onClick = onEditClick) {
@@ -228,247 +216,198 @@ fun ArtifactDetails(
             )
         }
 
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.artifact_name_label)
-        )
-
-        Text(
+        TextProperty(
             modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
+            label = stringResource(Res.string.artifact_name_label),
             text = artifact.name
         )
 
-        Text(
+        TextProperty(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.artifact_type_label)
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.artifact_type_label),
             text = artifact.type.name
         )
 
-        Text(
+        TextProperty(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.artifact_version_label)
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.artifact_version_label),
             text = artifact.currentVersion
         )
 
-        Text(
+        TextProperty(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.artifact_last_modification_label)
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.artifact_last_modification_label),
             text = artifact.lastModification
                 .toLocalDateTime(TimeZone.currentSystemDefault())
                 .format(DateTimeFormats.DEFAULT)
         )
 
-        Text(
+        Property(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.artifact_external_link_label)
-        )
-
-        ExternalLink(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            url = artifact.externalLink
-        )
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.artifact_external_link_label)
+        ) {
+            ExternalLink(url = artifact.externalLink)
+        }
 
         if (artifact.priority != null) {
-            Text(
+            TextProperty(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 4.dp),
-                style = MaterialTheme.typography.labelMedium,
-                text = stringResource(Res.string.priority_label)
-            )
-
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                style = MaterialTheme.typography.bodyMedium,
+                    .padding(top = 24.dp),
+                label = stringResource(Res.string.priority_label),
                 text = getPriorityText(artifact)
             )
         }
 
-        Text(
+        TextProperty(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.last_inspection_label)
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.last_inspection_label),
             text = lastInspection
                 ?.toLocalDateTime(TimeZone.currentSystemDefault())
                 ?.format(DateTimeFormats.DEFAULT)
                 ?: stringResource(Res.string.never)
         )
 
-        Text(
+        TextProperty(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 4.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.total_cost_label)
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            text = stringResource(Res.string.cash_format, artifact.totalCost.toString())
+                .padding(top = 24.dp),
+            label = stringResource(Res.string.total_cost_label),
+            text = artifact.totalCost.formatAsCurrency()
         )
 
         if (!artifact.archived) {
-            Text(
+            Property(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 4.dp),
-                style = MaterialTheme.typography.labelMedium,
-                text = stringResource(Res.string.inspectors_label)
-            )
-
-            ArtifactInspectorList(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                inspectors = inspectors,
-                onAddClick = onAddInspectorClick,
-                onRemoveClick = onRemoveInspectorClick,
-                enabled = enableInspectors,
-                readOnly = readOnlyInspectors
-            )
+                    .padding(top = 24.dp),
+                label = stringResource(Res.string.inspectors_label)
+            ) {
+                ArtifactInspectorList(
+                    modifier = Modifier.fillMaxWidth(),
+                    inspectors = inspectors,
+                    onAddClick = onAddInspectorClick,
+                    onRemoveClick = onRemoveInspectorClick,
+                    enabled = enableInspectors,
+                    readOnly = readOnlyInspectors
+                )
+            }
         }
 
         val filteredInspections =
             if (isInspector) inspections?.filter { it.inspector.id == loggedUserId.invoke() }
             else inspections
 
-        getInspections(filteredInspections)
+        if (!filteredInspections.isNullOrEmpty()) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp, bottom = 12.dp),
+                style = MaterialTheme.typography.labelMedium,
+                text = stringResource(Res.string.inspections_label)
+            )
 
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(filteredInspections) { inspection ->
+                        InspectionCard(
+                            inspection = inspection,
+                            onClick = { /* TODO: View inspection */ },
+                            modifier = Modifier.widthIn(max = maxWidth - 48.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun getInspections(
-    inspections: List<Inspection>?,
+fun InspectionCard(
+    inspection: Inspection,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (!inspections.isNullOrEmpty()) {
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 12.dp),
-            style = MaterialTheme.typography.labelMedium,
-            text = stringResource(Res.string.inspections_label)
-        )
+    val formattedDateTime = inspection.createdAt
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .format(DateTimeFormats.DEFAULT)
 
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            LazyRow(
+    ElevatedCard(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Column(Modifier.padding(24.dp)) {
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(inspections) { inspection ->
-                    val formattedDateTime = inspection.createdAt
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .format(DateTimeFormats.DEFAULT)
+                Avatar(
+                    initials = inspection.inspector.fullName.getInitials(),
+                    size = AvatarSize.Small,
+                )
 
-                    ElevatedCard(
-                        modifier = Modifier.widthIn(max = maxWidth - 48.dp),
-                        onClick = {
-                            // TODO: Redirect to inspection details
-                        }
-                    ) {
-                        Column(Modifier.padding(24.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Avatar(
-                                    initials = inspection.inspector.fullName.getInitials(),
-                                    size = AvatarSize.Small,
-                                )
-
-                                Text(
-                                    modifier = Modifier.padding(start = 8.dp),
-                                    text = stringResource(
-                                        Res.string.inspection_title,
-                                        inspection.inspector.fullName
-                                    ),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-
-                            Text(
-                                modifier = Modifier.padding(top = 12.dp),
-                                text = stringResource(
-                                    Res.string.made_on_format,
-                                    formattedDateTime
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(top = 4.dp),
-                                text = stringResource(
-                                    Res.string.duration_format,
-                                    inspection.duration.inWholeSeconds.seconds.toString()
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(top = 4.dp),
-                                text = stringResource(
-                                    Res.string.cost_format,
-                                    inspection.cost.toString()
-                                ),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = stringResource(
+                        Res.string.inspection_title,
+                        inspection.inspector.fullName
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
+
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(
+                    Res.string.made_on_format,
+                    formattedDateTime
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(
+                    Res.string.duration_format,
+                    inspection.duration.inWholeSeconds.seconds.toString()
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(
+                    Res.string.cost_format,
+                    inspection.cost.formatAsCurrency()
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -500,18 +439,4 @@ fun ArchivedArtifactAlert(modifier: Modifier = Modifier) {
             )
         }
     }
-}
-
-@Composable
-private fun ExternalLink(
-    url: String,
-    modifier: Modifier = Modifier
-) {
-    val uriHandler = LocalUriHandler.current
-
-    Text(
-        modifier = modifier.clickable { uriHandler.openUri(url) },
-        style = MaterialTheme.typography.bodyMedium,
-        text = url.toLink()
-    )
 }

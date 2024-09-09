@@ -23,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -32,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,7 +50,7 @@ import com.julia.imp.common.ui.avatar.Avatar
 import com.julia.imp.common.ui.avatar.AvatarSize
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
-import com.julia.imp.common.ui.title.CompoundTitle
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.priority.MoscowPriority
 import com.julia.imp.priority.WiegersPriority
 import com.julia.imp.project.Project
@@ -65,7 +63,6 @@ import imp.composeapp.generated.resources.archive_artifact_message
 import imp.composeapp.generated.resources.archive_artifact_title
 import imp.composeapp.generated.resources.archive_label
 import imp.composeapp.generated.resources.archived_label
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.artifacts_error_message
 import imp.composeapp.generated.resources.artifacts_title
 import imp.composeapp.generated.resources.edit_24px
@@ -88,7 +85,6 @@ import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtifactsScreen(
     project: Project,
@@ -106,18 +102,10 @@ fun ArtifactsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    CompoundTitle(
-                        title = stringResource(Res.string.artifacts_title),
-                        subtitle = project.name
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                }
+            TopBar(
+                title = stringResource(Res.string.artifacts_title),
+                subtitle = project.name,
+                onBackClick = onBackClick
             )
         },
         floatingActionButton = {

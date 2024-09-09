@@ -23,19 +23,12 @@ class CreateTeamViewModel(
         uiState = uiState.copy(name = name)
     }
 
-    fun setDefaultHourlyCost(defaultHourlyCost: Double) {
-        uiState = uiState.copy(defaultHourlyCost = defaultHourlyCost)
-    }
-
     fun createTeam() {
         viewModelScope.launch {
             uiState = uiState.copy(loading = true)
 
             try {
-                val team = repository.createTeam(
-                    name = uiState.name,
-                    defaultHourlyCost = uiState.defaultHourlyCost
-                )
+                val team = repository.createTeam(name = uiState.name)
                 val userId = requireSession().userId
                 val teamMember = memberRepository.getMember(team.id, userId)
 

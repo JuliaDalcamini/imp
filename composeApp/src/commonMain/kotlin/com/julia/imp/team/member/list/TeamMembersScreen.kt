@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,13 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.text.getInitials
 import com.julia.imp.common.ui.avatar.Avatar
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.SelectionDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.common.ui.title.Title
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
 import imp.composeapp.generated.resources.Res
@@ -53,7 +52,6 @@ import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.add_member_label
 import imp.composeapp.generated.resources.add_member_title
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.change_role_label
 import imp.composeapp.generated.resources.change_role_title
 import imp.composeapp.generated.resources.currency_exchange_24px
@@ -75,7 +73,6 @@ import imp.composeapp.generated.resources.update_cost_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamMembersScreen(
     onBackClick: () -> Unit,
@@ -87,13 +84,9 @@ fun TeamMembersScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Title(stringResource(Res.string.team_members_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                }
+            TopBar(
+                title = stringResource(Res.string.team_members_title),
+                onBackClick = onBackClick
             )
         },
         floatingActionButton = {
@@ -274,7 +267,7 @@ fun TeamMemberListItem(
                     Text(
                         text = stringResource(
                             Res.string.current_hourly_cost_format,
-                            member.hourlyCost.toString()
+                            member.hourlyCost.formatAsCurrency()
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

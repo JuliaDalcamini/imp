@@ -17,7 +17,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,7 +42,7 @@ import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.common.ui.title.Title
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
 import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
@@ -59,25 +57,27 @@ import imp.composeapp.generated.resources.delete_project_message
 import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.generate_report_label
-import imp.composeapp.generated.resources.manage_project_label
+import imp.composeapp.generated.resources.manage_label
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_project_label
 import imp.composeapp.generated.resources.no_projects_message
 import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
+import imp.composeapp.generated.resources.query_stats_24px
 import imp.composeapp.generated.resources.refresh_24px
 import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.try_again_label
+import imp.composeapp.generated.resources.view_stats_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
-    onNewProjectClick: () -> Unit,
-    onManageProjectClick: (Project) -> Unit,
     onProjectClick: (Project) -> Unit,
+    onNewProjectClick: () -> Unit,
+    onViewProjectStatsClick: (Project) -> Unit,
+    onManageProjectClick: (Project) -> Unit,
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
@@ -90,8 +90,8 @@ fun ProjectsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Title(stringResource(Res.string.projects_title)) },
+            TopBar(
+                title = stringResource(Res.string.projects_title),
                 actions = {
                     TeamSwitcher(
                         onTeamSwitch = onTeamSwitch,
@@ -135,6 +135,7 @@ fun ProjectsScreen(
                                 showDeleteOption = viewModel.uiState.showDeleteOption,
                                 showManageOption = viewModel.uiState.showManageOption,
                                 onClick = { onProjectClick(project) },
+                                onViewStatsClick = { onViewProjectStatsClick(project) },
                                 onManageProjectClick = { onManageProjectClick(project) },
                                 onDeleteClick = { viewModel.askToDelete(project) },
                                 onGenerateReportClick = { viewModel.generateReport(project) }
@@ -233,6 +234,7 @@ fun ProjectListItem(
     showDeleteOption: Boolean,
     showManageOption: Boolean,
     onClick: () -> Unit,
+    onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
@@ -277,6 +279,7 @@ fun ProjectListItem(
                     onDismissRequest = { expandOptions = false },
                     showDeleteOption = showDeleteOption,
                     showManageOption = showManageOption,
+                    onViewStatsClick = onViewStatsClick,
                     onManageProjectClick = onManageProjectClick,
                     onDeleteClick = onDeleteClick,
                     onGenerateReportClick = onGenerateReportClick
@@ -292,6 +295,7 @@ fun ProjectOptionsDropdown(
     onDismissRequest: () -> Unit,
     showDeleteOption: Boolean,
     showManageOption: Boolean,
+    onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
@@ -303,6 +307,15 @@ fun ProjectOptionsDropdown(
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
+            text = { Text(stringResource(Res.string.view_stats_label)) },
+            leadingIcon = { Icon(vectorResource(Res.drawable.query_stats_24px), null) },
+            onClick = {
+                onViewStatsClick()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
             text = { Text(stringResource(Res.string.generate_report_label)) },
             leadingIcon = { Icon(vectorResource(Res.drawable.description_24px), null) },
             onClick = {
@@ -313,7 +326,7 @@ fun ProjectOptionsDropdown(
 
         if (showManageOption) {
             DropdownMenuItem(
-                text = { Text(stringResource(Res.string.manage_project_label)) },
+                text = { Text(stringResource(Res.string.manage_label)) },
                 leadingIcon = { Icon(vectorResource(Res.drawable.settings_24px), null) },
                 onClick = {
                     onManageProjectClick()

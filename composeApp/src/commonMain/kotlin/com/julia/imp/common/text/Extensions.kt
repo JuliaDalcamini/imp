@@ -10,6 +10,34 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 
 /**
+ * Format a double to a string with a fixed number of decimal places.
+ */
+fun Number.format(decimalPlaces: Int = 2): String {
+    val string = this.toString()
+    val (wholePart, decimalPart) = string.split('.')
+
+    return "$wholePart.${decimalPart.take(decimalPlaces)}"
+}
+
+/**
+ * Format a number as a currency string.
+ */
+fun Number.formatAsCurrency(): String {
+    val string = this.toString()
+    val (wholePart, decimalPart) = string.split('.')
+
+    val formattedWholePart = wholePart
+        .reversed()
+        .chunked(3)
+        .joinToString(".")
+        .reversed()
+
+    val formattedDecimalPart = decimalPart.take(2)
+
+    return "R$ $formattedWholePart,$formattedDecimalPart"
+}
+
+/**
  * Get the first and last initials of a string.
  */
 fun String.getInitials(): String {

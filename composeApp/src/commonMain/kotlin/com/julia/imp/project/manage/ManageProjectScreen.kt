@@ -8,13 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -23,15 +19,14 @@ import com.julia.imp.common.datetime.DateFormats
 import com.julia.imp.common.ui.dialog.DatePickerDialog
 import com.julia.imp.common.ui.dialog.SelectionDialog
 import com.julia.imp.common.ui.dialog.TextInputDialog
-import com.julia.imp.common.ui.title.Title
+import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.arrow_back_24px
 import imp.composeapp.generated.resources.current_min_inspectors_format
 import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.inspectors_number_label
 import imp.composeapp.generated.resources.inspectors_number_select
-import imp.composeapp.generated.resources.manage_project_label
+import imp.composeapp.generated.resources.manage_project_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.target_date_format
@@ -41,9 +36,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageProjectScreen(
     project: Project,
@@ -59,24 +52,18 @@ fun ManageProjectScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(vectorResource(Res.drawable.arrow_back_24px), null)
-                    }
-                },
-                title = { Title(stringResource(Res.string.manage_project_label)) }
+            TopBar(
+                title = stringResource(Res.string.manage_project_title),
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->
-        val scrollState = rememberScrollState()
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues)
-                .verticalScroll(scrollState)
+                .verticalScroll(rememberScrollState())
         ) {
             ListItem(
                 modifier = Modifier
