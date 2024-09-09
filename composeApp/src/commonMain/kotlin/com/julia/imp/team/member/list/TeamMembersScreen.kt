@@ -2,6 +2,7 @@ package com.julia.imp.team.member.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -52,6 +53,7 @@ import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.add_member_label
 import imp.composeapp.generated.resources.add_member_title
+import imp.composeapp.generated.resources.change_cost_label
 import imp.composeapp.generated.resources.change_role_label
 import imp.composeapp.generated.resources.change_role_title
 import imp.composeapp.generated.resources.currency_exchange_24px
@@ -69,7 +71,6 @@ import imp.composeapp.generated.resources.rule_settings_24px
 import imp.composeapp.generated.resources.team_member_role_format
 import imp.composeapp.generated.resources.team_members_title
 import imp.composeapp.generated.resources.try_again_label
-import imp.composeapp.generated.resources.update_cost_label
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -122,11 +123,7 @@ fun TeamMembersScreen(
                                 member = member,
                                 showOptions = viewModel.uiState.showOptions,
                                 onChangeRoleClick = { viewModel.askToChangeRole(member) },
-                                onUpdateHourlyCostClick = {
-                                    viewModel.askToUpdatetHourlyCostDialog(
-                                        member
-                                    )
-                                },
+                                onChangeCostClick = { viewModel.askToChangeCost(member) },
                                 onRemoveClick = { viewModel.askToRemove(member) }
                             )
                         }
@@ -195,16 +192,11 @@ fun TeamMembersScreen(
         )
     }
 
-    viewModel.uiState.memberToUpdateHourlyCost?.let { member ->
-        UpdateHourlyCostDialog(
-            hourlyCost = member.hourlyCost,
-            onDismissRequest = { viewModel.dismissHourlyCostDialog() },
-            onConfirm = { newHourlyCost ->
-                viewModel.updateHourlyCost(
-                    member,
-                    newHourlyCost.toDouble()
-                )
-            }
+    viewModel.uiState.memberToChangeCost?.let { member ->
+        ChangeCostDialog(
+            currentCost = member.hourlyCost,
+            onDismissRequest = { viewModel.dismissCostChange() },
+            onConfirm = { newCost -> viewModel.changeCost(member, newCost.toDouble()) }
         )
     }
 
@@ -235,114 +227,124 @@ fun TeamMemberListItem(
     member: TeamMember,
     showOptions: Boolean,
     onChangeRoleClick: () -> Unit,
-    onUpdateHourlyCostClick: () -> Unit,
+    onChangeCostClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ListItem(
-        modifier = modifier,
-        leadingContent = { Avatar(member.fullName.getInitials()) },
-        headlineContent = {
-            Text(
-                text = member.fullName,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        supportingContent = {
-            Column(
-                modifier = Modifier
-                .fillMaxWidth()
-            ) {
+    BoxWithConstraints(modifier) {
+        val compact = maxWidth < 480.dp
+
+        ListItem(
+            modifier = Modifier.fillMaxWidth(),
+            leadingContent = { Avatar(member.fullName.getInitials()) },
+            headlineContent = {
                 Text(
-                    text = stringResource(
-                        Res.string.team_member_role_format,
-                        member.role.getLabel()
-                    ),
+                    text = member.fullName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
-                if (member.role != Role.Viewer) {
+            },
+            supportingContent = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(
                         text = stringResource(
-                            Res.string.current_hourly_cost_format,
-                            member.hourlyCost.formatAsCurrency()
+                            Res.string.team_member_role_format,
+                            member.role.getLabel()
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                }
-            }
-        },
-        trailingContent = {
-            var expandOptions by remember { mutableStateOf(false) }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = onChangeRoleClick,
-                ) {
-                    Icon(
-                        vectorResource(Res.drawable.rule_settings_24px),
-                        contentDescription = stringResource(Res.string.change_role_label)
-                    )
-                }
-
-                if (showOptions) {
-                    IconButton(onClick = { expandOptions = true }) {
-                        Icon(vectorResource(Res.drawable.more_vert_24px), null)
+                    if (member.role != Role.Viewer) {
+                        Text(
+                            text = stringResource(
+                                Res.string.current_hourly_cost_format,
+                                member.hourlyCost.formatAsCurrency()
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
+            },
+            trailingContent = {
+                if (showOptions) {
+                    TeamMemberOptions(
+                        compact = compact,
+                        showChangeCostOption = member.role != Role.Viewer,
+                        onChangeRoleClick = onChangeRoleClick,
+                        onChangeCostClick = onChangeCostClick,
+                        onRemoveClick = onRemoveClick
+                    )
+                }
             }
-
-            TeamMemberOptionsDropdown(
-                role = member.role,
-                expanded = expandOptions,
-                onDismissRequest = { expandOptions = false },
-                onUpdateHourlyCostClick = onUpdateHourlyCostClick,
-                onRemoveClick = onRemoveClick
-            )
-        }
-    )
+        )
+    }
 }
 
 @Composable
-fun TeamMemberOptionsDropdown(
-    role: Role,
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    onUpdateHourlyCostClick: () -> Unit,
+fun TeamMemberOptions(
+    compact: Boolean,
+    showChangeCostOption: Boolean,
+    onChangeRoleClick: () -> Unit,
+    onChangeCostClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DropdownMenu(
-        modifier = modifier,
-        expanded = expanded,
-        onDismissRequest = onDismissRequest
-    ) {
+    Box(modifier) {
+        var expanded by remember { mutableStateOf(false) }
 
-        if (role != Role.Viewer) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!compact) {
+                IconButton(onClick = onChangeRoleClick) {
+                    Icon(vectorResource(Res.drawable.rule_settings_24px), null)
+                }
+            }
+
+            IconButton(onClick = { expanded = true }) {
+                Icon(vectorResource(Res.drawable.more_vert_24px), null)
+            }
+        }
+
+        DropdownMenu(
+            modifier = modifier,
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            if (compact) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.change_role_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.rule_settings_24px), null) },
+                    onClick = {
+                        onChangeRoleClick()
+                        expanded = false
+                    }
+                )
+            }
+
+            if (showChangeCostOption) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.change_cost_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.currency_exchange_24px), null) },
+                    onClick = {
+                        onChangeCostClick()
+                        expanded = false
+                    }
+                )
+            }
+
             DropdownMenuItem(
-                text = { Text(stringResource(Res.string.update_cost_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.currency_exchange_24px), null) },
+                text = { Text(stringResource(Res.string.remove_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.person_remove_24px), null) },
                 onClick = {
-                    onUpdateHourlyCostClick()
-                    onDismissRequest()
+                    onRemoveClick()
+                    expanded = false
                 }
             )
         }
-
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.remove_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.person_remove_24px), null) },
-            onClick = {
-                onRemoveClick()
-                onDismissRequest()
-            }
-        )
     }
 }
 
@@ -390,14 +392,14 @@ fun AddMemberDialog(
 }
 
 @Composable
-fun UpdateHourlyCostDialog(
-    hourlyCost: Double,
+fun ChangeCostDialog(
+    currentCost: Double,
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
     TextInputDialog(
-        title = stringResource(Res.string.update_cost_label),
-        initialValue = hourlyCost.toString(),
+        title = stringResource(Res.string.change_cost_label),
+        initialValue = currentCost.toString(),
         onDismissRequest = onDismissRequest,
         onConfirm = onConfirm
     )

@@ -1,16 +1,20 @@
 package com.julia.imp.artifact.details
 
 import com.julia.imp.artifact.Artifact
-import com.julia.imp.common.navigation.serializableNavType
 import kotlinx.serialization.Serializable
-import kotlin.reflect.typeOf
 
 @Serializable
 data class ArtifactDetailsRoute(
-    val artifact: Artifact
+    val artifactId: String,
+    val projectId: String
 ) {
 
     companion object {
-        val typeMap = mapOf(typeOf<Artifact>() to serializableNavType<Artifact>())
+
+        fun of(artifact: Artifact): ArtifactDetailsRoute =
+            ArtifactDetailsRoute(
+                artifactId = artifact.id,
+                projectId = artifact.projectId
+            )
     }
 }

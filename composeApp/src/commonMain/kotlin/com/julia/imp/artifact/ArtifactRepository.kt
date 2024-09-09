@@ -24,6 +24,9 @@ class ArtifactRepository(
     suspend fun getArtifacts(projectId: String, filter: ArtifactFilter): List<Artifact> =
         client.get("projects/$projectId/artifacts?filter=$filter").body()
 
+    suspend fun getArtifact(projectId: String, artifactId: String): Artifact =
+        client.get("projects/$projectId/artifacts/$artifactId").body()
+
     suspend fun archiveArtifact(projectId: String, artifactId: String) {
         client.post("projects/$projectId/artifacts/$artifactId/archive")
     }

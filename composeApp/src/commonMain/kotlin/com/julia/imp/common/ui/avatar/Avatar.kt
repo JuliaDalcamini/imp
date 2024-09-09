@@ -84,6 +84,6 @@ private fun AvatarContents(
 }
 
 enum class AvatarSize(val shapeSize: Dp, val fontSize: TextUnit) {
-    Small(shapeSize = 24.dp, fontSize = 12.sp),
+    Small(shapeSize = 24.dp, fontSize = 10.sp),
     Medium(shapeSize = 40.dp, fontSize = 16.sp)
 }

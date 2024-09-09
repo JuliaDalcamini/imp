@@ -7,10 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
-import com.julia.imp.artifact.list.ArtifactListEntry
-import com.julia.imp.artifact.list.ArtifactsUiState
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
+import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.team.inspector.InspectorRepository
 import com.julia.imp.user.User
@@ -22,28 +21,21 @@ class ArtifactDetailsViewModel(
     private val inspectorRepository: InspectorRepository = InspectorRepository()
 ) : ViewModel() {
 
-    private lateinit var artifact: Artifact
+    private lateinit var artifactId: String
+    private lateinit var projectId: String
 
     var uiState by mutableStateOf(ArtifactDetailsUiState())
         private set
 
-    fun initialize(artifact: Artifact) {
-        this.artifact = artifact
-        val isAdmin = requireSession().isTeamAdmin
-
-        uiState = uiState.copy(
-            inspectors = artifact.inspectors,
-            canEditInspectors = isAdmin,
-            showEditButton = isAdmin && !artifact.archived
-        )
-
-        updateInspectButtonState()
-        loadInspections()
+    fun initialize(artifactId: String, projectId: String) {
+        this.artifactId = artifactId
+        this.projectId = projectId
+        loadArtifact()
     }
 
     private fun updateInspectButtonState() {
         uiState = uiState.copy(
-            canInspect = !artifact.archived && isUserInInspectorList()
+            canInspect = uiState.artifact?.archived == false && isUserInInspectorList()
         )
     }
 
@@ -51,18 +43,17 @@ class ArtifactDetailsViewModel(
 
     private fun isUserInInspectorList(): Boolean {
         val userId = getLoggedUserId()
-        return uiState.inspectors.any { it.id == userId }
+        return uiState.artifact?.inspectors?.any { it.id == userId } ?: false
     }
 
-    private fun loadInspections() {
+    private fun loadArtifact() {
         viewModelScope.launch {
-            uiState = uiState.copy(loading = true)
+            uiState = ArtifactDetailsUiState(loading = true)
 
             try {
-                val isInspector = requireSession().isInspector
-
-                uiState = uiState.copy(
-                    isInspector = isInspector
+                val artifact = artifactRepository.getArtifact(
+                    projectId = projectId,
+                    artifactId = artifactId
                 )
 
                 val inspections = inspectionRepository.getInspections(
@@ -70,16 +61,33 @@ class ArtifactDetailsViewModel(
                     artifactId = artifact.id
                 )
 
-                uiState = uiState.copy(
-                    inspections = inspections,
-                    lastInspection = inspections.maxOfOrNull { it.createdAt }
-                )
+                onArtifactLoaded(artifact, inspections)
             } catch (error: Throwable) {
                 uiState = uiState.copy(loadError = true)
             } finally {
                 uiState = uiState.copy(loading = false)
             }
         }
+    }
+
+    private fun onArtifactLoaded(artifact: Artifact, inspections: List<Inspection>?) {
+        val isAdmin = requireSession().isTeamAdmin
+        val isInspector = requireSession().isInspector
+
+        val filteredInspections =
+            if (isInspector) inspections?.filter { it.inspector.id == requireSession().userId }
+            else inspections
+
+        uiState = uiState.copy(
+            artifact = artifact,
+            inspections = filteredInspections,
+            lastInspection = inspections?.maxOfOrNull { it.createdAt },
+            canEditInspectors = isAdmin,
+            showEditButton = isAdmin && !artifact.archived,
+            showCosts = !isInspector
+        )
+
+        updateInspectButtonState()
     }
 
     fun dismissLoadError() {
@@ -91,14 +99,20 @@ class ArtifactDetailsViewModel(
     }
 
     fun addInspector(inspector: User) {
-        updateInspectors(uiState.inspectors + inspector)
+        uiState.artifact?.let { artifact ->
+            updateInspectors(artifact.inspectors + inspector)
+        }
     }
 
     fun removeInspector(inspector: User) {
-        updateInspectors(uiState.inspectors - inspector)
+        uiState.artifact?.let { artifact ->
+            updateInspectors(artifact.inspectors - inspector)
+        }
     }
 
     private fun updateInspectors(inspectors: List<User>) {
+        val artifact = uiState.artifact ?: return
+
         viewModelScope.launch {
             uiState = uiState.copy(updatingInspectors = true)
 
@@ -107,8 +121,7 @@ class ArtifactDetailsViewModel(
                     artifact.copy(inspectors = inspectors)
                 )
 
-                uiState = uiState.copy(inspectors = updatedArtifact.inspectors)
-                updateInspectButtonState()
+                onArtifactLoaded(updatedArtifact, uiState.inspections)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
             } finally {
@@ -132,8 +145,9 @@ class ArtifactDetailsViewModel(
 
             try {
                 val inspectors = inspectorRepository.getInspectors(requireTeam().id)
-                uiState =
-                    uiState.copy(availableInspectors = inspectors - uiState.inspectors.toSet())
+                val currentInspectors = uiState.artifact?.inspectors.orEmpty().toSet()
+
+                uiState = uiState.copy(availableInspectors = inspectors - currentInspectors)
             } catch (error: Throwable) {
                 uiState = uiState.copy(loadError = true, showInspectorPicker = false)
             }

@@ -87,14 +87,18 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ArtifactDetailsScreen(
-    artifact: Artifact,
+    artifactId: String,
+    projectId: String,
     onBackClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onInspectClick: () -> Unit,
+    onEditClick: (Artifact) -> Unit,
+    onInspectClick: (Artifact) -> Unit,
     viewModel: ArtifactDetailsViewModel = viewModel { ArtifactDetailsViewModel() }
 ) {
-    LaunchedEffect(artifact) {
-        viewModel.initialize(artifact)
+    LaunchedEffect(artifactId) {
+        viewModel.initialize(
+            artifactId = artifactId,
+            projectId = projectId
+        )
     }
 
     Scaffold(
@@ -102,11 +106,13 @@ fun ArtifactDetailsScreen(
         topBar = {
             TopBar(
                 title = stringResource(Res.string.artifact_details_title),
-                subtitle = artifact.name,
+                subtitle = viewModel.uiState.artifact?.name,
                 onBackClick = onBackClick,
                 actions = {
                     if (viewModel.uiState.showEditButton) {
-                        IconButton(onClick = onEditClick) {
+                        IconButton(
+                            onClick = { viewModel.uiState.artifact?.let { onEditClick(it) } }
+                        ) {
                             Icon(vectorResource(Res.drawable.edit_24px), null)
                         }
                     }
@@ -118,7 +124,7 @@ fun ArtifactDetailsScreen(
                 ExtendedFloatingActionButton(
                     text = { Text(stringResource(Res.string.inspect_label)) },
                     icon = { Icon(vectorResource(Res.drawable.assignment_24px), null) },
-                    onClick = onInspectClick
+                    onClick = { viewModel.uiState.artifact?.let { onInspectClick(it) } }
                 )
             }
         }
@@ -134,7 +140,9 @@ fun ArtifactDetailsScreen(
                     .padding(paddingValues)
                     .padding(24.dp)
             )
-        } else {
+        }
+
+        viewModel.uiState.artifact?.let { artifact ->
             ArtifactDetails(
                 modifier = Modifier
                     .fillMaxSize()
@@ -144,15 +152,14 @@ fun ArtifactDetailsScreen(
                     .padding(vertical = 24.dp)
                     .verticalScroll(rememberScrollState()),
                 artifact = artifact,
-                inspectors = uiState.inspectors,
+                inspectors = artifact.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 enableInspectors = !uiState.updatingInspectors,
                 readOnlyInspectors = !uiState.canEditInspectors,
                 lastInspection = uiState.lastInspection,
                 inspections = uiState.inspections,
-                isInspector = uiState.isInspector,
-                loggedUserId = { viewModel.getLoggedUserId() }
+                showCosts = uiState.showCosts
             )
         }
     }
@@ -203,9 +210,8 @@ fun ArtifactDetails(
     readOnlyInspectors: Boolean,
     lastInspection: Instant?,
     inspections: List<Inspection>?,
-    isInspector: Boolean,
-    loggedUserId: () -> String,
-    modifier: Modifier = Modifier
+    showCosts: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         if (artifact.archived) {
@@ -278,13 +284,15 @@ fun ArtifactDetails(
                 ?: stringResource(Res.string.never)
         )
 
-        TextProperty(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
-            label = stringResource(Res.string.total_cost_label),
-            text = artifact.totalCost.formatAsCurrency()
-        )
+        if (showCosts) {
+            TextProperty(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp),
+                label = stringResource(Res.string.total_cost_label),
+                text = artifact.totalCost.formatAsCurrency()
+            )
+        }
 
         if (!artifact.archived) {
             Property(
@@ -304,11 +312,7 @@ fun ArtifactDetails(
             }
         }
 
-        val filteredInspections =
-            if (isInspector) inspections?.filter { it.inspector.id == loggedUserId.invoke() }
-            else inspections
-
-        if (!filteredInspections.isNullOrEmpty()) {
+        if (!inspections.isNullOrEmpty()) {
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
@@ -323,11 +327,12 @@ fun ArtifactDetails(
                     contentPadding = PaddingValues(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(filteredInspections) { inspection ->
+                    items(inspections) { inspection ->
                         InspectionCard(
+                            modifier = Modifier.widthIn(max = maxWidth - 48.dp),
                             inspection = inspection,
+                            showCost = showCosts,
                             onClick = { /* TODO: View inspection */ },
-                            modifier = Modifier.widthIn(max = maxWidth - 48.dp)
                         )
                     }
                 }
@@ -339,6 +344,7 @@ fun ArtifactDetails(
 @Composable
 fun InspectionCard(
     inspection: Inspection,
+    showCost: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -397,17 +403,19 @@ fun InspectionCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = stringResource(
-                    Res.string.cost_format,
-                    inspection.cost.formatAsCurrency()
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (showCost) {
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = stringResource(
+                        Res.string.cost_format,
+                        inspection.cost.formatAsCurrency()
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

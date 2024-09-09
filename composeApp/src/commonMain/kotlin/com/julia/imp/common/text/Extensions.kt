@@ -16,7 +16,11 @@ fun Number.format(decimalPlaces: Int = 2): String {
     val string = this.toString()
     val (wholePart, decimalPart) = string.split('.')
 
-    return "$wholePart.${decimalPart.take(decimalPlaces)}"
+    val formattedDecimalPart = decimalPart
+        .take(decimalPlaces)
+        .padEnd(decimalPlaces, '0')
+
+    return "$wholePart.$formattedDecimalPart"
 }
 
 /**
@@ -32,7 +36,9 @@ fun Number.formatAsCurrency(): String {
         .joinToString(".")
         .reversed()
 
-    val formattedDecimalPart = decimalPart.take(2)
+    val formattedDecimalPart = decimalPart
+        .take(2)
+        .padEnd(2, '0')
 
     return "R$ $formattedWholePart,$formattedDecimalPart"
 }

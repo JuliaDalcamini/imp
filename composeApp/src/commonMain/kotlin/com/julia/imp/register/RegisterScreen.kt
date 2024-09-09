@@ -67,7 +67,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            val compact = maxWidth < 600.dp
+            val compact = maxWidth < 480.dp
             val maxFormWidth = if (compact) Dp.Unspecified else 480.dp
 
             Column(

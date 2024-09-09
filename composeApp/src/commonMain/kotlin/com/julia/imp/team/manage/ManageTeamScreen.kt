@@ -21,6 +21,7 @@ import com.julia.imp.common.ui.dialog.TextInputDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.team.Team
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.change_default_cost_label
 import imp.composeapp.generated.resources.current_hourly_cost_format
 import imp.composeapp.generated.resources.current_name_format
 import imp.composeapp.generated.resources.manage_team_members_description
@@ -28,7 +29,6 @@ import imp.composeapp.generated.resources.manage_team_members_label
 import imp.composeapp.generated.resources.manage_team_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_team_title
-import imp.composeapp.generated.resources.update_cost_default_title
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -71,7 +71,7 @@ fun ManageTeamScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.showUpdateDefaultCostDialog() },
-                headlineContent = { Text(stringResource(Res.string.update_cost_default_title)) },
+                headlineContent = { Text(stringResource(Res.string.change_default_cost_label)) },
                 supportingContent = {
                     Text(
                         stringResource(
@@ -101,8 +101,8 @@ fun ManageTeamScreen(
     }
 
     if (viewModel.uiState.showUpdateDefaultCostDialog) {
-        UpdateDefaultCostDialog(
-            defaultHourlyCost = requireTeam().defaultHourlyCost,
+        ChangeDefaultCostDialog(
+            currentCost = requireTeam().defaultHourlyCost,
             onDismissRequest = { viewModel.dismissDefaultCostDialog() },
             onConfirm = { newDefaultHourlyCost -> viewModel.updateDefaultHourlyCost(requireTeam(), newDefaultHourlyCost.toDouble()) }
         )
@@ -124,14 +124,14 @@ fun RenameTeamDialog(
 }
 
 @Composable
-fun UpdateDefaultCostDialog(
-    defaultHourlyCost: Double,
+fun ChangeDefaultCostDialog(
+    currentCost: Double,
     onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
     TextInputDialog(
-        title = stringResource(Res.string.update_cost_default_title),
-        initialValue = defaultHourlyCost.toString(),
+        title = stringResource(Res.string.change_default_cost_label),
+        initialValue = currentCost.toString(),
         onDismissRequest = onDismissRequest,
         onConfirm = onConfirm
     )

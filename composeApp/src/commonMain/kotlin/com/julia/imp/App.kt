@@ -175,7 +175,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     ArtifactsScreen(
                         project = route.project,
                         onBackClick = { navController.popBackStack() },
-                        onArtifactClick = { navController.navigate(ArtifactDetailsRoute(it)) },
+                        onArtifactClick = { navController.navigate(ArtifactDetailsRoute.of(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
                         onPrioritizeArtifactClick = {
@@ -198,7 +198,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactCreated = { artifact ->
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute.of(artifact))
                             }
                         }
                     )
@@ -213,7 +213,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactSaved = { artifact ->
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute.of(artifact))
                             }
                         }
                     )
@@ -229,20 +229,21 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactSaved = { artifact ->
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute.of(artifact))
                             }
                         }
                     )
                 }
 
-                composable<ArtifactDetailsRoute>(ArtifactDetailsRoute.typeMap) { entry ->
+                composable<ArtifactDetailsRoute> { entry ->
                     val route = entry.toRoute<ArtifactDetailsRoute>()
 
                     ArtifactDetailsScreen(
-                        artifact = route.artifact,
+                        artifactId = route.artifactId,
+                        projectId = route.projectId,
                         onBackClick = { navController.popBackStack() },
-                        onEditClick = { navController.navigate(EditArtifactRoute(route.artifact)) },
-                        onInspectClick = { navController.navigate(CreateInspectionRoute(route.artifact)) }
+                        onEditClick = { navController.navigate(EditArtifactRoute(it)) },
+                        onInspectClick = { navController.navigate(CreateInspectionRoute(it)) }
                     )
                 }
 
@@ -256,7 +257,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                             // TODO: Redirect to inspection details
                             navController.run {
                                 popBackStack()
-                                popUpToAndNavigate(ArtifactDetailsRoute(route.artifact))
+                                popUpToAndNavigate(ArtifactDetailsRoute.of(route.artifact))
                             }
                         }
                     )

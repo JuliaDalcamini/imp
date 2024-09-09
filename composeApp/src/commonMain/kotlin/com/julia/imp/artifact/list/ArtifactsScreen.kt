@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -77,6 +78,7 @@ import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
 import imp.composeapp.generated.resources.no_artifacts_message
 import imp.composeapp.generated.resources.not_prioritized_label
+import imp.composeapp.generated.resources.prioritize_label
 import imp.composeapp.generated.resources.priority_moscow_format
 import imp.composeapp.generated.resources.priority_wiegers_format
 import imp.composeapp.generated.resources.refresh_24px
@@ -309,106 +311,91 @@ fun ArtifactListItem(
         modifier = modifier,
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier.padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
+        BoxWithConstraints {
+            val compact = maxWidth < 480.dp
+
+            Row(
+                modifier = Modifier.padding(24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f, fill = false),
+                            text = artifact.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        if (artifact.archived) {
+                            Icon(
+                                modifier = Modifier.size(16.dp),
+                                imageVector = vectorResource(Res.drawable.inventory_2_20px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        } else if (artifact.inspectors.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier.offset(x = (-2).dp),
+                                horizontalArrangement = Arrangement.spacedBy((-8).dp)
+                            ) {
+                                artifact.inspectors.forEachIndexed { index, inspector ->
+                                    val zIndex = artifact.inspectors.size - index
+
+                                    Avatar(
+                                        modifier = Modifier.zIndex(zIndex.toFloat()),
+                                        initials = inspector.fullName.getInitials(),
+                                        size = AvatarSize.Small,
+                                        border = BorderStroke(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.surfaceContainerLow
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Text(
-                        modifier = Modifier.weight(1f, fill = false),
-                        text = artifact.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = artifact.type.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
                     if (artifact.archived) {
-                        Icon(
-                            modifier = Modifier.size(16.dp),
-                            imageVector = vectorResource(Res.drawable.inventory_2_20px),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp),
+                            text = stringResource(Res.string.archived_label),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    } else if (artifact.inspectors.isNotEmpty()) {
-                        Row(
-                            modifier = Modifier.offset(x = (-2).dp),
-                            horizontalArrangement = Arrangement.spacedBy((-8).dp)
-                        ) {
-                            artifact.inspectors.forEachIndexed { index, inspector ->
-                                val zIndex = artifact.inspectors.size - index
-
-                                Avatar(
-                                    modifier = Modifier.zIndex(zIndex.toFloat()),
-                                    initials = inspector.fullName.getInitials(),
-                                    size = AvatarSize.Small,
-                                    border = BorderStroke(
-                                        width = 2.dp,
-                                        color = MaterialTheme.colorScheme.surfaceContainerLow
-                                    )
-                                )
-                            }
-                        }
+                    } else {
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp),
+                            text = getPriorityText(artifact),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
 
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = artifact.type.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                if (artifact.archived) {
-                    Text(
-                        modifier = Modifier.padding(top = 4.dp),
-                        text = stringResource(Res.string.archived_label),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    Text(
-                        modifier = Modifier.padding(top = 4.dp),
-                        text = getPriorityText(artifact),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-
-            if (showOptions) {
-                Box {
-                    var expandOptions by remember { mutableStateOf(false) }
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        IconButton(onClick = onPrioritizeClick) {
-                            Icon(vectorResource(Res.drawable.swap_vert_24px), null)
-                        }
-
-                        if (showOptions) {
-                            IconButton(onClick = { expandOptions = true }) {
-                                Icon(vectorResource(Res.drawable.more_vert_24px), null)
-                            }
-                        }
-                    }
-
-                    ArtifactOptionsDropdown(
-                        expanded = expandOptions,
-                        onDismissRequest = { expandOptions = false },
+                if (showOptions) {
+                    ArtifactOptions(
+                        compact = compact,
+                        onPrioritizeClick = onPrioritizeClick,
                         onEditClick = onEditClick,
                         onArchiveClick = onArchiveClick
                     )
@@ -439,34 +426,60 @@ private fun getWiegersPriorityText(priority: Double?): String =
     }
 
 @Composable
-fun ArtifactOptionsDropdown(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
+fun ArtifactOptions(
+    compact: Boolean,
+    onPrioritizeClick: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DropdownMenu(
-        modifier = modifier,
-        expanded = expanded,
-        onDismissRequest = onDismissRequest
-    ) {
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.edit_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
-            onClick = {
-                onEditClick()
-                onDismissRequest()
-            }
-        )
+    Box(modifier) {
+        var expanded by remember { mutableStateOf(false) }
 
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.archive_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.archive_24px), null) },
-            onClick = {
-                onArchiveClick()
-                onDismissRequest()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!compact) {
+                IconButton(onClick = onPrioritizeClick) {
+                    Icon(vectorResource(Res.drawable.swap_vert_24px), null)
+                }
             }
-        )
+
+            IconButton(onClick = { expanded = true }) {
+                Icon(vectorResource(Res.drawable.more_vert_24px), null)
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            if (compact) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.prioritize_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.swap_vert_24px), null) },
+                    onClick = {
+                        onPrioritizeClick()
+                        expanded = false
+                    }
+                )
+            }
+
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.edit_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
+                onClick = {
+                    onEditClick()
+                    expanded = false
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.archive_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.archive_24px), null) },
+                onClick = {
+                    onArchiveClick()
+                    expanded = false
+                }
+            )
+        }
     }
 }
