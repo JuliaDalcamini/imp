@@ -173,4 +173,10 @@
     <string name="low_severity_label">Severidade baixa</string>
     <string name="medium_severity_label">Severidade média</string>
     <string name="high_severity_label">Severidade alta</string>
+    <string name="edited_artifact_alert_message">Este artefato foi editado e talvez necessite ser priorizado novamente.</string>
+    <string name="inspection_details_title">Detalhes da inspeção</string>
+    <string name="made_on_title">Feito em</string>
+    <string name="duration_title">Duração</string>
+    <string name="inspected_by_title">Inspecionado por</string>
+    <string name="detected_defect_format">Defeito Detectado: %1$s</string>"
 </resources>

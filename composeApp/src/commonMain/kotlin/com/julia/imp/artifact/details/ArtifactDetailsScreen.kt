@@ -63,6 +63,7 @@ import imp.composeapp.generated.resources.assignment_24px
 import imp.composeapp.generated.resources.cost_format
 import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
+import imp.composeapp.generated.resources.edited_artifact_alert_message
 import imp.composeapp.generated.resources.inspect_label
 import imp.composeapp.generated.resources.inspection_title
 import imp.composeapp.generated.resources.inspections_label
@@ -92,6 +93,7 @@ fun ArtifactDetailsScreen(
     onBackClick: () -> Unit,
     onEditClick: (Artifact) -> Unit,
     onInspectClick: (Artifact) -> Unit,
+    onInspectionClick: (Inspection) -> Unit,
     viewModel: ArtifactDetailsViewModel = viewModel { ArtifactDetailsViewModel() }
 ) {
     LaunchedEffect(artifactId) {
@@ -153,6 +155,7 @@ fun ArtifactDetailsScreen(
                     .verticalScroll(rememberScrollState()),
                 artifact = artifact,
                 inspectors = artifact.inspectors,
+                onInspectionClick = onInspectionClick,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 enableInspectors = !uiState.updatingInspectors,
@@ -204,6 +207,7 @@ private fun Placeholder(modifier: Modifier = Modifier) {
 fun ArtifactDetails(
     artifact: Artifact,
     inspectors: List<User>,
+    onInspectionClick: (Inspection) -> Unit,
     onAddInspectorClick: () -> Unit,
     onRemoveInspectorClick: (User) -> Unit,
     enableInspectors: Boolean,
@@ -332,7 +336,7 @@ fun ArtifactDetails(
                             modifier = Modifier.widthIn(max = maxWidth - 48.dp),
                             inspection = inspection,
                             showCost = showCosts,
-                            onClick = { /* TODO: View inspection */ },
+                            onClick = { onInspectionClick(inspection) },
                         )
                     }
                 }
@@ -443,6 +447,27 @@ fun ArchivedArtifactAlert(modifier: Modifier = Modifier) {
 
             Text(
                 text = stringResource(Res.string.archived_artifact_alert_message),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun EditedArtifactAlert(modifier: Modifier = Modifier) {
+    OutlinedCard(modifier) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.padding(end = 16.dp),
+                imageVector = vectorResource(Res.drawable.inventory_2_24px),
+                contentDescription = null
+            )
+
+            Text(
+                text = stringResource(Res.string.edited_artifact_alert_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

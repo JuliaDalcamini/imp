@@ -30,6 +30,8 @@ import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
 import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
+import com.julia.imp.inspection.InspectionDetailsRoute
+import com.julia.imp.inspection.InspectionDetailsScreen
 import com.julia.imp.inspection.create.CreateInspectionRoute
 import com.julia.imp.inspection.create.CreateInspectionScreen
 import com.julia.imp.login.LoginRoute
@@ -165,7 +167,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     ManageProjectScreen(
                         project = route.project,
                         onBackClick = { navController.popBackStack() },
-                        onProjectUpdate = {  }
+                        onProjectUpdate = { }
                     )
                 }
 
@@ -243,7 +245,16 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         projectId = route.projectId,
                         onBackClick = { navController.popBackStack() },
                         onEditClick = { navController.navigate(EditArtifactRoute(it)) },
-                        onInspectClick = { navController.navigate(CreateInspectionRoute(it)) }
+                        onInspectClick = { navController.navigate(CreateInspectionRoute(it)) },
+                        onInspectionClick = {
+                            navController.navigate(
+                                InspectionDetailsRoute(
+                                    route.artifactId,
+                                    route.projectId,
+                                    it.id
+                                )
+                            )
+                        }
                     )
                 }
 
@@ -254,12 +265,22 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         artifact = route.artifact,
                         onBackClick = { navController.popBackStack() },
                         onInspectionCreated = {
-                            // TODO: Redirect to inspection details
                             navController.run {
                                 popBackStack()
                                 popUpToAndNavigate(ArtifactDetailsRoute.of(route.artifact))
                             }
                         }
+                    )
+                }
+
+                composable<InspectionDetailsRoute> { entry ->
+                    val route = entry.toRoute<InspectionDetailsRoute>()
+
+                    InspectionDetailsScreen(
+                        artifactId = route.artifactId,
+                        projectId = route.projectId,
+                        inspectionId = route.inspectionId,
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
             }

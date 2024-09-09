@@ -19,6 +19,9 @@ class InspectionRepository(
     suspend fun getInspections(projectId: String, artifactId: String): List<Inspection> =
         client.get("projects/$projectId/artifacts/$artifactId/inspections").body()
 
+    suspend fun getInspection(projectId: String, artifactId: String, inspectionId: String): Inspection =
+        client.get("projects/$projectId/artifacts/$artifactId/inspections/$inspectionId").body()
+
     suspend fun createInspection(
         projectId: String,
         artifactId: String,
