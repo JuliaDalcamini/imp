@@ -32,9 +32,6 @@ import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.question.Question
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.answer_option_no_label
-import imp.composeapp.generated.resources.answer_option_not_applicable_label
-import imp.composeapp.generated.resources.answer_option_yes_label
 import imp.composeapp.generated.resources.finish_inspection_error_message
 import imp.composeapp.generated.resources.finish_inspection_error_title
 import imp.composeapp.generated.resources.finish_inspection_label
@@ -151,7 +148,7 @@ fun CreateInspectionForm(
                     selectedOption = selectedAnswer,
                     onSelectionChange = { onAnswerChange(question, it) },
                     enabled = !submitting,
-                    optionLabel = { Text(getAnswerOptionLabel(it)) }
+                    optionLabel = { Text(it.getLabel()) }
                 )
             }
 
@@ -166,11 +163,4 @@ fun CreateInspectionForm(
             loading = submitting
         )
     }
-}
-
-@Composable
-fun getAnswerOptionLabel(answer: AnswerOption) = when (answer) {
-    AnswerOption.Yes -> stringResource(Res.string.answer_option_yes_label)
-    AnswerOption.No -> stringResource(Res.string.answer_option_no_label)
-    AnswerOption.NotApplicable -> stringResource(Res.string.answer_option_not_applicable_label)
 }

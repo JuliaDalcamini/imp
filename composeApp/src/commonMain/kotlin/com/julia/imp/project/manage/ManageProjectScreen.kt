@@ -61,9 +61,9 @@ fun ManageProjectScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
             ListItem(
                 modifier = Modifier

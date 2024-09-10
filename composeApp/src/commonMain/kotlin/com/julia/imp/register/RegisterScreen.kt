@@ -74,11 +74,11 @@ fun RegisterScreen(
                 modifier = Modifier
                     .widthIn(max = maxFormWidth)
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .consumeWindowInsets(PaddingValues(horizontal = 24.dp))
                     .consumeWindowInsets(paddingValues)
                     .padding(horizontal = 24.dp)
-                    .padding(paddingValues)
-                    .verticalScroll(scrollState),
+                    .padding(paddingValues),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

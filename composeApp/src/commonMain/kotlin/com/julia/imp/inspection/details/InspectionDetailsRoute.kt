@@ -1,6 +1,7 @@
-package com.julia.imp.inspection
+package com.julia.imp.inspection.details
 
 import com.julia.imp.artifact.Artifact
+import com.julia.imp.inspection.Inspection
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -30,10 +30,10 @@ import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
 import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
-import com.julia.imp.inspection.InspectionDetailsRoute
-import com.julia.imp.inspection.InspectionDetailsScreen
 import com.julia.imp.inspection.create.CreateInspectionRoute
 import com.julia.imp.inspection.create.CreateInspectionScreen
+import com.julia.imp.inspection.details.InspectionDetailsRoute
+import com.julia.imp.inspection.details.InspectionDetailsScreen
 import com.julia.imp.login.LoginRoute
 import com.julia.imp.login.LoginScreen
 import com.julia.imp.project.ProjectsRoute
@@ -277,9 +277,9 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     val route = entry.toRoute<InspectionDetailsRoute>()
 
                     InspectionDetailsScreen(
+                        inspectionId = route.inspectionId,
                         artifactId = route.artifactId,
                         projectId = route.projectId,
-                        inspectionId = route.inspectionId,
                         onBackClick = { navController.popBackStack() }
                     )
                 }

@@ -128,7 +128,7 @@
     <string name="artifact_details_title">Detalhes do artefato</string>
     <string name="archived_artifact_alert_message">Esse artefato está arquivado e não pode ser alterado ou inspecionado.</string>
     <string name="last_inspection_label">Última inspeção</string>
-    <string name="total_cost_label">Custo total</string>"
+    <string name="total_cost_label">Custo total</string>
     <string name="never">Nunca</string>
     <string name="inspections_label">Inspeções</string>
     <string name="made_on_format">Feito em: %1$s</string>
@@ -145,8 +145,8 @@
     <string name="rename_team_title">Renomear time</string>
     <string name="change_default_cost_label">Alterar custo/hora padrão</string>
     <string name="change_cost_label">Alterar custo/hora</string>
-    <string name="inspection_title">Inspecionado por: %1$s</string>
-    <string name="never_inspected">Nunca inspecionado</string>"
+    <string name="inspection_title">Inspeção de %1$s</string>
+    <string name="never_inspected">Nunca inspecionado</string>
     <string name="target_date_label">Data limite</string>
     <string name="target_date_format">%1$s</string>
     <string name="manage_label">Gerenciar</string>
@@ -177,6 +177,11 @@
     <string name="inspection_details_title">Detalhes da inspeção</string>
     <string name="made_on_title">Feito em</string>
     <string name="duration_title">Duração</string>
-    <string name="inspected_by_title">Inspecionado por</string>
-    <string name="detected_defect_format">Defeito Detectado: %1$s</string>"
+    <string name="made_by_label">Realizada por</string>
+    <string name="made_on_label">Realizada em</string>
+    <string name="answer_format">Resposta: %1$s</string>
+    <string name="defect_format">Defeito: %1$s</string>
+    <string name="found_defects_label">Defeitos encontrados</string>
+    <string name="summary_title">Resumo</string>
+    <string name="questions_and_answers_title">Perguntas e respostas</string>
 </resources>

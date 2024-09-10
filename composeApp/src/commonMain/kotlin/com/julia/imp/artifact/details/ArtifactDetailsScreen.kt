@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactInspectorList
@@ -148,11 +149,11 @@ fun ArtifactDetailsScreen(
             ArtifactDetails(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .consumeWindowInsets(paddingValues)
                     .consumeWindowInsets(PaddingValues(vertical = 24.dp))
                     .padding(paddingValues)
-                    .padding(vertical = 24.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(vertical = 24.dp),
                 artifact = artifact,
                 inspectors = artifact.inspectors,
                 onInspectionClick = onInspectionClick,
@@ -326,6 +327,8 @@ fun ArtifactDetails(
             )
 
             BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val maxCardWidth = min(maxWidth - 48.dp, 480.dp)
+
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 24.dp),
@@ -333,7 +336,7 @@ fun ArtifactDetails(
                 ) {
                     items(inspections) { inspection ->
                         InspectionCard(
-                            modifier = Modifier.widthIn(max = maxWidth - 48.dp),
+                            modifier = Modifier.widthIn(max = maxCardWidth),
                             inspection = inspection,
                             showCost = showCosts,
                             onClick = { onInspectionClick(inspection) },
