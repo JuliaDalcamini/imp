@@ -191,14 +191,6 @@ fun ProjectsScreen(
         )
     }
 
-    viewModel.uiState.projectToRename?.let { project ->
-        RenameProjectDialog(
-            projectName = project.name,
-            onDismissRequest = { viewModel.dismissRenaming() },
-            onConfirm = { newName -> viewModel.rename(project, newName) }
-        )
-    }
-
     viewModel.uiState.projectToGenerateReport?.let { project ->
         ProjectReportGenerator { pages ->
             onShowReportRequest(pages)
@@ -346,20 +338,6 @@ fun ProjectOptionsDropdown(
             )
         }
     }
-}
-
-@Composable
-fun RenameProjectDialog(
-    projectName: String,
-    onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
-    TextInputDialog(
-        title = stringResource(Res.string.rename_project_title),
-        initialValue = projectName,
-        onDismissRequest = onDismissRequest,
-        onConfirm = onConfirm
-    )
 }
 
 @Composable

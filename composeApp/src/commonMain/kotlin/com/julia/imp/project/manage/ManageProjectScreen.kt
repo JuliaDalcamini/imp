@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,7 +32,8 @@ import imp.composeapp.generated.resources.inspectors_number_select
 import imp.composeapp.generated.resources.manage_project_title
 import imp.composeapp.generated.resources.rename_label
 import imp.composeapp.generated.resources.rename_project_title
-import imp.composeapp.generated.resources.target_date_format
+import imp.composeapp.generated.resources.start_date_label
+import imp.composeapp.generated.resources.string_format
 import imp.composeapp.generated.resources.target_date_label
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -37,6 +41,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageProjectScreen(
     project: Project,
@@ -98,12 +103,27 @@ fun ManageProjectScreen(
             ListItem(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { viewModel.showChangeStartDateDialog()},
+                headlineContent = { Text(stringResource(Res.string.start_date_label)) },
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            Res.string.string_format,
+                            project.startDate.format(DateFormats.DEFAULT)
+                        )
+                    )
+                }
+            )
+
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable { viewModel.showChangeTargetDateDialog() },
                 headlineContent = { Text(stringResource(Res.string.target_date_label)) },
                 supportingContent = {
                     Text(
                         stringResource(
-                            Res.string.target_date_format,
+                            Res.string.string_format,
                             project.targetDate.format(DateFormats.DEFAULT)
                         )
                     )
@@ -126,6 +146,17 @@ fun ManageProjectScreen(
             onDismissRequest = { viewModel.dismissChangeMinInspectorsDialog() },
             onConfirm = { newMinInspectors ->
                 viewModel.changeMinInspectors(project, newMinInspectors)
+            }
+        )
+    }
+
+    if (viewModel.uiState.showChangeStartDateDialog) {
+        DatePickerDialog(
+            initialDate = project.startDate,
+            minDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+            onDismissRequest = { viewModel.dismissChangeStartDateDialog() },
+            onConfirm = { newStartDate ->
+                viewModel.changeStartDate(project, newStartDate)
             }
         )
     }

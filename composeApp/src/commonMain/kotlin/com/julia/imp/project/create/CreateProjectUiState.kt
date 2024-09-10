@@ -9,6 +9,7 @@ import kotlinx.datetime.todayIn
 
 data class CreateProjectUiState(
     val name: String = "",
+    val startDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     val targetDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     val prioritizer: Prioritizer = MoscowPrioritizer,
     val minInspectors: Int = 2,

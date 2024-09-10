@@ -148,7 +148,8 @@
     <string name="inspection_title">Inspeção de %1$s</string>
     <string name="never_inspected">Nunca inspecionado</string>
     <string name="target_date_label">Data limite</string>
-    <string name="target_date_format">%1$s</string>
+    <string name="start_date_label">Data inicial</string>
+    <string name="string_format">%1$s</string>
     <string name="manage_label">Gerenciar</string>
     <string name="manage_project_title">Gerenciar projeto</string>
     <string name="view_stats_label">Ver estatísticas</string>

@@ -61,47 +61,6 @@ class ProjectsViewModel(
         }
     }
 
-    fun askToRename(project: Project) {
-        uiState = uiState.copy(projectToRename = project)
-    }
-
-    fun dismissRenaming() {
-        uiState = uiState.copy(projectToRename = null)
-    }
-
-    fun rename(project: Project, newName: String) {
-        viewModelScope.launch {
-            try {
-                repository.updateProject(project.id, newName, project.targetDate, project.minInspectors)
-                getProjects()
-            } catch (error: Throwable) {
-                uiState = uiState.copy(actionError = true)
-            }
-        }
-    }
-
-    fun changeTargetDate(project: Project, newTargetDate: LocalDate) {
-        viewModelScope.launch {
-            try {
-                repository.updateProject(project.id, project.name, newTargetDate, project.minInspectors)
-                getProjects()
-            } catch (error: Throwable) {
-                uiState = uiState.copy(actionError = true)
-            }
-        }
-    }
-
-    fun changeMinInspectors(project: Project, newMinInspectors: Int) {
-        viewModelScope.launch {
-            try {
-                repository.updateProject(project.id, project.name, project.targetDate, newMinInspectors)
-                getProjects()
-            } catch (error: Throwable) {
-                uiState = uiState.copy(actionError = true)
-            }
-        }
-    }
-
     fun generateReport(project: Project) {
         uiState = uiState.copy(projectToGenerateReport = project)
     }

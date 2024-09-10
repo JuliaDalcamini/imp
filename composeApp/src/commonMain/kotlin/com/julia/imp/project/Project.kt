@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 data class Project(
     val id: String,
     val name: String,
-    val creationDateTime: Instant,
+    val startDate: LocalDate,
     val targetDate: LocalDate,
     val creator: User,
     val prioritizer: Prioritizer,

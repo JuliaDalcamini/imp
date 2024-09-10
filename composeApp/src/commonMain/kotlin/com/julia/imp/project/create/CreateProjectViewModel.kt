@@ -31,6 +31,10 @@ class CreateProjectViewModel(
         uiState = uiState.copy(prioritizer = prioritizer)
     }
 
+    fun setStartDate(date: LocalDate) {
+        uiState = uiState.copy(startDate = date)
+    }
+
     fun setTargetDate(date: LocalDate) {
         uiState = uiState.copy(targetDate = date)
     }
@@ -42,6 +46,7 @@ class CreateProjectViewModel(
             try {
                 repository.createProject(
                     name = uiState.name,
+                    startDate = uiState.startDate,
                     minInspectors = uiState.minInspectors,
                     prioritizer = uiState.prioritizer,
                     teamId = requireTeam().id,

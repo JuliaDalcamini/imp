@@ -44,6 +44,7 @@ import imp.composeapp.generated.resources.moscow_label
 import imp.composeapp.generated.resources.new_project_title
 import imp.composeapp.generated.resources.prioritization_method_label
 import imp.composeapp.generated.resources.project_name_label
+import imp.composeapp.generated.resources.start_date_label
 import imp.composeapp.generated.resources.target_date_label
 import imp.composeapp.generated.resources.user_value_weight_label
 import imp.composeapp.generated.resources.wiegers_label
@@ -106,6 +107,15 @@ fun CreateProjectScreen(
                     onOptionSelected = { viewModel.setInspectorCount(it) },
                     enabled = !viewModel.uiState.loading,
                     optionLabel = { optionNumber -> Text(optionNumber.toString()) }
+                )
+
+                DateFormField(
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    date = viewModel.uiState.startDate,
+                    label = stringResource(Res.string.start_date_label),
+                    onDateSelected = { viewModel.setStartDate(it) },
+                    enabled = !viewModel.uiState.loading,
+                    minDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
                 )
 
                 DateFormField(

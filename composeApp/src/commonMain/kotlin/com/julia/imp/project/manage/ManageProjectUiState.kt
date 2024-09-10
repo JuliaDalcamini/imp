@@ -4,8 +4,10 @@ import com.julia.imp.project.Project
 
 data class ManageProjectUiState(
     val minInspectors: Int = 2,
+    val canUpdateStartDate: Boolean = false,
     val showRenameDialog: Boolean = false,
     val showChangeMinInspectorsDialog: Boolean = false,
+    val showChangeStartDateDialog: Boolean = false,
     val showChangeTargetDateDialog: Boolean = false,
     val projectToRename: Project? = null,
     val actionError: Boolean = false,
