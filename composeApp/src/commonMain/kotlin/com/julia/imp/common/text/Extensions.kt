@@ -72,3 +72,6 @@ fun String.toLink(url: String = this) = buildAnnotatedString {
         }
     }
 }
+
+fun String?.nullIfBlank(): String? =
+    if (this.isNullOrBlank()) null else this

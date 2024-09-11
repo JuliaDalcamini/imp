@@ -84,7 +84,7 @@ fun CreateInspectionScreen(
                     .padding(24.dp),
                 questions = viewModel.uiState.questions,
                 onAnswerChange = { question, answer ->
-                    viewModel.setQuestionAnswer(question, answer)
+                    viewModel.setAnswer(question, answer)
                 },
                 canSubmit = viewModel.uiState.canCreate,
                 submitting = viewModel.uiState.saving,

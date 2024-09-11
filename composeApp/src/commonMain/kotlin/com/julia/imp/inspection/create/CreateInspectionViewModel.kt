@@ -8,6 +8,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
+import com.julia.imp.common.text.nullIfBlank
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.question.Question
@@ -49,20 +50,29 @@ class CreateInspectionViewModel(
         }
     }
 
-    private fun createAnswerMap(questions: List<Question>): SnapshotStateMap<Question, AnswerOption?> {
-        val answerMap = mutableStateMapOf<Question, AnswerOption?>()
+    private fun createAnswerMap(questions: List<Question>): SnapshotStateMap<Question, QuestionState> {
+        val answerMap = mutableStateMapOf<Question, QuestionState>()
 
         questions.forEach { question ->
-            answerMap[question] = null
+            answerMap[question] = QuestionState()
         }
 
         return answerMap
     }
 
-    fun setQuestionAnswer(question: Question, answer: AnswerOption) {
+    fun setAnswer(question: Question, answer: AnswerOption) {
         val questions = uiState.questions ?: throw IllegalStateException("Questions not loaded")
+        val currentState = questions[question] ?: QuestionState()
 
-        questions[question] = answer
+        questions[question] = currentState.copy(answer = answer)
+        updateCreateButtonState()
+    }
+
+    fun setDefectDetail(question: Question, detail: String) {
+        val questions = uiState.questions ?: throw IllegalStateException("Questions not loaded")
+        val currentState = questions[question] ?: QuestionState()
+
+        questions[question] = currentState.copy(defectDetail = detail.nullIfBlank())
         updateCreateButtonState()
     }
 
@@ -92,7 +102,7 @@ class CreateInspectionViewModel(
         return Clock.System.now() - startTime
     }
 
-    private fun getFinalAnswerMap(): Map<String, AnswerOption> {
+    private fun getFinalAnswerMap(): Map<String, QuestionState> {
         val questions = uiState.questions ?: throw IllegalStateException("Questions not loaded")
 
         return questions.map { entry ->
@@ -113,7 +123,9 @@ class CreateInspectionViewModel(
 
     private fun updateCreateButtonState() {
         uiState = uiState.copy(
-            canCreate = uiState.questions?.all { it.value != null } ?: false
+            canCreate = uiState.questions?.values?.all { state ->
+                state.answer != null && (state.answer != AnswerOption.No || state.defectDetail != null)
+            } ?: false
         )
     }
 }

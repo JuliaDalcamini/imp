@@ -152,8 +152,8 @@
     <string name="string_format">%1$s</string>
     <string name="manage_label">Gerenciar</string>
     <string name="manage_project_title">Gerenciar projeto</string>
-    <string name="view_stats_label">Ver estatísticas</string>
-    <string name="project_stats_title">Estatísticas do projeto</string>
+    <string name="view_stats_label">Ver dashboard</string>
+    <string name="project_stats_title">Dashboard do projeto</string>
     <string name="dashboard_error_message">Ocorreu um erro ao carregar os dados do projeto. Por favor, tente novamente.</string>
     <string name="overall_progress_title">Progresso geral</string>
     <string name="fully_inspected_artifacts">Artefatos totalmente inspecionados</string>

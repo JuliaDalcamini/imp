@@ -179,6 +179,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onBackClick = { navController.popBackStack() },
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute.of(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
+                        onInspectClick = { navController.navigate(CreateInspectionRoute(it)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
                         onPrioritizeArtifactClick = {
                             navController.navigate(

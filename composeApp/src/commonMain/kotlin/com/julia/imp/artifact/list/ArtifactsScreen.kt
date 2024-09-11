@@ -73,6 +73,7 @@ import imp.composeapp.generated.resources.filter_archived
 import imp.composeapp.generated.resources.filter_assigned_to_me
 import imp.composeapp.generated.resources.filter_not_prioritized
 import imp.composeapp.generated.resources.filter_prioritized
+import imp.composeapp.generated.resources.inspect_label
 import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
@@ -93,6 +94,7 @@ fun ArtifactsScreen(
     onBackClick: () -> Unit,
     onArtifactClick: (Artifact) -> Unit,
     onNewArtifactClick: () -> Unit,
+    onInspectClick: (Artifact) -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
     onPrioritizeArtifactClick: (Artifact) -> Unit,
 
@@ -132,6 +134,7 @@ fun ArtifactsScreen(
                 contentPadding = paddingValues,
                 entries = viewModel.uiState.entries,
                 onArtifactClick = onArtifactClick,
+                onInspectClick = onInspectClick,
                 onEditArtifactClick = onEditArtifactClick,
                 onArchiveArtifactClick = { viewModel.askToArchive(it) },
                 onPrioritizeArtifactClick = onPrioritizeArtifactClick,
@@ -222,6 +225,7 @@ fun NewArtifactButton(
 fun ArtifactList(
     entries: List<ArtifactListEntry>?,
     onArtifactClick: (Artifact) -> Unit,
+    onInspectClick: (Artifact) -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
     onArchiveArtifactClick: (Artifact) -> Unit,
     onPrioritizeArtifactClick: (Artifact) -> Unit,
@@ -253,6 +257,7 @@ fun ArtifactList(
                     artifact = entry.artifact,
                     showOptions = entry.showOptions,
                     onClick = { onArtifactClick(entry.artifact) },
+                    onInspectClick = { onInspectClick(entry.artifact) },
                     onEditClick = { onEditArtifactClick(entry.artifact) },
                     onArchiveClick = { onArchiveArtifactClick(entry.artifact) },
                     onPrioritizeClick = { onPrioritizeArtifactClick(entry.artifact) }
@@ -302,6 +307,7 @@ fun ArtifactListItem(
     artifact: Artifact,
     showOptions: Boolean,
     onClick: () -> Unit,
+    onInspectClick: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onPrioritizeClick: () -> Unit,
@@ -395,6 +401,9 @@ fun ArtifactListItem(
                 if (showOptions) {
                     ArtifactOptions(
                         compact = compact,
+                        //TODO
+                        canInspect = true,
+                        onInspectClick = onInspectClick,
                         onPrioritizeClick = onPrioritizeClick,
                         onEditClick = onEditClick,
                         onArchiveClick = onArchiveClick
@@ -428,6 +437,8 @@ private fun getWiegersPriorityText(priority: Double?): String =
 @Composable
 fun ArtifactOptions(
     compact: Boolean,
+    canInspect: Boolean,
+    onInspectClick: () -> Unit,
     onPrioritizeClick: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
@@ -458,6 +469,17 @@ fun ArtifactOptions(
                     leadingIcon = { Icon(vectorResource(Res.drawable.swap_vert_24px), null) },
                     onClick = {
                         onPrioritizeClick()
+                        expanded = false
+                    }
+                )
+            }
+
+            if (canInspect) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.inspect_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
+                    onClick = {
+                        onInspectClick()
                         expanded = false
                     }
                 )

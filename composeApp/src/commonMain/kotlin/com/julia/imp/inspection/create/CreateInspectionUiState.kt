@@ -9,7 +9,7 @@ import kotlinx.datetime.Instant
 data class CreateInspectionUiState(
     val loading: Boolean = true,
     val artifactName: String = "",
-    val questions: SnapshotStateMap<Question, AnswerOption?>? = null,
+    val questions: SnapshotStateMap<Question, QuestionState>? = null,
     val startTime: Instant? = null,
     val saving: Boolean = false,
     val createdInspection: Inspection? = null,
