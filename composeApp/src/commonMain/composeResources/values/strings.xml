@@ -51,6 +51,8 @@
     <string name="filter_prioritized">Priorizados</string>
     <string name="filter_not_prioritized">Não Priorizados</string>
     <string name="filter_archived">Arquivados</string>
+    <string name="filter_active">Ativos</string>
+    <string name="filter_finished">Finalizados</string>
     <string name="filter_all">Todos</string>
     <string name="priority_moscow_format">Prioridade: %1$s</string>
     <string name="priority_moscow_wont_have">Não terá</string>
@@ -187,4 +189,8 @@
     <string name="summary_title">Resumo</string>
     <string name="questions_and_answers_title">Perguntas e respostas</string>
     <string name="defect_detail_label">Descrição e/ou localização do defeito identificado</string>
+    <string name="finish_project_label">Finalizar projeto</string>
+    <string name="finish_project_description">Finaliza o projeto, impedindo qualquer alteração em seus itens</string>
+    <string name="finish_project_title">Finalizar projeto</string>
+    <string name="finish_project_message">Tem certeza de que deseja finalizar o projeto %1$s? Isso impedirá qualquer nova alteração no projeto, mas ainda será possível consultar as informações.</string>
 </resources>

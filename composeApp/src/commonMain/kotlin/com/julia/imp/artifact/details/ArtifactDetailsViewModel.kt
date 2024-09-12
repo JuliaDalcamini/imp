@@ -11,31 +11,36 @@ import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.InspectionRepository
+import com.julia.imp.project.Project
+import com.julia.imp.project.ProjectRepository
 import com.julia.imp.team.inspector.InspectorRepository
 import com.julia.imp.user.User
 import kotlinx.coroutines.launch
 
 class ArtifactDetailsViewModel(
     private val artifactRepository: ArtifactRepository = ArtifactRepository(),
+    private val projectRepository: ProjectRepository = ProjectRepository(),
     private val inspectionRepository: InspectionRepository = InspectionRepository(),
     private val inspectorRepository: InspectorRepository = InspectorRepository()
 ) : ViewModel() {
 
     private lateinit var artifactId: String
-    private lateinit var projectId: String
+    private lateinit var project: Project
 
     var uiState by mutableStateOf(ArtifactDetailsUiState())
         private set
 
-    fun initialize(artifactId: String, projectId: String) {
+    suspend fun initialize(artifactId: String, projectId: String) {
         this.artifactId = artifactId
-        this.projectId = projectId
+        this.project = projectRepository.getProject(projectId)
         loadArtifact()
     }
 
     private fun updateInspectButtonState() {
         uiState = uiState.copy(
-            canInspect = uiState.artifact?.archived == false && isUserInInspectorList()
+            canInspect = uiState.artifact?.archived == false
+                    && isUserInInspectorList()
+                    && !project.finished
         )
     }
 
@@ -52,7 +57,7 @@ class ArtifactDetailsViewModel(
 
             try {
                 val artifact = artifactRepository.getArtifact(
-                    projectId = projectId,
+                    projectId = project.id,
                     artifactId = artifactId
                 )
 
@@ -82,8 +87,8 @@ class ArtifactDetailsViewModel(
             artifact = artifact,
             inspections = filteredInspections,
             lastInspection = inspections?.maxOfOrNull { it.createdAt },
-            canEditInspectors = isAdmin,
-            showEditButton = isAdmin && !artifact.archived,
+            canEditInspectors = isAdmin && !project.finished,
+            showEditButton = isAdmin && !artifact.archived && !project.finished,
             showCosts = !isInspector
         )
 

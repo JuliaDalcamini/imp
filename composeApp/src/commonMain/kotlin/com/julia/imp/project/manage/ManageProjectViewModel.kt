@@ -22,14 +22,26 @@ class ManageProjectViewModel(
     var uiState by mutableStateOf(ManageProjectUiState())
         private set
 
-    suspend fun initialize(project: Project) {
-        canUpdateStartDate(project)
-    }
+    fun initialize(projectId: String) {
+        viewModelScope.launch {
+            try {
+                val project = repository.getProject(projectId)
+                val artifacts = artifactRepository.getArtifacts(project.id, ArtifactFilter.All)
 
-    private suspend fun canUpdateStartDate(project: Project) {
-        val artifacts = artifactRepository.getArtifacts(project.id, ArtifactFilter.All)
-        artifacts.map { inspectionRepository.getInspections(project.id, it.id) }
-        uiState = uiState.copy(canUpdateStartDate = artifacts.isEmpty())
+                val inspections = artifacts.flatMap {
+                    inspectionRepository.getInspections(project.id, it.id)
+                }
+
+                uiState = uiState.copy(
+                    project = project,
+                    canChangeStartDate = inspections.isEmpty()
+                )
+            } catch (error: Throwable) {
+                uiState = uiState.copy(loadError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
+            }
+        }
     }
 
     fun showRenameDialog() {
@@ -64,67 +76,106 @@ class ManageProjectViewModel(
         uiState = uiState.copy(showChangeStartDateDialog = false)
     }
 
+    fun showFinishDialog() {
+        uiState = uiState.copy(showFinishDialog = true)
+    }
+
+    fun dismissFinishDialog() {
+        uiState = uiState.copy(showFinishDialog = false)
+    }
+
+    fun dismissLoadError() {
+        uiState = uiState.copy(loadError = false)
+    }
+
     fun rename(project: Project, newName: String) {
         viewModelScope.launch {
+            uiState = uiState.copy(loading = true)
+
             try {
-                repository.updateProject(
-                    projectId = project.id,
-                    newName = newName,
-                    newStartDate = project.startDate,
-                    newTargetDate = project.targetDate,
-                    newMinInspectors = project.minInspectors
-                )
+                updateProject(project = project, name = newName)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
             }
         }
     }
 
     fun changeStartDate(project: Project, newStartDate: LocalDate) {
         viewModelScope.launch {
+            uiState = uiState.copy(loading = true)
+
             try {
-                repository.updateProject(
-                    projectId = project.id,
-                    newName = project.name,
-                    newStartDate = newStartDate,
-                    newTargetDate = project.targetDate,
-                    newMinInspectors = project.minInspectors
-                )
+                updateProject(project = project, startDate = newStartDate)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
             }
         }
     }
 
     fun changeTargetDate(project: Project, newTargetDate: LocalDate) {
         viewModelScope.launch {
+            uiState = uiState.copy(loading = true)
+
             try {
-                repository.updateProject(
-                    projectId = project.id,
-                    newName = project.name,
-                    newStartDate = project.startDate,
-                    newTargetDate = newTargetDate,
-                    newMinInspectors = project.minInspectors
-                )
+                updateProject(project = project, targetDate = newTargetDate)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
             }
         }
     }
 
     fun changeMinInspectors(project: Project, newMinInspectors: Int) {
         viewModelScope.launch {
+            uiState = uiState.copy(loading = true)
+
             try {
-                repository.updateProject(
-                    projectId = project.id,
-                    newName = project.name,
-                    newStartDate = project.startDate,
-                    newTargetDate = project.targetDate,
-                    newMinInspectors = newMinInspectors
-                )
+                updateProject(project = project, minInspectors = newMinInspectors)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
             }
         }
+    }
+
+    fun finishProject(project: Project) {
+        viewModelScope.launch {
+            uiState = uiState.copy(loading = true)
+
+            try {
+                updateProject(project = project, finished = true)
+                uiState = uiState.copy(projectFinished = true)
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
+            }
+        }
+    }
+
+    private suspend fun updateProject(
+        project: Project,
+        name: String = project.name,
+        startDate: LocalDate = project.startDate,
+        targetDate: LocalDate = project.targetDate,
+        minInspectors: Int = project.minInspectors,
+        finished: Boolean = project.finished
+    ) {
+        val updatedProject = repository.updateProject(
+            projectId = project.id,
+            name = name,
+            startDate = startDate,
+            targetDate = targetDate,
+            minInspectors = minInspectors,
+            finished = finished
+        )
+
+        uiState = uiState.copy(project = updatedProject)
     }
 }

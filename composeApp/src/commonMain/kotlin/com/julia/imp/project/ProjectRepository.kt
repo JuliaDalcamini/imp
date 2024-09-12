@@ -17,8 +17,11 @@ import kotlinx.datetime.LocalDate
 
 class ProjectRepository(private val client: HttpClient = configuredHttpClient) {
 
-    suspend fun getProjects(teamId: String): List<Project> =
-        client.get("projects?teamId=$teamId").body()
+    suspend fun getProject(projectId: String): Project =
+        client.get("projects/$projectId").body()
+
+    suspend fun getProjects(teamId: String, filter: ProjectFilter): List<Project> =
+        client.get("projects?teamId=$teamId&filter=$filter").body()
 
     suspend fun deleteProject(projectId: String) {
         client.delete("projects/$projectId")
@@ -26,23 +29,25 @@ class ProjectRepository(private val client: HttpClient = configuredHttpClient) {
 
     suspend fun updateProject(
         projectId: String,
-        newName: String,
-        newStartDate: LocalDate,
-        newTargetDate: LocalDate,
-        newMinInspectors: Int
-    ) {
+        name: String,
+        startDate: LocalDate,
+        targetDate: LocalDate,
+        minInspectors: Int,
+        finished: Boolean
+    ): Project =
         client.patch("projects/$projectId") {
             contentType(ContentType.Application.Json)
+
             setBody(
                 UpdateProjectRequest(
-                    name = newName,
-                    startDate = newStartDate,
-                    targetDate = newTargetDate,
-                    minInspectors = newMinInspectors
+                    name = name,
+                    startDate = startDate,
+                    targetDate = targetDate,
+                    minInspectors = minInspectors,
+                    finished = finished
                 )
             )
-        }
-    }
+        }.body()
 
     suspend fun createProject(
         name: String,

@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.project.Project
+import com.julia.imp.project.ProjectFilter
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
 
 class ProjectsViewModel(
     private val repository: ProjectRepository = ProjectRepository()
@@ -19,19 +19,20 @@ class ProjectsViewModel(
     var uiState by mutableStateOf(ProjectsUiState())
         private set
 
-    fun getProjects() {
+    fun getProjects(filter: ProjectFilter = uiState.filter) {
         viewModelScope.launch {
             try {
                 val isAdmin = requireSession().isTeamAdmin
 
                 uiState = ProjectsUiState(
                     loading = true,
+                    filter = filter,
                     showCreateButton = isAdmin,
                     showManageOption = isAdmin,
                     showDeleteOption = isAdmin
                 )
 
-                val projects = repository.getProjects(requireTeam().id)
+                val projects = repository.getProjects(requireTeam().id, uiState.filter)
 
                 uiState = uiState.copy(projects = projects)
             } catch (error: Throwable) {
@@ -39,6 +40,13 @@ class ProjectsViewModel(
             } finally {
                 uiState = uiState.copy(loading = false)
             }
+        }
+    }
+
+    fun setFilter(filter: ProjectFilter) {
+        if (filter != uiState.filter) {
+            uiState = uiState.copy(filter = filter)
+            getProjects()
         }
     }
 

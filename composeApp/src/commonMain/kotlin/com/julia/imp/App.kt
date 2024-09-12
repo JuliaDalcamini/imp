@@ -137,7 +137,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onProjectClick = { navController.navigate(ArtifactsRoute(it)) },
                         onNewProjectClick = { navController.navigate(CreateProjectRoute) },
                         onViewProjectStatsClick = { navController.navigate(DashboardRoute(it)) },
-                        onManageProjectClick = { navController.navigate(ManageProjectRoute(it)) },
+                        onManageProjectClick = { navController.navigate(ManageProjectRoute(it.id)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
                         onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
@@ -161,13 +161,13 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     )
                 }
 
-                composable<ManageProjectRoute>(ManageProjectRoute.typeMap) { entry ->
+                composable<ManageProjectRoute> { entry ->
                     val route = entry.toRoute<ManageProjectRoute>()
 
                     ManageProjectScreen(
-                        project = route.project,
+                        projectId = route.projectId,
                         onBackClick = { navController.popBackStack() },
-                        onProjectUpdate = { }
+                        onProjectFinished = { navController.popBackStack() }
                     )
                 }
 
@@ -179,7 +179,6 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onBackClick = { navController.popBackStack() },
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute.of(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
-                        onInspectClick = { navController.navigate(CreateInspectionRoute(it)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
                         onPrioritizeArtifactClick = {
                             navController.navigate(

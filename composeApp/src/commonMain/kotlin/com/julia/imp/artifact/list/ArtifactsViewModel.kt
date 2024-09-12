@@ -8,37 +8,41 @@ import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.session.requireSession
+import com.julia.imp.project.Project
 import kotlinx.coroutines.launch
 
 class ArtifactsViewModel(
     private val repository: ArtifactRepository = ArtifactRepository()
 ) : ViewModel() {
 
-    private var lastProjectId: String? = null
+    private lateinit var project: Project
 
     var uiState by mutableStateOf(ArtifactsUiState())
         private set
 
-    fun getArtifacts(projectId: String, filter: ArtifactFilter) {
-        lastProjectId = projectId
+    fun initialize(project: Project) {
+        this.project = project
+        getArtifacts()
+    }
 
+    private fun getArtifacts() {
         viewModelScope.launch {
             try {
                 val isAdmin = requireSession().isTeamAdmin
 
                 uiState = ArtifactsUiState(
                     loading = true,
-                    filter = filter,
-                    showCreateButton = isAdmin
+                    filter = uiState.filter,
+                    showCreateButton = isAdmin && !project.finished
                 )
 
-                val artifacts = repository.getArtifacts(projectId, filter)
+                val artifacts = repository.getArtifacts(project.id, uiState.filter)
 
                 uiState = uiState.copy(
                     entries = artifacts.map { artifact ->
                         ArtifactListEntry(
                             artifact = artifact,
-                            showOptions = isAdmin && !artifact.archived
+                            showOptions = isAdmin && !artifact.archived && !project.finished
                         )
                     },
                     empty = artifacts.isEmpty()
@@ -52,7 +56,10 @@ class ArtifactsViewModel(
     }
 
     fun setFilter(filter: ArtifactFilter) {
-        uiState = uiState.copy(filter = filter)
+        if (filter != uiState.filter) {
+            uiState = uiState.copy(filter = filter)
+            getArtifacts()
+        }
     }
 
     fun askToArchive(artifact: Artifact) {
@@ -83,6 +90,6 @@ class ArtifactsViewModel(
     }
 
     fun reload() {
-        lastProjectId?.let { getArtifacts(it, uiState.filter) }
+        getArtifacts()
     }
 }

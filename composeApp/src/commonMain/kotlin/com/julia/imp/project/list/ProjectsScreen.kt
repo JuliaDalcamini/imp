@@ -1,8 +1,10 @@
 package com.julia.imp.project.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -12,12 +14,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +45,9 @@ import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
-import com.julia.imp.common.ui.dialog.TextInputDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
+import com.julia.imp.project.ProjectFilter
 import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
@@ -56,6 +60,9 @@ import imp.composeapp.generated.resources.delete_label
 import imp.composeapp.generated.resources.delete_project_message
 import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.description_24px
+import imp.composeapp.generated.resources.filter_active
+import imp.composeapp.generated.resources.filter_all
+import imp.composeapp.generated.resources.filter_finished
 import imp.composeapp.generated.resources.generate_report_label
 import imp.composeapp.generated.resources.manage_label
 import imp.composeapp.generated.resources.more_vert_24px
@@ -65,7 +72,6 @@ import imp.composeapp.generated.resources.projects_error_message
 import imp.composeapp.generated.resources.projects_title
 import imp.composeapp.generated.resources.query_stats_24px
 import imp.composeapp.generated.resources.refresh_24px
-import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.try_again_label
 import imp.composeapp.generated.resources.view_stats_label
@@ -85,7 +91,7 @@ fun ProjectsScreen(
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
     LaunchedEffect(SessionManager.activeSession) {
-        viewModel.getProjects()
+        viewModel.getProjects(ProjectFilter.Active)
     }
 
     Scaffold(
@@ -116,42 +122,28 @@ fun ProjectsScreen(
                 )
             }
 
-            viewModel.uiState.projects?.let { projects ->
-                if (projects.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .consumeWindowInsets(paddingValues),
-                        contentPadding = paddingValues
-                    ) {
-                        items(projects) { project ->
-                            ProjectListItem(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .padding(bottom = 8.dp)
-                                    .animateItem(),
-                                project = project,
-                                showDeleteOption = viewModel.uiState.showDeleteOption,
-                                showManageOption = viewModel.uiState.showManageOption,
-                                onClick = { onProjectClick(project) },
-                                onViewStatsClick = { onViewProjectStatsClick(project) },
-                                onManageProjectClick = { onManageProjectClick(project) },
-                                onDeleteClick = { viewModel.askToDelete(project) },
-                                onGenerateReportClick = { viewModel.generateReport(project) }
-                            )
-                        }
+            ProjectList(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(paddingValues),
+                entries = viewModel.uiState.projects,
+                onProjectClick = onProjectClick,
+                onViewProjectStatsClick = onViewProjectStatsClick,
+                onManageProjectClick = onManageProjectClick,
+                onDeleteProjectClick = { viewModel.askToDelete(it) },
+                onGenerateProjectClick = { viewModel.generateReport(it) },
+                selectedFilter = viewModel.uiState.filter,
+                onFilterChange = { viewModel.setFilter(it) },
+                showDeleteOption = viewModel.uiState.showDeleteOption,
+                showManageOption = viewModel.uiState.showManageOption,
+                contentPadding = paddingValues
+            )
 
-                        item {
-                            Spacer(Modifier.height(56.dp))
-                        }
-                    }
-                } else {
-                    Text(
-                        modifier = Modifier.padding(24.dp).align(Alignment.Center),
-                        text = stringResource(Res.string.no_projects_message)
-                    )
-                }
+            if (viewModel.uiState.projects?.isEmpty() == true) {
+                Text(
+                    modifier = Modifier.padding(24.dp).align(Alignment.Center),
+                    text = stringResource(Res.string.no_projects_message)
+                )
             }
 
             if (viewModel.uiState.error) {
@@ -207,6 +199,60 @@ fun ProjectsScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ProjectList(
+    entries: List<Project>?,
+    onProjectClick: (Project) -> Unit,
+    onViewProjectStatsClick: (Project) -> Unit,
+    onManageProjectClick: (Project) -> Unit,
+    onDeleteProjectClick: (Project) -> Unit,
+    onGenerateProjectClick: (Project) -> Unit,
+    selectedFilter: ProjectFilter,
+    onFilterChange: (ProjectFilter) -> Unit,
+    showDeleteOption: Boolean,
+    showManageOption: Boolean,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = contentPadding
+    ) {
+        stickyHeader("filters") {
+            ProjectListFilters(
+                modifier = Modifier.fillMaxWidth(),
+                selectedFilter = selectedFilter,
+                onFilterChange = onFilterChange
+            )
+        }
+
+        entries?.let {
+            items(entries) { project ->
+                ProjectListItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 8.dp)
+                        .animateItem(),
+                    project = project,
+                    showDeleteOption = showDeleteOption,
+                    showManageOption = showManageOption,
+                    onClick = { onProjectClick(project) },
+                    onViewStatsClick = { onViewProjectStatsClick(project) },
+                    onManageProjectClick = { onManageProjectClick(project) },
+                    onDeleteClick = { onDeleteProjectClick(project) },
+                    onGenerateReportClick = { onGenerateProjectClick(project) }
+                )
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(56.dp))
+        }
+    }
+}
+
 @Composable
 fun NewProjectButton(
     onClick: () -> Unit,
@@ -221,7 +267,36 @@ fun NewProjectButton(
 }
 
 @Composable
-fun ProjectListItem(
+private fun ProjectListFilters(
+    modifier: Modifier,
+    selectedFilter: ProjectFilter,
+    onFilterChange: (ProjectFilter) -> Unit
+) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(ProjectFilter.entries) {
+            FilterChip(
+                selected = it == selectedFilter,
+                onClick = { onFilterChange(it) },
+                label = { Text(getFilterText(it)) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun getFilterText(filter: ProjectFilter): String =
+    when (filter) {
+        ProjectFilter.Active -> stringResource(Res.string.filter_active)
+        ProjectFilter.Finished -> stringResource(Res.string.filter_finished)
+        ProjectFilter.All -> stringResource(Res.string.filter_all)
+    }
+
+@Composable
+private fun ProjectListItem(
     project: Project,
     showDeleteOption: Boolean,
     showManageOption: Boolean,
@@ -282,7 +357,7 @@ fun ProjectListItem(
 }
 
 @Composable
-fun ProjectOptionsDropdown(
+private fun ProjectOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     showDeleteOption: Boolean,
@@ -341,7 +416,7 @@ fun ProjectOptionsDropdown(
 }
 
 @Composable
-fun DeleteProjectDialog(
+private fun DeleteProjectDialog(
     projectName: String,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
