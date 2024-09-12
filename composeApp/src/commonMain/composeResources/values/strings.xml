@@ -182,7 +182,9 @@
     <string name="made_on_label">Realizada em</string>
     <string name="answer_format">Resposta: %1$s</string>
     <string name="defect_format">Defeito: %1$s</string>
+    <string name="description_format">Descrição: %1$s</string>
     <string name="found_defects_label">Defeitos encontrados</string>
     <string name="summary_title">Resumo</string>
     <string name="questions_and_answers_title">Perguntas e respostas</string>
+    <string name="defect_detail_label">Descrição e/ou localização do defeito identificado</string>
 </resources>

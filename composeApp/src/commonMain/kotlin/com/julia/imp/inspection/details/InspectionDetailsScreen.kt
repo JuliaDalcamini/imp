@@ -40,6 +40,7 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.answer_format
 import imp.composeapp.generated.resources.cost_title
 import imp.composeapp.generated.resources.defect_format
+import imp.composeapp.generated.resources.description_format
 import imp.composeapp.generated.resources.duration_title
 import imp.composeapp.generated.resources.found_defects_label
 import imp.composeapp.generated.resources.inspection_details_title
@@ -231,6 +232,15 @@ fun InspectionDetails(
                         text = stringResource(
                             Res.string.defect_format,
                             answer.question.defectType.name
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    Text(
+                        text = stringResource(
+                            Res.string.description_format,
+                            answer.defectDetail.toString()
                         ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error

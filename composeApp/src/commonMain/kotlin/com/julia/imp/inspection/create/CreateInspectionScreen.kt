@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.question.Question
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.defect_detail_label
 import imp.composeapp.generated.resources.finish_inspection_error_message
 import imp.composeapp.generated.resources.finish_inspection_error_title
 import imp.composeapp.generated.resources.finish_inspection_label
@@ -86,6 +88,8 @@ fun CreateInspectionScreen(
                 onAnswerChange = { question, answer ->
                     viewModel.setAnswer(question, answer)
                 },
+                onDefectDetailChange = { question, detail ->
+                    viewModel.setDefectDetail(question, detail) },
                 canSubmit = viewModel.uiState.canCreate,
                 submitting = viewModel.uiState.saving,
                 onSubmit = { viewModel.createInspection() }
@@ -122,8 +126,9 @@ private fun Placeholder(modifier: Modifier = Modifier) {
 
 @Composable
 fun CreateInspectionForm(
-    questions: SnapshotStateMap<Question, AnswerOption?>?,
+    questions: SnapshotStateMap<Question, QuestionState>?,
     onAnswerChange: (Question, AnswerOption) -> Unit,
+    onDefectDetailChange: (Question, String) -> Unit,
     canSubmit: Boolean,
     submitting: Boolean,
     onSubmit: () -> Unit,
@@ -139,7 +144,7 @@ fun CreateInspectionForm(
         ) {
             questions?.forEach { entry ->
                 val question = entry.key
-                val selectedAnswer = entry.value
+                val selectedAnswer = entry.value.answer
 
                 RadioGroupFormField(
                     modifier = Modifier.fillMaxWidth(),
@@ -150,6 +155,16 @@ fun CreateInspectionForm(
                     enabled = !submitting,
                     optionLabel = { Text(it.getLabel()) }
                 )
+
+                if (entry.value.answer == AnswerOption.No) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = entry.value.defectDetail.orEmpty(),
+                        onValueChange = { text -> onDefectDetailChange(question, text) },
+                        label = { Text(stringResource(Res.string.defect_detail_label)) },
+                        singleLine = true
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))

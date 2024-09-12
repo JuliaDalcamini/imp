@@ -11,6 +11,7 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.text.nullIfBlank
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.answer.AnswerOption
+import com.julia.imp.inspection.answer.InspectionAnswerRequest
 import com.julia.imp.question.Question
 import com.julia.imp.question.QuestionRepository
 import kotlinx.coroutines.launch
@@ -85,7 +86,7 @@ class CreateInspectionViewModel(
                     projectId = artifact.projectId,
                     artifactId = artifact.id,
                     duration = getDuration(),
-                    answers = getFinalAnswerMap()
+                    answers = getAnswersForRequest()
                 )
 
                 uiState = uiState.copy(createdInspection = inspection)
@@ -102,15 +103,19 @@ class CreateInspectionViewModel(
         return Clock.System.now() - startTime
     }
 
-    private fun getFinalAnswerMap(): Map<String, QuestionState> {
+    private fun getAnswersForRequest(): List<InspectionAnswerRequest> {
         val questions = uiState.questions ?: throw IllegalStateException("Questions not loaded")
 
         return questions.map { entry ->
             val question = entry.key
-            val answer = entry.value ?: throw IllegalStateException("Answer not set")
+            val answer = entry.value
 
-            question.id to answer
-        }.toMap()
+            InspectionAnswerRequest(
+                questionId = question.id,
+                answer = answer.answer ?: throw IllegalStateException("Answer not set"),
+                defectDetail = answer.defectDetail
+            )
+        }
     }
 
     fun dismissCreateError() {
