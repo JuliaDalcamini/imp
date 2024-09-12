@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ import imp.composeapp.generated.resources.rename_project_title
 import imp.composeapp.generated.resources.start_date_label
 import imp.composeapp.generated.resources.string_format
 import imp.composeapp.generated.resources.target_date_label
+import imp.composeapp.generated.resources.update_number_inspectors_message
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -253,11 +255,17 @@ fun ChangeMinInspectorsDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (Int) -> Unit
 ) {
+    Text(
+        text = stringResource(Res.string.update_number_inspectors_message),
+        style = MaterialTheme.typography.labelMedium
+    )
+
     SelectionDialog(
         title = stringResource(Res.string.inspectors_number_select),
         options = (2..5).toList(),
         onDismissRequest = onDismissRequest,
         initialSelection = minInspectors,
-        onConfirm = onConfirm
+        onConfirm = onConfirm,
+        message = stringResource(Res.string.update_number_inspectors_message)
     )
 }
