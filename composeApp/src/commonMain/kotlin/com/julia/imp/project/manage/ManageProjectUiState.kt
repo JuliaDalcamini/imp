@@ -7,6 +7,7 @@ data class ManageProjectUiState(
     val project: Project? = null,
     val canChangeStartDate: Boolean = false,
     val showRenameDialog: Boolean = false,
+    val showDeleteDialog: Boolean = false,
     val showChangeMinInspectorsDialog: Boolean = false,
     val showChangeStartDateDialog: Boolean = false,
     val showChangeTargetDateDialog: Boolean = false,
@@ -14,5 +15,6 @@ data class ManageProjectUiState(
     val projectToRename: Project? = null,
     val actionError: Boolean = false,
     val projectFinished: Boolean = false,
+    val projectDeleted: Boolean = false,
     val loadError: Boolean = false
 )

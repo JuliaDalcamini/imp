@@ -94,7 +94,7 @@ fun ArtifactDetailsScreen(
     onBackClick: () -> Unit,
     onEditClick: (Artifact) -> Unit,
     onInspectClick: (Artifact) -> Unit,
-    onInspectionClick: (Inspection) -> Unit,
+    onInspectionClick: (Artifact, Inspection) -> Unit,
     viewModel: ArtifactDetailsViewModel = viewModel { ArtifactDetailsViewModel() }
 ) {
     LaunchedEffect(artifactId) {
@@ -156,7 +156,7 @@ fun ArtifactDetailsScreen(
                     .padding(vertical = 24.dp),
                 artifact = artifact,
                 inspectors = artifact.inspectors,
-                onInspectionClick = onInspectionClick,
+                onInspectionClick = { onInspectionClick(artifact, it) },
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
                 enableInspectors = !uiState.updatingInspectors,

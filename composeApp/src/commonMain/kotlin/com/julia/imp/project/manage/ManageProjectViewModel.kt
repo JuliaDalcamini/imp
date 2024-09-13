@@ -44,6 +44,14 @@ class ManageProjectViewModel(
         }
     }
 
+    fun showDeleteDialog() {
+        uiState = uiState.copy(showDeleteDialog = true)
+    }
+
+    fun dismissDeleteDialog() {
+        uiState = uiState.copy(showDeleteDialog = false)
+    }
+
     fun showRenameDialog() {
         uiState = uiState.copy(showRenameDialog = true)
     }
@@ -136,6 +144,19 @@ class ManageProjectViewModel(
 
             try {
                 updateProject(project = project, minInspectors = newMinInspectors)
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            } finally {
+                uiState = uiState.copy(loading = false)
+            }
+        }
+    }
+
+    fun delete(project: Project) {
+        viewModelScope.launch {
+            try {
+                repository.deleteProject(project.id)
+                uiState = uiState.copy(projectDeleted = true)
             } catch (error: Throwable) {
                 uiState = uiState.copy(actionError = true)
             } finally {

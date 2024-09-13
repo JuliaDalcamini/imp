@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class ProjectsViewModel(
     private val repository: ProjectRepository = ProjectRepository()
 ) : ViewModel() {
-    
+
     var uiState by mutableStateOf(ProjectsUiState())
         private set
 
@@ -28,8 +28,7 @@ class ProjectsViewModel(
                     loading = true,
                     filter = filter,
                     showCreateButton = isAdmin,
-                    showManageOption = isAdmin,
-                    showDeleteOption = isAdmin
+                    showManageOption = isAdmin
                 )
 
                 val projects = repository.getProjects(requireTeam().id, uiState.filter)
@@ -47,25 +46,6 @@ class ProjectsViewModel(
         if (filter != uiState.filter) {
             uiState = uiState.copy(filter = filter)
             getProjects()
-        }
-    }
-
-    fun askToDelete(project: Project) {
-        uiState = uiState.copy(projectToDelete = project)
-    }
-
-    fun dismissDeletion() {
-        uiState = uiState.copy(projectToDelete = null)
-    }
-
-    fun delete(project: Project) {
-        viewModelScope.launch {
-            try {
-                repository.deleteProject(project.id)
-                getProjects()
-            } catch (error: Throwable) {
-                uiState = uiState.copy(actionError = true)
-            }
         }
     }
 

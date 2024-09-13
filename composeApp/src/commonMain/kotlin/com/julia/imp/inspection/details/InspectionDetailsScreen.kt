@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.datetime.DateTimeFormats
 import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.text.getInitials
@@ -59,7 +60,7 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun InspectionDetailsScreen(
     inspectionId: String,
-    artifactId: String,
+    artifact: Artifact,
     projectId: String,
     onBackClick: () -> Unit,
     viewModel: InspectionDetailsViewModel = viewModel { InspectionDetailsViewModel() }
@@ -67,7 +68,7 @@ fun InspectionDetailsScreen(
     LaunchedEffect(inspectionId) {
         viewModel.initialize(
             inspectionId = inspectionId,
-            artifactId = artifactId,
+            artifactId = artifact.id,
             projectId = projectId
         )
     }
@@ -77,6 +78,7 @@ fun InspectionDetailsScreen(
         topBar = {
             TopBar(
                 title = stringResource(Res.string.inspection_details_title),
+                subtitle = artifact.name,
                 onBackClick = onBackClick
             )
         }
@@ -197,7 +199,7 @@ fun InspectionDetails(
             TextProperty(
                 modifier = Modifier.padding(top = 24.dp),
                 label = stringResource(Res.string.found_defects_label),
-                text = inspection.answers.filter { it.answer == AnswerOption.No }.size.toString()
+                text = inspection.answers.filter { it.answerOption == AnswerOption.No }.size.toString()
             )
         }
 
@@ -223,28 +225,30 @@ fun InspectionDetails(
                 )
 
                 Text(
-                    text = stringResource(Res.string.answer_format, answer.answer.getLabel()),
+                    text = stringResource(Res.string.answer_format, answer.answerOption.getLabel()),
                     style = MaterialTheme.typography.labelMedium
                 )
 
-                if (answer.answer == AnswerOption.No) {
+                answer.defect?.let { defect ->
                     Text(
                         text = stringResource(
                             Res.string.defect_format,
-                            answer.question.defectType.name
+                            defect.type.name
                         ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.error
                     )
 
-                    Text(
-                        text = stringResource(
-                            Res.string.description_format,
-                            answer.defectDetail.toString()
-                        ),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    if (defect.description != null) {
+                        Text(
+                            text = stringResource(
+                                Res.string.description_format,
+                                defect.description
+                            ),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
 

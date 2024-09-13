@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class InspectionAnswerRequest(
     val questionId: String,
     val answer: AnswerOption,
-    val defectDetail: String?
+    val defectDescription: String?
 )

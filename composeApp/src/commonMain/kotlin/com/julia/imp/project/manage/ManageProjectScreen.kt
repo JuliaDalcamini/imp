@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,6 +33,9 @@ import com.julia.imp.common.ui.topbar.TopBar
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.current_min_inspectors_format
 import imp.composeapp.generated.resources.current_name_format
+import imp.composeapp.generated.resources.delete_24px
+import imp.composeapp.generated.resources.delete_project_message
+import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.finish_project_description
 import imp.composeapp.generated.resources.finish_project_label
 import imp.composeapp.generated.resources.finish_project_message
@@ -51,12 +56,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun ManageProjectScreen(
     projectId: String,
     onBackClick: () -> Unit,
     onProjectFinished: () -> Unit,
+    onProjectDeleted: () -> Unit,
     viewModel: ManageProjectViewModel = viewModel { ManageProjectViewModel() }
 ) {
     val project = viewModel.uiState.project
@@ -71,11 +78,24 @@ fun ManageProjectScreen(
         }
     }
 
+    LaunchedEffect(viewModel.uiState.projectDeleted) {
+        if (viewModel.uiState.projectDeleted) {
+            onProjectDeleted()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopBar(
                 title = stringResource(Res.string.manage_project_title),
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.showDeleteDialog() }
+                    ) {
+                        Icon(vectorResource(Res.drawable.delete_24px), null)
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -165,6 +185,14 @@ fun ManageProjectScreen(
                 )
             }
         }
+    }
+
+    if (project != null && viewModel.uiState.showDeleteDialog) {
+        DeleteProjectDialog(
+            projectName = project.name,
+            onDismissRequest = { viewModel.dismissDeleteDialog() },
+            onConfirm = { viewModel.delete(project) }
+        )
     }
 
     if (project != null && viewModel.uiState.showRenameDialog) {
@@ -267,5 +295,19 @@ fun ChangeMinInspectorsDialog(
         initialSelection = minInspectors,
         onConfirm = onConfirm,
         message = stringResource(Res.string.update_number_inspectors_message)
+    )
+}
+
+@Composable
+private fun DeleteProjectDialog(
+    projectName: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(Res.string.delete_project_title),
+        message = stringResource(Res.string.delete_project_message, projectName),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
     )
 }

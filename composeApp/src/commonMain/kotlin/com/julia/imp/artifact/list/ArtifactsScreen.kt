@@ -73,6 +73,7 @@ import imp.composeapp.generated.resources.filter_archived
 import imp.composeapp.generated.resources.filter_assigned_to_me
 import imp.composeapp.generated.resources.filter_not_prioritized
 import imp.composeapp.generated.resources.filter_prioritized
+import imp.composeapp.generated.resources.fix_list_label
 import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
@@ -94,6 +95,7 @@ fun ArtifactsScreen(
     onArtifactClick: (Artifact) -> Unit,
     onNewArtifactClick: () -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
+    onShowDefectsClick: (Artifact) -> Unit,
     onPrioritizeArtifactClick: (Artifact) -> Unit,
     viewModel: ArtifactsViewModel = viewModel { ArtifactsViewModel() }
 ) {
@@ -132,6 +134,7 @@ fun ArtifactsScreen(
                 entries = viewModel.uiState.entries,
                 onArtifactClick = onArtifactClick,
                 onEditArtifactClick = onEditArtifactClick,
+                onShowDefectsClick = onShowDefectsClick,
                 onArchiveArtifactClick = { viewModel.askToArchive(it) },
                 onPrioritizeArtifactClick = onPrioritizeArtifactClick,
                 selectedFilter = viewModel.uiState.filter,
@@ -222,6 +225,7 @@ private fun ArtifactList(
     entries: List<ArtifactListEntry>?,
     onArtifactClick: (Artifact) -> Unit,
     onEditArtifactClick: (Artifact) -> Unit,
+    onShowDefectsClick: (Artifact) -> Unit,
     onArchiveArtifactClick: (Artifact) -> Unit,
     onPrioritizeArtifactClick: (Artifact) -> Unit,
     selectedFilter: ArtifactFilter,
@@ -253,6 +257,7 @@ private fun ArtifactList(
                     showOptions = entry.showOptions,
                     onClick = { onArtifactClick(entry.artifact) },
                     onEditClick = { onEditArtifactClick(entry.artifact) },
+                    onDefectsClick = { onShowDefectsClick(entry.artifact) },
                     onArchiveClick = { onArchiveArtifactClick(entry.artifact) },
                     onPrioritizeClick = { onPrioritizeArtifactClick(entry.artifact) }
                 )
@@ -302,6 +307,7 @@ private fun ArtifactListItem(
     showOptions: Boolean,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
+    onDefectsClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onPrioritizeClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -396,6 +402,7 @@ private fun ArtifactListItem(
                         compact = compact,
                         onPrioritizeClick = onPrioritizeClick,
                         onEditClick = onEditClick,
+                        onDefectsClick = onDefectsClick,
                         onArchiveClick = onArchiveClick
                     )
                 }
@@ -429,6 +436,7 @@ private fun ArtifactOptions(
     compact: Boolean,
     onPrioritizeClick: () -> Unit,
     onEditClick: () -> Unit,
+    onDefectsClick: () -> Unit,
     onArchiveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -467,6 +475,15 @@ private fun ArtifactOptions(
                 leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
                 onClick = {
                     onEditClick()
+                    expanded = false
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.fix_list_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
+                onClick = {
+                    onDefectsClick()
                     expanded = false
                 }
             )

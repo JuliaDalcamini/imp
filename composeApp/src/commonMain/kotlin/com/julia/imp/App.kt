@@ -30,6 +30,8 @@ import com.julia.imp.artifact.prioritize.PrioritizeArtifactRoute
 import com.julia.imp.artifact.prioritize.PrioritizeArtifactScreen
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.ui.theme.ImpTheme
+import com.julia.imp.defect.DefectRoute
+import com.julia.imp.defect.DefectsScreen
 import com.julia.imp.inspection.create.CreateInspectionRoute
 import com.julia.imp.inspection.create.CreateInspectionScreen
 import com.julia.imp.inspection.details.InspectionDetailsRoute
@@ -167,7 +169,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     ManageProjectScreen(
                         projectId = route.projectId,
                         onBackClick = { navController.popBackStack() },
-                        onProjectFinished = { navController.popBackStack() }
+                        onProjectFinished = { navController.popBackStack() },
+                        onProjectDeleted = { navController.popBackStack() }
                     )
                 }
 
@@ -180,6 +183,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute.of(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
+                        onShowDefectsClick = { navController.navigate(DefectRoute(it)) },
                         onPrioritizeArtifactClick = {
                             navController.navigate(
                                 PrioritizeArtifactRoute(
@@ -246,12 +250,12 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onBackClick = { navController.popBackStack() },
                         onEditClick = { navController.navigate(EditArtifactRoute(it)) },
                         onInspectClick = { navController.navigate(CreateInspectionRoute(it)) },
-                        onInspectionClick = {
+                        onInspectionClick = { artifact, inspection ->
                             navController.navigate(
                                 InspectionDetailsRoute(
-                                    route.artifactId,
+                                    artifact,
                                     route.projectId,
-                                    it.id
+                                    inspection.id
                                 )
                             )
                         }
@@ -273,13 +277,22 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     )
                 }
 
-                composable<InspectionDetailsRoute> { entry ->
+                composable<InspectionDetailsRoute>(InspectionDetailsRoute.typeMap) { entry ->
                     val route = entry.toRoute<InspectionDetailsRoute>()
 
                     InspectionDetailsScreen(
                         inspectionId = route.inspectionId,
-                        artifactId = route.artifactId,
+                        artifact = route.artifact,
                         projectId = route.projectId,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+
+                composable<DefectRoute>(DefectRoute.typeMap) { entry ->
+                    val route = entry.toRoute<DefectRoute>()
+
+                    DefectsScreen(
+                        artifact = route.artifact,
                         onBackClick = { navController.popBackStack() }
                     )
                 }

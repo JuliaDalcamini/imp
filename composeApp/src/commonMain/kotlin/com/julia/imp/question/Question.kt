@@ -5,7 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Question(
     val id: String,
-    val text: String,
-    val severity: Severity,
-    val defectType: DefectType
+    val text: String
 )

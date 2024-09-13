@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.SessionManager
 import com.julia.imp.common.session.UserSession
-import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
@@ -55,10 +54,6 @@ import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.created_by_format
-import imp.composeapp.generated.resources.delete_24px
-import imp.composeapp.generated.resources.delete_label
-import imp.composeapp.generated.resources.delete_project_message
-import imp.composeapp.generated.resources.delete_project_title
 import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.filter_active
 import imp.composeapp.generated.resources.filter_all
@@ -130,11 +125,9 @@ fun ProjectsScreen(
                 onProjectClick = onProjectClick,
                 onViewProjectStatsClick = onViewProjectStatsClick,
                 onManageProjectClick = onManageProjectClick,
-                onDeleteProjectClick = { viewModel.askToDelete(it) },
                 onGenerateProjectClick = { viewModel.generateReport(it) },
                 selectedFilter = viewModel.uiState.filter,
                 onFilterChange = { viewModel.setFilter(it) },
-                showDeleteOption = viewModel.uiState.showDeleteOption,
                 showManageOption = viewModel.uiState.showManageOption,
                 contentPadding = paddingValues
             )
@@ -175,14 +168,6 @@ fun ProjectsScreen(
         }
     }
 
-    viewModel.uiState.projectToDelete?.let { project ->
-        DeleteProjectDialog(
-            projectName = project.name,
-            onDismissRequest = { viewModel.dismissDeletion() },
-            onConfirm = { viewModel.delete(project) }
-        )
-    }
-
     viewModel.uiState.projectToGenerateReport?.let { project ->
         ProjectReportGenerator { pages ->
             onShowReportRequest(pages)
@@ -206,11 +191,9 @@ fun ProjectList(
     onProjectClick: (Project) -> Unit,
     onViewProjectStatsClick: (Project) -> Unit,
     onManageProjectClick: (Project) -> Unit,
-    onDeleteProjectClick: (Project) -> Unit,
     onGenerateProjectClick: (Project) -> Unit,
     selectedFilter: ProjectFilter,
     onFilterChange: (ProjectFilter) -> Unit,
-    showDeleteOption: Boolean,
     showManageOption: Boolean,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -236,12 +219,10 @@ fun ProjectList(
                         .padding(bottom = 8.dp)
                         .animateItem(),
                     project = project,
-                    showDeleteOption = showDeleteOption,
                     showManageOption = showManageOption,
                     onClick = { onProjectClick(project) },
                     onViewStatsClick = { onViewProjectStatsClick(project) },
                     onManageProjectClick = { onManageProjectClick(project) },
-                    onDeleteClick = { onDeleteProjectClick(project) },
                     onGenerateReportClick = { onGenerateProjectClick(project) }
                 )
             }
@@ -298,12 +279,10 @@ private fun getFilterText(filter: ProjectFilter): String =
 @Composable
 private fun ProjectListItem(
     project: Project,
-    showDeleteOption: Boolean,
     showManageOption: Boolean,
     onClick: () -> Unit,
     onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
-    onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -344,11 +323,9 @@ private fun ProjectListItem(
                 ProjectOptionsDropdown(
                     expanded = expandOptions,
                     onDismissRequest = { expandOptions = false },
-                    showDeleteOption = showDeleteOption,
                     showManageOption = showManageOption,
                     onViewStatsClick = onViewStatsClick,
                     onManageProjectClick = onManageProjectClick,
-                    onDeleteClick = onDeleteClick,
                     onGenerateReportClick = onGenerateReportClick
                 )
             }
@@ -360,11 +337,9 @@ private fun ProjectListItem(
 private fun ProjectOptionsDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    showDeleteOption: Boolean,
     showManageOption: Boolean,
     onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
-    onDeleteClick: () -> Unit,
     onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -401,30 +376,5 @@ private fun ProjectOptionsDropdown(
                 }
             )
         }
-
-        if (showDeleteOption) {
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.delete_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.delete_24px), null) },
-                onClick = {
-                    onDeleteClick()
-                    onDismissRequest()
-                }
-            )
-        }
     }
-}
-
-@Composable
-private fun DeleteProjectDialog(
-    projectName: String,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    ConfirmationDialog(
-        title = stringResource(Res.string.delete_project_title),
-        message = stringResource(Res.string.delete_project_message, projectName),
-        onDismissRequest = onDismissRequest,
-        onConfirm = onConfirm
-    )
 }

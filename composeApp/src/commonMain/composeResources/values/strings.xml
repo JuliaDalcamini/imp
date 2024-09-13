@@ -185,6 +185,7 @@
     <string name="answer_format">Resposta: %1$s</string>
     <string name="defect_format">Defeito: %1$s</string>
     <string name="description_format">Descrição: %1$s</string>
+    <string name="no_description">Sem descrição</string>
     <string name="found_defects_label">Defeitos encontrados</string>
     <string name="summary_title">Resumo</string>
     <string name="questions_and_answers_title">Perguntas e respostas</string>
@@ -194,4 +195,11 @@
     <string name="finish_project_title">Finalizar projeto</string>
     <string name="finish_project_message">Tem certeza de que deseja finalizar o projeto %1$s? Isso impedirá qualquer nova alteração no projeto, mas ainda será possível consultar as informações.</string>
     <string name="update_number_inspectors_message">Alterar o número de inspetores agora não irá afetar os artefatos já inspecionados.</string>
+    <string name="defects_title">Defeitos encontrados</string>
+    <string name="no_defects_artifact_message">Nenhum defeito foi encontrado neste artefato.</string>
+    <string name="no_defects_project_message">Nenhum defeito foi encontrado neste projeto.</string>
+    <string name="filter_not_fixed">Não corrigidos</string>
+    <string name="filter_fixed">Corrigidos</string>
+    <string name="fix_label">Corrigir</string>
+    <string name="fix_list_label">Lista de defeitos</string>
 </resources>

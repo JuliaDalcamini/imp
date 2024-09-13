@@ -113,7 +113,7 @@ class CreateInspectionViewModel(
             InspectionAnswerRequest(
                 questionId = question.id,
                 answer = answer.answer ?: throw IllegalStateException("Answer not set"),
-                defectDetail = answer.defectDetail
+                defectDescription = answer.defectDetail
             )
         }
     }
