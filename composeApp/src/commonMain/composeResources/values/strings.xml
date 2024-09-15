@@ -204,4 +204,5 @@
     <string name="fix_label">Corrigir</string>
     <string name="fix_list_label">Lista de defeitos</string>
     <string name="fixed_defects_label">Defeitos corrigidos</string>
+    <string name="finished_label">Finalizado</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -53,11 +54,13 @@ import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
+import imp.composeapp.generated.resources.check_circle_20px
 import imp.composeapp.generated.resources.created_by_format
 import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.filter_active
 import imp.composeapp.generated.resources.filter_all
 import imp.composeapp.generated.resources.filter_finished
+import imp.composeapp.generated.resources.finished_label
 import imp.composeapp.generated.resources.generate_report_label
 import imp.composeapp.generated.resources.manage_label
 import imp.composeapp.generated.resources.more_vert_24px
@@ -295,13 +298,29 @@ private fun ProjectListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = project.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f, fill = false),
+                        text = project.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    if (project.finished) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = vectorResource(Res.drawable.check_circle_20px),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
 
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
@@ -311,6 +330,17 @@ private fun ProjectListItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                if (project.finished) {
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = stringResource(Res.string.finished_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             Box {
@@ -323,7 +353,7 @@ private fun ProjectListItem(
                 ProjectOptionsDropdown(
                     expanded = expandOptions,
                     onDismissRequest = { expandOptions = false },
-                    showManageOption = showManageOption,
+                    showManageOption = showManageOption && !project.finished,
                     onViewStatsClick = onViewStatsClick,
                     onManageProjectClick = onManageProjectClick,
                     onGenerateReportClick = onGenerateReportClick
