@@ -20,16 +20,19 @@ import imp.composeapp.generated.resources.artifact_type_label
 import imp.composeapp.generated.resources.artifact_version_label
 import imp.composeapp.generated.resources.inspectors_label
 import imp.composeapp.generated.resources.select_label
+import imp.composeapp.generated.resources.version_change_needed_message
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun ArtifactFormFields(
+private fun ArtifactFormFields(
     name: String,
     onNameChange: (String) -> Unit,
     currentVersion: String,
     onVersionChange: (String) -> Unit,
+    needsVersionChange: Boolean,
+    showType: Boolean,
     type: ArtifactType?,
-    onTypeChange: (ArtifactType) -> Unit,
+    onTypeChange: ((ArtifactType) -> Unit)?,
     inspectors: List<User>,
     onAddInspectorClick: () -> Unit,
     onRemoveInspectorClick: (User) -> Unit,
@@ -55,7 +58,13 @@ fun ArtifactFormFields(
             onValueChange = onVersionChange,
             enabled = enabled,
             label = { Text(stringResource(Res.string.artifact_version_label)) },
-            singleLine = true
+            singleLine = true,
+            isError = needsVersionChange,
+            supportingText = if (needsVersionChange) {
+                { Text(stringResource(Res.string.version_change_needed_message)) }
+            } else {
+                null
+            }
         )
 
         OutlinedTextField(
@@ -67,13 +76,13 @@ fun ArtifactFormFields(
             singleLine = true
         )
 
-        if (availableTypes != null) {
+        if (showType && availableTypes != null) {
             DropdownFormField(
                 modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
                 text = type?.name ?: stringResource(Res.string.select_label),
                 label = stringResource(Res.string.artifact_type_label),
                 options = availableTypes,
-                onOptionSelected = onTypeChange,
+                onOptionSelected = { onTypeChange?.invoke(it) },
                 enabled = enabled,
                 optionLabel = { optionType -> Text(optionType.name) }
             )
@@ -95,5 +104,78 @@ fun ArtifactFormFields(
 
         Spacer(Modifier.height(24.dp))
     }
+}
+
+@Composable
+fun ArtifactFormFields(
+    name: String,
+    onNameChange: (String) -> Unit,
+    currentVersion: String,
+    onVersionChange: (String) -> Unit,
+    type: ArtifactType?,
+    onTypeChange: (ArtifactType) -> Unit,
+    inspectors: List<User>,
+    onAddInspectorClick: () -> Unit,
+    onRemoveInspectorClick: (User) -> Unit,
+    availableTypes: List<ArtifactType>?,
+    externalLink: String,
+    onExternalLinkChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    ArtifactFormFields(
+        name = name,
+        onNameChange = onNameChange,
+        currentVersion = currentVersion,
+        onVersionChange = onVersionChange,
+        needsVersionChange = false,
+        showType = true,
+        type = type,
+        onTypeChange = onTypeChange,
+        inspectors = inspectors,
+        onAddInspectorClick = onAddInspectorClick,
+        onRemoveInspectorClick = onRemoveInspectorClick,
+        availableTypes = availableTypes,
+        externalLink = externalLink,
+        onExternalLinkChange = onExternalLinkChange,
+        modifier = modifier,
+        enabled = enabled
+    )
+}
+
+@Composable
+fun ArtifactFormFields(
+    name: String,
+    onNameChange: (String) -> Unit,
+    currentVersion: String,
+    onVersionChange: (String) -> Unit,
+    needsVersionChange: Boolean,
+    inspectors: List<User>,
+    onAddInspectorClick: () -> Unit,
+    onRemoveInspectorClick: (User) -> Unit,
+    availableTypes: List<ArtifactType>?,
+    externalLink: String,
+    onExternalLinkChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    ArtifactFormFields(
+        name = name,
+        onNameChange = onNameChange,
+        currentVersion = currentVersion,
+        onVersionChange = onVersionChange,
+        needsVersionChange = needsVersionChange,
+        showType = false,
+        type = null,
+        onTypeChange = null,
+        inspectors = inspectors,
+        onAddInspectorClick = onAddInspectorClick,
+        onRemoveInspectorClick = onRemoveInspectorClick,
+        availableTypes = availableTypes,
+        externalLink = externalLink,
+        onExternalLinkChange = onExternalLinkChange,
+        modifier = modifier,
+        enabled = enabled
+    )
 }
 

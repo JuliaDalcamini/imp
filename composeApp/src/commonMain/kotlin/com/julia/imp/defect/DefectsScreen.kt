@@ -53,7 +53,7 @@ import imp.composeapp.generated.resources.fix_defect_message
 import imp.composeapp.generated.resources.fix_defect_title
 import imp.composeapp.generated.resources.fixed_label
 import imp.composeapp.generated.resources.load_error_message
-import imp.composeapp.generated.resources.no_defects_artifact_message
+import imp.composeapp.generated.resources.no_defects_found_message
 import imp.composeapp.generated.resources.no_description
 import imp.composeapp.generated.resources.question_format
 import imp.composeapp.generated.resources.refresh_24px
@@ -104,7 +104,8 @@ fun DefectsScreen(
             if (viewModel.uiState.defects?.isEmpty() == true) {
                 Text(
                     modifier = Modifier.padding(24.dp).align(Alignment.Center),
-                    text = stringResource(Res.string.no_defects_artifact_message)
+                    textAlign = TextAlign.Center,
+                    text = stringResource(Res.string.no_defects_found_message)
                 )
             }
 

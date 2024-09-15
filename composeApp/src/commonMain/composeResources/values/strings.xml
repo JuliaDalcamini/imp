@@ -134,6 +134,7 @@
     <string name="never">Nunca</string>
     <string name="inspections_label">Inspeções</string>
     <string name="made_on_format">Feito em: %1$s</string>
+    <string name="version_format">Versão: %1$s</string>
     <string name="duration_format">Duração: %1$s</string>
     <string name="cost_format">Custo: %1$s</string>
     <string name="inspect_label">Inspecionar</string>
@@ -177,7 +178,7 @@
     <string name="low_severity_label">Severidade baixa</string>
     <string name="medium_severity_label">Severidade média</string>
     <string name="high_severity_label">Severidade alta</string>
-    <string name="edited_artifact_alert_message">Este artefato foi editado e talvez necessite ser priorizado novamente.</string>
+    <string name="reinspection_needed_alert_message">Este artefato foi editado e deve ser inspecionado novamente.</string>
     <string name="inspection_details_title">Detalhes da inspeção</string>
     <string name="made_on_title">Feito em</string>
     <string name="duration_title">Duração</string>
@@ -197,8 +198,7 @@
     <string name="finish_project_message">Tem certeza de que deseja finalizar o projeto %1$s? Isso impedirá qualquer nova alteração no projeto, mas ainda será possível consultar as informações.</string>
     <string name="update_number_inspectors_message">Alterar o número de inspetores agora não irá afetar os artefatos já inspecionados.</string>
     <string name="defects_title">Defeitos encontrados</string>
-    <string name="no_defects_artifact_message">Nenhum defeito foi encontrado neste artefato.</string>
-    <string name="no_defects_project_message">Nenhum defeito foi encontrado neste projeto.</string>
+    <string name="no_defects_found_message">Nenhum defeito foi encontrado.</string>
     <string name="filter_not_fixed">Não corrigidos</string>
     <string name="filter_fixed">Corrigidos</string>
     <string name="fix_label">Corrigir</string>
@@ -209,4 +209,7 @@
     <string name="fix_defect_title">Corrigir defeito</string>
     <string name="fix_defect_message">Tem certeza de que deseja marcar o defeito como corrigido? Essa ação é irreversível.</string>
     <string name="fixed_label">Corrigido</string>
+    <string name="confirm_update_artifact_title">Atualizar artefato</string>
+    <string name="confirm_update_artifact_message">Tem certeza de que deseja atualizar o artefato? Talvez seja necessário repriorizá-lo.</string>
+    <string name="version_change_needed_message">A versão deve ser alterada</string>
 </resources>

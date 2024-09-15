@@ -18,10 +18,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactFormFields
 import com.julia.imp.common.ui.button.PrimaryButton
+import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.user.UserPickerDialog
 import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.confirm_update_artifact_message
+import imp.composeapp.generated.resources.confirm_update_artifact_title
 import imp.composeapp.generated.resources.edit_artifact_title
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.load_error_title
@@ -70,10 +73,9 @@ fun EditArtifactScreen(
                     .verticalScroll(rememberScrollState()),
                 name = viewModel.uiState.name,
                 onNameChange = { viewModel.setName(it) },
-                currentVersion = viewModel.uiState.currentVersion,
+                currentVersion = viewModel.uiState.version,
                 onVersionChange = { viewModel.setCurrentVersion(it) },
-                type = viewModel.uiState.type,
-                onTypeChange = { viewModel.setType(it) },
+                needsVersionChange = viewModel.uiState.needsVersionChange,
                 inspectors = viewModel.uiState.inspectors,
                 onAddInspectorClick = { viewModel.openInspectorPicker() },
                 onRemoveInspectorClick = { viewModel.removeInspector(it) },
@@ -86,7 +88,7 @@ fun EditArtifactScreen(
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
                 label = stringResource(Res.string.save_label),
-                onClick = { viewModel.updateArtifact() },
+                onClick = { viewModel.askToSave() },
                 enabled = !viewModel.uiState.saving && viewModel.uiState.canSave,
                 loading = viewModel.uiState.saving
             )
@@ -120,4 +122,24 @@ fun EditArtifactScreen(
             }
         )
     }
+
+    if (viewModel.uiState.showSaveDialog) {
+        ConfirmSaveDialog(
+            onDismissRequest = { viewModel.dismissSaveDialog() },
+            onConfirm = { viewModel.updateArtifact() }
+        )
+    }
+}
+
+@Composable
+private fun ConfirmSaveDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(Res.string.confirm_update_artifact_title),
+        message = stringResource(Res.string.confirm_update_artifact_message),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
 }

@@ -64,7 +64,6 @@ import imp.composeapp.generated.resources.assignment_24px
 import imp.composeapp.generated.resources.cost_format
 import imp.composeapp.generated.resources.duration_format
 import imp.composeapp.generated.resources.edit_24px
-import imp.composeapp.generated.resources.edited_artifact_alert_message
 import imp.composeapp.generated.resources.inspect_label
 import imp.composeapp.generated.resources.inspection_title
 import imp.composeapp.generated.resources.inspections_label
@@ -77,8 +76,11 @@ import imp.composeapp.generated.resources.made_on_format
 import imp.composeapp.generated.resources.never
 import imp.composeapp.generated.resources.not_prioritized_label
 import imp.composeapp.generated.resources.priority_label
+import imp.composeapp.generated.resources.reinspection_needed_alert_message
 import imp.composeapp.generated.resources.select_inspector_label
 import imp.composeapp.generated.resources.total_cost_label
+import imp.composeapp.generated.resources.version_format
+import imp.composeapp.generated.resources.warning_24px
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -153,7 +155,8 @@ fun ArtifactDetailsScreen(
                     .consumeWindowInsets(paddingValues)
                     .consumeWindowInsets(PaddingValues(vertical = 24.dp))
                     .padding(paddingValues)
-                    .padding(vertical = 24.dp),
+                    .padding(vertical = 24.dp)
+                    .padding(bottom = 56.dp),
                 artifact = artifact,
                 inspectors = artifact.inspectors,
                 onInspectionClick = { onInspectionClick(artifact, it) },
@@ -163,7 +166,8 @@ fun ArtifactDetailsScreen(
                 readOnlyInspectors = !uiState.canEditInspectors,
                 lastInspection = uiState.lastInspection,
                 inspections = uiState.inspections,
-                showCosts = uiState.showCosts
+                showCosts = uiState.showCosts,
+                showReinspectAlert = uiState.showReinspectAlert
             )
         }
     }
@@ -216,15 +220,16 @@ fun ArtifactDetails(
     lastInspection: Instant?,
     inspections: List<Inspection>?,
     showCosts: Boolean,
+    showReinspectAlert: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier) {
-        if (artifact.archived) {
-            ArchivedArtifactAlert(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 24.dp)
-            )
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        when {
+            artifact.archived -> ArchivedArtifactAlert(Modifier.padding(horizontal = 24.dp))
+            showReinspectAlert -> ReinspectionNeededAlert(Modifier.padding(horizontal = 24.dp))
         }
 
         TextProperty(
@@ -234,25 +239,19 @@ fun ArtifactDetails(
         )
 
         TextProperty(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             label = stringResource(Res.string.artifact_type_label),
             text = artifact.type.name
         )
 
         TextProperty(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             label = stringResource(Res.string.artifact_version_label),
             text = artifact.currentVersion
         )
 
         TextProperty(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             label = stringResource(Res.string.artifact_last_modification_label),
             text = artifact.lastModification
                 .toLocalDateTime(TimeZone.currentSystemDefault())
@@ -260,9 +259,7 @@ fun ArtifactDetails(
         )
 
         Property(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             label = stringResource(Res.string.artifact_external_link_label)
         ) {
             ExternalLink(url = artifact.externalLink)
@@ -270,18 +267,14 @@ fun ArtifactDetails(
 
         if (artifact.priority != null) {
             TextProperty(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp),
                 label = stringResource(Res.string.priority_label),
                 text = getPriorityText(artifact)
             )
         }
 
         TextProperty(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             label = stringResource(Res.string.last_inspection_label),
             text = lastInspection
                 ?.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -291,9 +284,7 @@ fun ArtifactDetails(
 
         if (showCosts) {
             TextProperty(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp),
                 label = stringResource(Res.string.total_cost_label),
                 text = artifact.totalCost.formatAsCurrency()
             )
@@ -301,9 +292,7 @@ fun ArtifactDetails(
 
         if (!artifact.archived) {
             Property(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp),
                 label = stringResource(Res.string.inspectors_label)
             ) {
                 ArtifactInspectorList(
@@ -318,29 +307,31 @@ fun ArtifactDetails(
         }
 
         if (!inspections.isNullOrEmpty()) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 12.dp),
-                style = MaterialTheme.typography.labelMedium,
-                text = stringResource(Res.string.inspections_label)
-            )
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 12.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    text = stringResource(Res.string.inspections_label)
+                )
 
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val maxCardWidth = min(maxWidth - 48.dp, 480.dp)
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val maxCardWidth = min(maxWidth - 48.dp, 480.dp)
 
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(inspections) { inspection ->
-                        InspectionCard(
-                            modifier = Modifier.widthIn(max = maxCardWidth),
-                            inspection = inspection,
-                            showCost = showCosts,
-                            onClick = { onInspectionClick(inspection) },
-                        )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(inspections) { inspection ->
+                            InspectionCard(
+                                modifier = Modifier.widthIn(max = maxCardWidth),
+                                inspection = inspection,
+                                showCost = showCosts,
+                                onClick = { onInspectionClick(inspection) },
+                            )
+                        }
                     }
                 }
             }
@@ -392,6 +383,15 @@ fun InspectionCard(
                     Res.string.made_on_format,
                     formattedDateTime
                 ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(Res.string.version_format, inspection.artifactVersion),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -457,7 +457,7 @@ fun ArchivedArtifactAlert(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EditedArtifactAlert(modifier: Modifier = Modifier) {
+fun ReinspectionNeededAlert(modifier: Modifier = Modifier) {
     OutlinedCard(modifier) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -465,12 +465,12 @@ fun EditedArtifactAlert(modifier: Modifier = Modifier) {
         ) {
             Icon(
                 modifier = Modifier.padding(end = 16.dp),
-                imageVector = vectorResource(Res.drawable.inventory_2_24px),
+                imageVector = vectorResource(Res.drawable.warning_24px),
                 contentDescription = null
             )
 
             Text(
-                text = stringResource(Res.string.edited_artifact_alert_message),
+                text = stringResource(Res.string.reinspection_needed_alert_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

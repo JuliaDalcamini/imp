@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
-import com.julia.imp.artifact.ArtifactType
 import com.julia.imp.common.session.requireTeam
 import com.julia.imp.team.inspector.InspectorRepository
 import com.julia.imp.user.User
@@ -28,9 +27,8 @@ class EditArtifactViewModel(
 
         uiState = uiState.copy(
             name = artifact.name,
-            currentVersion = artifact.currentVersion,
+            version = artifact.currentVersion,
             externalLink = artifact.externalLink,
-            type = artifact.type,
             inspectors = artifact.inspectors
         )
 
@@ -56,17 +54,16 @@ class EditArtifactViewModel(
     }
 
     fun setCurrentVersion(currentVersion: String) {
-        uiState = uiState.copy(currentVersion = currentVersion)
+        uiState = uiState.copy(
+            version = currentVersion,
+            needsVersionChange = false
+        )
+
         updateSaveButtonState()
     }
 
     fun setExternalLink(externalLink: String) {
         uiState = uiState.copy(externalLink = externalLink)
-        updateSaveButtonState()
-    }
-
-    fun setType(type: ArtifactType) {
-        uiState = uiState.copy(type = type)
         updateSaveButtonState()
     }
 
@@ -97,9 +94,8 @@ class EditArtifactViewModel(
 
     private fun getUpdatedArtifact() = artifact.copy(
         name = uiState.name,
-        currentVersion = uiState.currentVersion,
+        currentVersion = uiState.version,
         externalLink = uiState.externalLink,
-        type = uiState.type ?: throw IllegalStateException("Type not set"),
         inspectors = uiState.inspectors
     )
 
@@ -140,9 +136,30 @@ class EditArtifactViewModel(
         )
     }
 
+    fun askToSave() {
+        if (validateChanges()) {
+            uiState = uiState.copy(showSaveDialog = true)
+        }
+    }
+
+    fun dismissSaveDialog() {
+        uiState = uiState.copy(showSaveDialog = false)
+    }
+
+    private fun validateChanges(): Boolean {
+        uiState = uiState.copy(needsVersionChange = needsVersionChange())
+        updateSaveButtonState()
+
+        return !uiState.needsVersionChange
+    }
+
+    private fun needsVersionChange() =
+        uiState.version == artifact.currentVersion &&
+                (uiState.name != artifact.name || uiState.externalLink != artifact.externalLink)
+
     private fun updateSaveButtonState() {
         uiState = uiState.copy(
-            canSave = uiState.run { name.isNotBlank() && type != null }
+            canSave = uiState.run { name.isNotBlank() && !needsVersionChange }
         )
     }
 }

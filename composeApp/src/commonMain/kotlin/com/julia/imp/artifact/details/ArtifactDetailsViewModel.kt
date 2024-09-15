@@ -44,12 +44,8 @@ class ArtifactDetailsViewModel(
         )
     }
 
-    fun getLoggedUserId(): String = requireSession().userId
-
-    private fun isUserInInspectorList(): Boolean {
-        val userId = getLoggedUserId()
-        return uiState.artifact?.inspectors?.any { it.id == userId } ?: false
-    }
+    private fun isUserInInspectorList(): Boolean =
+        uiState.artifact?.inspectors?.any { it.id == requireSession().userId } ?: false
 
     private fun loadArtifact() {
         viewModelScope.launch {
@@ -78,18 +74,21 @@ class ArtifactDetailsViewModel(
     private fun onArtifactLoaded(artifact: Artifact, inspections: List<Inspection>?) {
         val isAdmin = requireSession().isTeamAdmin
         val isInspector = requireSession().isInspector
+        val filteredInspections = inspections?.filter { it.inspector.id == requireSession().userId }
 
-        val filteredInspections =
-            if (isInspector) inspections?.filter { it.inspector.id == requireSession().userId }
-            else inspections
+        val showReinspectAlert = !artifact.archived &&
+                !artifact.fullyInspected &&
+                !filteredInspections.isNullOrEmpty() &&
+                filteredInspections.none { it.artifactVersion == artifact.currentVersion }
 
         uiState = uiState.copy(
             artifact = artifact,
-            inspections = filteredInspections,
+            inspections = if (isInspector) filteredInspections else inspections,
             lastInspection = inspections?.maxOfOrNull { it.createdAt },
             canEditInspectors = isAdmin && !project.finished,
             showEditButton = isAdmin && !artifact.archived && !project.finished,
-            showCosts = !isInspector
+            showCosts = !isInspector,
+            showReinspectAlert = showReinspectAlert
         )
 
         updateInspectButtonState()

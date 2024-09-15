@@ -18,5 +18,6 @@ data class Artifact(
     val calculatedPriority: Double?,
     val lastModification: Instant,
     val currentVersion: String,
-    val totalCost: Double
+    val totalCost: Double,
+    val fullyInspected: Boolean
 )

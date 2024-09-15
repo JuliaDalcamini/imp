@@ -61,7 +61,7 @@ import imp.composeapp.generated.resources.fully_inspected_artifacts
 import imp.composeapp.generated.resources.high_severity_label
 import imp.composeapp.generated.resources.low_severity_label
 import imp.composeapp.generated.resources.medium_severity_label
-import imp.composeapp.generated.resources.no_defects_project_message
+import imp.composeapp.generated.resources.no_defects_found_message
 import imp.composeapp.generated.resources.overall_progress_title
 import imp.composeapp.generated.resources.percentage_format
 import imp.composeapp.generated.resources.progress_by_inspector_title
@@ -404,7 +404,7 @@ fun DefectTypesCard(
         if (data.isEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(Res.string.no_defects_project_message),
+                text = stringResource(Res.string.no_defects_found_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -466,7 +466,7 @@ fun ArtifactTypesCard(
         if (data.isEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(Res.string.no_defects_project_message),
+                text = stringResource(Res.string.no_defects_found_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
