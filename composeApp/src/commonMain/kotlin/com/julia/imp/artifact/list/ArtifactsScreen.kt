@@ -66,6 +66,8 @@ import imp.composeapp.generated.resources.archive_label
 import imp.composeapp.generated.resources.archived_label
 import imp.composeapp.generated.resources.artifacts_error_message
 import imp.composeapp.generated.resources.artifacts_title
+import imp.composeapp.generated.resources.bug_report_24px
+import imp.composeapp.generated.resources.defects_label
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.edit_label
 import imp.composeapp.generated.resources.filter_all
@@ -73,7 +75,6 @@ import imp.composeapp.generated.resources.filter_archived
 import imp.composeapp.generated.resources.filter_assigned_to_me
 import imp.composeapp.generated.resources.filter_not_prioritized
 import imp.composeapp.generated.resources.filter_prioritized
-import imp.composeapp.generated.resources.fix_list_label
 import imp.composeapp.generated.resources.inventory_2_20px
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_artifact_label
@@ -480,8 +481,8 @@ private fun ArtifactOptions(
             )
 
             DropdownMenuItem(
-                text = { Text(stringResource(Res.string.fix_list_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
+                text = { Text(stringResource(Res.string.defects_label)) },
+                leadingIcon = { Icon(vectorResource(Res.drawable.bug_report_24px), null) },
                 onClick = {
                     onDefectsClick()
                     expanded = false

@@ -26,7 +26,7 @@ class DefectsViewModel(
     fun getDefects() {
         viewModelScope.launch {
             try {
-                val canFix = requireSession().isTeamAdmin && requireSession().isInspector
+                val canFix = requireSession().isTeamAdmin || requireSession().isInspector
 
                 uiState = DefectsUiState(
                     loading = true,
@@ -49,26 +49,35 @@ class DefectsViewModel(
         }
     }
 
-    fun changeFixStatus(defect: Defect) {
-        viewModelScope.launch {
-            try {
-                repository.updateDefect(
-                    artifact = artifact,
-                    defectId = defect.id,
-                    fixed = !defect.fixed
-                )
-            } catch (error: Throwable) {
-                uiState = uiState.copy(actionError = true)
-            } finally {
-                uiState = uiState.copy(actionError = false)
-            }
-        }
-    }
-
     fun setFilter(filter: DefectFilter) {
         if (filter != uiState.filter) {
             uiState = uiState.copy(filter = filter)
             getDefects()
+        }
+    }
+
+    fun askToFix(defect: Defect) {
+        uiState = uiState.copy(defectToFix = defect)
+    }
+
+    fun dismissFixDialog() {
+        uiState = uiState.copy(defectToFix = null)
+    }
+
+    fun fixDefect(defect: Defect) {
+        viewModelScope.launch {
+            try {
+                repository.updateDefect(
+                    projectId = artifact.projectId,
+                    artifactId = artifact.id,
+                    defectId = defect.id,
+                    fixed = true
+                )
+
+                getDefects()
+            } catch (error: Throwable) {
+                uiState = uiState.copy(actionError = true)
+            }
         }
     }
 

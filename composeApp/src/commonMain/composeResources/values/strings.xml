@@ -202,7 +202,11 @@
     <string name="filter_not_fixed">Não corrigidos</string>
     <string name="filter_fixed">Corrigidos</string>
     <string name="fix_label">Corrigir</string>
-    <string name="fix_list_label">Lista de defeitos</string>
+    <string name="defects_label">Defeitos</string>
     <string name="fixed_defects_label">Defeitos corrigidos</string>
     <string name="finished_label">Finalizado</string>
+    <string name="question_format">Pergunta: %1$s</string>
+    <string name="fix_defect_title">Corrigir defeito</string>
+    <string name="fix_defect_message">Tem certeza de que deseja marcar o defeito como corrigido? Essa ação é irreversível.</string>
+    <string name="fixed_label">Corrigido</string>
 </resources>

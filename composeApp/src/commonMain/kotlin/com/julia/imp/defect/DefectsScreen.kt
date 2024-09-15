@@ -18,11 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,19 +36,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.artifact.Artifact
+import com.julia.imp.common.ui.dialog.ConfirmationDialog
+import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.defect_format
+import imp.composeapp.generated.resources.action_error_message
+import imp.composeapp.generated.resources.action_error_title
+import imp.composeapp.generated.resources.check_24px
+import imp.composeapp.generated.resources.check_circle_20px
 import imp.composeapp.generated.resources.defects_title
 import imp.composeapp.generated.resources.description_format
 import imp.composeapp.generated.resources.filter_all
 import imp.composeapp.generated.resources.filter_fixed
 import imp.composeapp.generated.resources.filter_not_fixed
-import imp.composeapp.generated.resources.fix_label
-import imp.composeapp.generated.resources.inventory_2_20px
+import imp.composeapp.generated.resources.fix_defect_message
+import imp.composeapp.generated.resources.fix_defect_title
+import imp.composeapp.generated.resources.fixed_label
 import imp.composeapp.generated.resources.load_error_message
 import imp.composeapp.generated.resources.no_defects_artifact_message
 import imp.composeapp.generated.resources.no_description
+import imp.composeapp.generated.resources.question_format
 import imp.composeapp.generated.resources.refresh_24px
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
@@ -90,6 +97,7 @@ fun DefectsScreen(
                 selectedFilter = viewModel.uiState.filter,
                 onFilterChange = { viewModel.setFilter(it) },
                 showFixButton = viewModel.uiState.showFixButton,
+                onFixClick = { viewModel.askToFix(it) },
                 contentPadding = paddingValues
             )
 
@@ -127,7 +135,35 @@ fun DefectsScreen(
                 }
             }
         }
+
+        viewModel.uiState.defectToFix?.let { defect ->
+            FixDefectDialog(
+                onDismissRequest = { viewModel.dismissFixDialog() },
+                onConfirm = { viewModel.fixDefect(defect) }
+            )
+        }
+
+        if (viewModel.uiState.actionError) {
+            ErrorDialog(
+                title = stringResource(Res.string.action_error_title),
+                message = stringResource(Res.string.action_error_message),
+                onDismissRequest = { viewModel.dismissActionError() }
+            )
+        }
     }
+}
+
+@Composable
+private fun FixDefectDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ConfirmationDialog(
+        title = stringResource(Res.string.fix_defect_title),
+        message = stringResource(Res.string.fix_defect_message),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -137,6 +173,7 @@ fun DefectList(
     selectedFilter: DefectFilter,
     onFilterChange: (DefectFilter) -> Unit,
     showFixButton: Boolean,
+    onFixClick: (Defect) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
@@ -153,15 +190,16 @@ fun DefectList(
         }
 
         entries?.let {
-            items(entries) { entry ->
+            items(entries) { defect ->
                 DefectListItem(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .padding(top = 8.dp)
                         .fillMaxWidth()
                         .animateItem(),
-                    defect = entry,
-                    showFixButton = showFixButton
+                    defect = defect,
+                    showFixButton = showFixButton && !defect.fixed,
+                    onFixClick = { onFixClick(defect) }
                 )
             }
         }
@@ -205,11 +243,10 @@ private fun getFilterText(filter: DefectFilter): String =
 private fun DefectListItem(
     defect: Defect,
     showFixButton: Boolean,
+    onFixClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ElevatedCard(
-        modifier = modifier
-    ) {
+    ElevatedCard(modifier) {
         BoxWithConstraints {
             Row(
                 modifier = Modifier.padding(24.dp),
@@ -221,14 +258,9 @@ private fun DefectListItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val descriptionText =
-                            if (defect.description != null)
-                                stringResource(Res.string.description_format, defect.description)
-                            else stringResource(Res.string.no_description)
-
                         Text(
                             modifier = Modifier.weight(1f, fill = false),
-                            text = stringResource(Res.string.defect_format, defect.type.name),
+                            text = defect.type.name,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
@@ -238,29 +270,52 @@ private fun DefectListItem(
                         if (defect.fixed) {
                             Icon(
                                 modifier = Modifier.size(16.dp),
-                                imageVector = vectorResource(Res.drawable.inventory_2_20px),
+                                imageVector = vectorResource(Res.drawable.check_circle_20px),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
-
-                        Text(
-                            modifier = Modifier.padding(top = 4.dp),
-                            text = descriptionText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
                     }
 
-                    if (showFixButton) {
-                        Button(
-                            modifier = Modifier.padding(top = 8.dp),
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Text(stringResource(Res.string.fix_label))
-                        }
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = stringResource(
+                            Res.string.question_format,
+                            defect.question.text
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    val descriptionText = if (defect.description != null) {
+                        stringResource(
+                            Res.string.description_format,
+                            defect.description
+                        )
+                    } else {
+                        stringResource(Res.string.no_description)
+                    }
+
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = descriptionText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    if (defect.fixed) {
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp),
+                            text = stringResource(Res.string.fixed_label),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                if (showFixButton) {
+                    IconButton(onClick = onFixClick) {
+                        Icon(vectorResource(Res.drawable.check_24px), null)
                     }
                 }
             }

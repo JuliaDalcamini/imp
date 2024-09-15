@@ -6,5 +6,6 @@ data class DefectsUiState(
     val defects: List<Defect>? = null,
     val error: Boolean = false,
     val showFixButton: Boolean = false,
+    val defectToFix: Defect? = null,
     val actionError: Boolean = false
 )
