@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class CostOverview(
     val total: Double,
     val averagePerArtifact: Double,
-    val averagePerInspection: Double
+    val averagePerInspection: Double,
+    val standardDeviationPerInspection: Double
 )

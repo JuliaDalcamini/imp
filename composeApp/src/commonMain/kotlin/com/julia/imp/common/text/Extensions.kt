@@ -28,7 +28,7 @@ fun Number.format(decimalPlaces: Int = 2): String {
  */
 fun Number.formatAsCurrency(): String {
     val string = this.toString()
-    val (wholePart, decimalPart) = string.split('.')
+    val (wholePart, decimalPart) = string.trimStart('-').split('.')
 
     val formattedWholePart = wholePart
         .reversed()
@@ -40,7 +40,9 @@ fun Number.formatAsCurrency(): String {
         .take(2)
         .padEnd(2, '0')
 
-    return "R$ $formattedWholePart,$formattedDecimalPart"
+    val sign = if (string.startsWith('-')) "- " else ""
+
+    return "${sign}R$ $formattedWholePart,$formattedDecimalPart"
 }
 
 /**

@@ -43,7 +43,7 @@ import com.julia.imp.project.dashboard.data.DashboardData
 import com.julia.imp.project.dashboard.data.DefectTypeSummary
 import com.julia.imp.project.dashboard.data.EffortOverview
 import com.julia.imp.project.dashboard.data.InspectorProgress
-import com.julia.imp.project.dashboard.data.OverallProgress
+import com.julia.imp.project.dashboard.data.Progress
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.average_by_inspected_artifact_label
 import imp.composeapp.generated.resources.average_by_inspection_label
@@ -56,16 +56,19 @@ import imp.composeapp.generated.resources.dashboard_error_message
 import imp.composeapp.generated.resources.defect_types_title
 import imp.composeapp.generated.resources.defects_by_artifact_type_title
 import imp.composeapp.generated.resources.effort_title
+import imp.composeapp.generated.resources.fixed_defects_label
 import imp.composeapp.generated.resources.fully_inspected_artifacts
 import imp.composeapp.generated.resources.high_severity_label
 import imp.composeapp.generated.resources.low_severity_label
 import imp.composeapp.generated.resources.medium_severity_label
+import imp.composeapp.generated.resources.no_defects_project_message
 import imp.composeapp.generated.resources.overall_progress_title
 import imp.composeapp.generated.resources.percentage_format
 import imp.composeapp.generated.resources.progress_by_inspector_title
 import imp.composeapp.generated.resources.project_stats_title
 import imp.composeapp.generated.resources.quantity_label
 import imp.composeapp.generated.resources.refresh_24px
+import imp.composeapp.generated.resources.standard_deviation_label
 import imp.composeapp.generated.resources.total_label
 import imp.composeapp.generated.resources.try_again_label
 import org.jetbrains.compose.resources.stringResource
@@ -156,7 +159,8 @@ fun DashboardContents(
             item("progress") {
                 ProjectProgressCard(
                     modifier = Modifier.fillMaxWidth(),
-                    data = data.overallProgress
+                    inspectionProgress = data.inspectionProgress,
+                    defectsProgress = data.defectsProgress
                 )
             }
 
@@ -177,14 +181,14 @@ fun DashboardContents(
             item("inspectors") {
                 InspectorProgressCard(
                     modifier = Modifier.fillMaxWidth(),
-                    data = data.inspectorProgress
+                    data = data.inspectorsProgress
                 )
             }
 
             item("defectTypes") {
                 DefectTypesCard(
                     modifier = Modifier.fillMaxWidth(),
-                    data = data.defectsTypes
+                    data = data.defectTypes
                 )
             }
 
@@ -200,17 +204,43 @@ fun DashboardContents(
 
 @Composable
 fun ProjectProgressCard(
-    data: OverallProgress,
+    inspectionProgress: Progress,
+    defectsProgress: Progress,
     modifier: Modifier = Modifier
 ) {
     DashboardCard(
         modifier = modifier,
-        title = stringResource(Res.string.overall_progress_title)
+        title = stringResource(Res.string.overall_progress_title),
+        itemSpacing = 12.dp
     ) {
-        val percentage = (data.percentage * 100).toInt()
+        LabeledProgress(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.fully_inspected_artifacts),
+            progress = inspectionProgress
+        )
+
+        LabeledProgress(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.fixed_defects_label),
+            progress = defectsProgress
+        )
+    }
+}
+
+@Composable
+fun LabeledProgress(
+    label: String,
+    progress: Progress,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        val percentage = (progress.percentage * 100).toInt()
 
         Text(
-            text = stringResource(Res.string.fully_inspected_artifacts),
+            text = label,
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -218,12 +248,12 @@ fun ProjectProgressCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-            progress = { data.percentage.toFloat() }
+            progress = { progress.percentage.toFloat() }
         )
 
         InfoRow(
             modifier = Modifier.fillMaxWidth(),
-            label = stringResource(Res.string.count_format, data.count, data.total),
+            label = stringResource(Res.string.count_format, progress.count, progress.total),
             text = stringResource(Res.string.percentage_format, percentage)
         )
     }
@@ -255,6 +285,12 @@ fun EffortOverviewCard(
             label = stringResource(Res.string.average_by_inspection_label),
             text = data.averagePerInspection.inWholeSeconds.seconds.toString()
         )
+
+        InfoRow(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.standard_deviation_label),
+            text = data.standardDeviationPerInspection.inWholeSeconds.seconds.toString()
+        )
     }
 }
 
@@ -283,6 +319,12 @@ fun CostOverviewCard(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.average_by_inspection_label),
             text = data.averagePerInspection.formatAsCurrency()
+        )
+
+        InfoRow(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.standard_deviation_label),
+            text = data.standardDeviationPerInspection.formatAsCurrency()
         )
     }
 }
@@ -358,6 +400,14 @@ fun DefectTypesCard(
                 )
             }
         }
+
+        if (data.isEmpty()) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.no_defects_project_message),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
@@ -411,6 +461,14 @@ fun ArtifactTypesCard(
                     text = summary.highSeverity.run { "$count (${cost.formatAsCurrency()})" }
                 )
             }
+        }
+
+        if (data.isEmpty()) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.no_defects_project_message),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

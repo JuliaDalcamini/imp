@@ -166,6 +166,7 @@
     <string name="total_label">Total</string>
     <string name="average_by_inspected_artifact_label">Média por artefato inspecionado</string>
     <string name="average_by_inspection_label">Média por inspeção</string>
+    <string name="standard_deviation_label">Desvio padrão</string>
     <string name="cost_title">Custo</string>
     <string name="progress_by_inspector_title">Progresso por inspetor</string>
     <string name="defect_types_title">Tipos de defeito</string>
@@ -202,4 +203,5 @@
     <string name="filter_fixed">Corrigidos</string>
     <string name="fix_label">Corrigir</string>
     <string name="fix_list_label">Lista de defeitos</string>
+    <string name="fixed_defects_label">Defeitos corrigidos</string>
 </resources>

@@ -7,5 +7,6 @@ import kotlin.time.Duration
 data class EffortOverview(
     val total: Duration,
     val averagePerArtifact: Duration,
-    val averagePerInspection: Duration
+    val averagePerInspection: Duration,
+    val standardDeviationPerInspection: Duration
 )

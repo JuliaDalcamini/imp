@@ -4,10 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DashboardData(
-    val overallProgress: OverallProgress,
+    val inspectionProgress: Progress,
+    val defectsProgress: Progress,
     val effortOverview: EffortOverview,
     val costOverview: CostOverview,
-    val inspectorProgress: List<InspectorProgress>,
+    val inspectorsProgress: List<InspectorProgress>,
     val artifactTypes: List<ArtifactTypeDefectSummary>,
-    val defectsTypes: List<DefectTypeSummary>
+    val defectTypes: List<DefectTypeSummary>
 )
