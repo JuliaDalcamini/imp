@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,7 +60,7 @@ fun DefectTypesPage(
             )
 
             DefectTypesCharts(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(220.dp),
                 data = data.defectTypes
             )
         } else {
@@ -179,7 +180,7 @@ private fun DefectTypesCharts(
     ) {
         val defectsData = data.filter { it.count > 0 }
         val totalDefects = defectsData.sumOf { it.count }
-        val defectPercentages = defectsData.map { (it.count.toFloat() / totalDefects) }
+        val defectPercentages = defectsData.map { it.count.toFloat() / totalDefects }
 
         if (totalDefects > 0) {
             LabeledPieChart(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,7 +56,7 @@ fun InspectorsPage(
             )
 
             InspectorsCharts(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(220.dp),
                 data = data
             )
         } else {
@@ -197,7 +198,7 @@ private fun InspectorsCharts(
 
         val assignedData = data.filter { it.progress.total > 0 }
         val totalAssigned = assignedData.sumOf { it.progress.total }
-        val assignedPercentages = assignedData.map { (it.progress.total / totalAssigned).toFloat() }
+        val assignedPercentages = assignedData.map { it.progress.total.toFloat() / totalAssigned }
 
         if (totalAssigned > 0) {
             LabeledPieChart(
@@ -215,7 +216,7 @@ private fun InspectorsCharts(
 
         val doneData = data.filter { it.progress.count > 0 }
         val totalDone = doneData.sumOf { it.progress.count }
-        val donePercentages = doneData.map { (it.progress.count / totalDone).toFloat() }
+        val donePercentages = doneData.map { it.progress.count.toFloat() / totalDone }
 
         if (totalDone > 0) {
             LabeledPieChart(
