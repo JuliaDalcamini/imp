@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.common.session.requireSession
 import com.julia.imp.common.session.requireTeam
-import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectFilter
 import com.julia.imp.project.ProjectRepository
 import kotlinx.coroutines.launch
@@ -47,14 +46,6 @@ class ProjectsViewModel(
             uiState = uiState.copy(filter = filter)
             getProjects()
         }
-    }
-
-    fun generateReport(project: Project) {
-        uiState = uiState.copy(projectToGenerateReport = project)
-    }
-
-    fun onReportOpened() {
-        uiState = uiState.copy(projectToGenerateReport = null)
     }
 
     fun dismissActionError() {

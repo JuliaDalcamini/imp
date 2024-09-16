@@ -28,4 +28,12 @@ class DashboardViewModel(
             }
         }
     }
+
+    fun generateReport() {
+        uiState = uiState.copy(generateReport = true)
+    }
+
+    fun onReportOpened() {
+        uiState = uiState.copy(generateReport = false)
+    }
 }

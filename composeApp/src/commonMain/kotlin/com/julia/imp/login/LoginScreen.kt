@@ -43,6 +43,7 @@ import imp.composeapp.generated.resources.create_account_label
 import imp.composeapp.generated.resources.email_label
 import imp.composeapp.generated.resources.login_error_message
 import imp.composeapp.generated.resources.login_error_title
+import imp.composeapp.generated.resources.login_subtitle
 import imp.composeapp.generated.resources.password_label
 import imp.composeapp.generated.resources.sign_in_label
 import imp.composeapp.generated.resources.welcome_to_format
@@ -134,20 +135,33 @@ fun LoginFormTitle(modifier: Modifier = Modifier) {
     val appName = stringResource(Res.string.app_name)
     val title = stringResource(Res.string.welcome_to_format, appName)
 
-    Text(
+    Column(
         modifier = modifier,
-        text = buildAnnotatedString {
-            append(title)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = buildAnnotatedString {
+                append(title)
 
-            addStyle(
-                style = SpanStyle(color = MaterialTheme.colorScheme.primary),
-                start = title.indexOf(appName),
-                end = title.indexOf(appName) + appName.length
-            )
-        },
-        style = MaterialTheme.typography.headlineLarge,
-        textAlign = TextAlign.Center
-    )
+                addStyle(
+                    style = SpanStyle(color = MaterialTheme.colorScheme.primary),
+                    start = title.indexOf(appName),
+                    end = title.indexOf(appName) + appName.length
+                )
+            },
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(Res.string.login_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Composable

@@ -142,8 +142,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onManageProjectClick = { navController.navigate(ManageProjectRoute(it.id)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
-                        onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
-                        onShowReportRequest = onShowReportRequest
+                        onCreateTeamClick = { navController.navigate(CreateTeamRoute) }
                     )
                 }
 
@@ -159,7 +158,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                     DashboardScreen(
                         project = route.project,
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onShowReportRequest = onShowReportRequest
                     )
                 }
 

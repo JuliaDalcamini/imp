@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,7 +47,6 @@ import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectFilter
-import com.julia.imp.report.ProjectReportGenerator
 import com.julia.imp.team.switcher.TeamSwitcher
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
@@ -56,12 +54,10 @@ import imp.composeapp.generated.resources.action_error_title
 import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.check_circle_20px
 import imp.composeapp.generated.resources.created_by_format
-import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.filter_active
 import imp.composeapp.generated.resources.filter_all
 import imp.composeapp.generated.resources.filter_finished
 import imp.composeapp.generated.resources.finished_label
-import imp.composeapp.generated.resources.generate_report_label
 import imp.composeapp.generated.resources.manage_label
 import imp.composeapp.generated.resources.more_vert_24px
 import imp.composeapp.generated.resources.new_project_label
@@ -85,7 +81,6 @@ fun ProjectsScreen(
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
-    onShowReportRequest: (List<ImageBitmap>) -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
     LaunchedEffect(SessionManager.activeSession) {
@@ -128,7 +123,6 @@ fun ProjectsScreen(
                 onProjectClick = onProjectClick,
                 onViewProjectStatsClick = onViewProjectStatsClick,
                 onManageProjectClick = onManageProjectClick,
-                onGenerateProjectClick = { viewModel.generateReport(it) },
                 selectedFilter = viewModel.uiState.filter,
                 onFilterChange = { viewModel.setFilter(it) },
                 showManageOption = viewModel.uiState.showManageOption,
@@ -171,13 +165,6 @@ fun ProjectsScreen(
         }
     }
 
-    viewModel.uiState.projectToGenerateReport?.let { project ->
-        ProjectReportGenerator { pages ->
-            onShowReportRequest(pages)
-            viewModel.onReportOpened()
-        }
-    }
-
     if (viewModel.uiState.actionError) {
         ErrorDialog(
             title = stringResource(Res.string.action_error_title),
@@ -194,7 +181,6 @@ fun ProjectList(
     onProjectClick: (Project) -> Unit,
     onViewProjectStatsClick: (Project) -> Unit,
     onManageProjectClick: (Project) -> Unit,
-    onGenerateProjectClick: (Project) -> Unit,
     selectedFilter: ProjectFilter,
     onFilterChange: (ProjectFilter) -> Unit,
     showManageOption: Boolean,
@@ -219,14 +205,13 @@ fun ProjectList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp)
+                        .padding(top = 8.dp)
                         .animateItem(),
                     project = project,
                     showManageOption = showManageOption,
                     onClick = { onProjectClick(project) },
                     onViewStatsClick = { onViewProjectStatsClick(project) },
-                    onManageProjectClick = { onManageProjectClick(project) },
-                    onGenerateReportClick = { onGenerateProjectClick(project) }
+                    onManageProjectClick = { onManageProjectClick(project) }
                 )
             }
         }
@@ -286,7 +271,6 @@ private fun ProjectListItem(
     onClick: () -> Unit,
     onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
-    onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -355,8 +339,7 @@ private fun ProjectListItem(
                     onDismissRequest = { expandOptions = false },
                     showManageOption = showManageOption && !project.finished,
                     onViewStatsClick = onViewStatsClick,
-                    onManageProjectClick = onManageProjectClick,
-                    onGenerateReportClick = onGenerateReportClick
+                    onManageProjectClick = onManageProjectClick
                 )
             }
         }
@@ -370,7 +353,6 @@ private fun ProjectOptionsDropdown(
     showManageOption: Boolean,
     onViewStatsClick: () -> Unit,
     onManageProjectClick: () -> Unit,
-    onGenerateReportClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
@@ -383,15 +365,6 @@ private fun ProjectOptionsDropdown(
             leadingIcon = { Icon(vectorResource(Res.drawable.query_stats_24px), null) },
             onClick = {
                 onViewStatsClick()
-                onDismissRequest()
-            }
-        )
-
-        DropdownMenuItem(
-            text = { Text(stringResource(Res.string.generate_report_label)) },
-            leadingIcon = { Icon(vectorResource(Res.drawable.description_24px), null) },
-            onClick = {
-                onGenerateReportClick()
                 onDismissRequest()
             }
         )

@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -37,13 +39,14 @@ import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.ui.padding.plus
 import com.julia.imp.common.ui.topbar.TopBar
 import com.julia.imp.project.Project
-import com.julia.imp.project.dashboard.data.ArtifactTypeDefectSummary
+import com.julia.imp.project.dashboard.data.ArtifactTypeSummary
 import com.julia.imp.project.dashboard.data.CostOverview
 import com.julia.imp.project.dashboard.data.DashboardData
 import com.julia.imp.project.dashboard.data.DefectTypeSummary
 import com.julia.imp.project.dashboard.data.EffortOverview
-import com.julia.imp.project.dashboard.data.InspectorProgress
+import com.julia.imp.project.dashboard.data.InspectorSummary
 import com.julia.imp.project.dashboard.data.Progress
+import com.julia.imp.project.report.ProjectReportGenerator
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.average_by_inspected_artifact_label
 import imp.composeapp.generated.resources.average_by_inspection_label
@@ -55,9 +58,11 @@ import imp.composeapp.generated.resources.count_with_percentage_format
 import imp.composeapp.generated.resources.dashboard_error_message
 import imp.composeapp.generated.resources.defect_types_title
 import imp.composeapp.generated.resources.defects_by_artifact_type_title
+import imp.composeapp.generated.resources.description_24px
 import imp.composeapp.generated.resources.effort_title
 import imp.composeapp.generated.resources.fixed_defects_label
-import imp.composeapp.generated.resources.fully_inspected_artifacts
+import imp.composeapp.generated.resources.fully_inspected_artifacts_label
+import imp.composeapp.generated.resources.generate_report_label
 import imp.composeapp.generated.resources.high_severity_label
 import imp.composeapp.generated.resources.low_severity_label
 import imp.composeapp.generated.resources.medium_severity_label
@@ -79,6 +84,7 @@ import kotlin.time.Duration.Companion.seconds
 fun DashboardScreen(
     project: Project,
     onBackClick: () -> Unit,
+    onShowReportRequest: (List<ImageBitmap>) -> Unit,
     viewModel: DashboardViewModel = viewModel { DashboardViewModel() }
 ) {
     LaunchedEffect(project) {
@@ -90,7 +96,15 @@ fun DashboardScreen(
             TopBar(
                 title = stringResource(Res.string.project_stats_title),
                 subtitle = project.name,
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                actions = {
+                    IconButton(onClick = { viewModel.generateReport() }) {
+                        Icon(
+                            imageVector = vectorResource(Res.drawable.description_24px),
+                            contentDescription = stringResource(Res.string.generate_report_label)
+                        )
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -127,6 +141,18 @@ fun DashboardScreen(
                     text = stringResource(Res.string.dashboard_error_message),
                     onRetryClick = { viewModel.getDashboardData(project.id) }
                 )
+            }
+        }
+    }
+
+    if (viewModel.uiState.generateReport) {
+        viewModel.uiState.data?.let { data ->
+            ProjectReportGenerator(
+                data = data,
+                project = project
+            ) { pages ->
+                onShowReportRequest(pages)
+                viewModel.onReportOpened()
             }
         }
     }
@@ -181,7 +207,7 @@ fun DashboardContents(
             item("inspectors") {
                 InspectorProgressCard(
                     modifier = Modifier.fillMaxWidth(),
-                    data = data.inspectorsProgress
+                    data = data.inspectors
                 )
             }
 
@@ -192,8 +218,8 @@ fun DashboardContents(
                 )
             }
 
-            item("artifactTypes") {
-                ArtifactTypesCard(
+            item("defectsByArtifactType") {
+                DefectsByArtifactTypeCard(
                     modifier = Modifier.fillMaxWidth(),
                     data = data.artifactTypes
                 )
@@ -215,7 +241,7 @@ fun ProjectProgressCard(
     ) {
         LabeledProgress(
             modifier = Modifier.fillMaxWidth(),
-            label = stringResource(Res.string.fully_inspected_artifacts),
+            label = stringResource(Res.string.fully_inspected_artifacts_label),
             progress = inspectionProgress
         )
 
@@ -331,23 +357,23 @@ fun CostOverviewCard(
 
 @Composable
 fun InspectorProgressCard(
-    data: List<InspectorProgress>,
+    data: List<InspectorSummary>,
     modifier: Modifier = Modifier
 ) {
     DashboardCard(
         modifier = modifier,
         title = stringResource(Res.string.progress_by_inspector_title)
     ) {
-        data.forEach { progress ->
-            val percentage = (progress.percentage * 100).toInt()
+        data.forEach { summary ->
+            val percentage = (summary.progress.percentage * 100).toInt()
 
             InfoRow(
                 modifier = Modifier.fillMaxWidth(),
-                label = progress.inspector.fullName,
+                label = summary.inspector.fullName,
                 text = stringResource(
                     Res.string.count_with_percentage_format,
-                    progress.count,
-                    progress.total,
+                    summary.progress.count,
+                    summary.progress.total,
                     percentage
                 )
             )
@@ -412,8 +438,8 @@ fun DefectTypesCard(
 }
 
 @Composable
-fun ArtifactTypesCard(
-    data: List<ArtifactTypeDefectSummary>,
+fun DefectsByArtifactTypeCard(
+    data: List<ArtifactTypeSummary>,
     modifier: Modifier = Modifier
 ) {
     DashboardCard(
@@ -426,7 +452,8 @@ fun ArtifactTypesCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                val percentage = (summary.percentage * 100).toInt()
+                val defects = summary.defects
+                val percentage = (defects.percentage * 100).toInt()
 
                 InfoRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -440,25 +467,25 @@ fun ArtifactTypesCard(
                 InfoRow(
                     modifier = Modifier.fillMaxWidth(),
                     label = stringResource(Res.string.total_label),
-                    text = summary.total.run { "$count (${cost.formatAsCurrency()})" }
+                    text = defects.total.run { "$count (${cost.formatAsCurrency()})" }
                 )
 
                 InfoRow(
                     modifier = Modifier.fillMaxWidth(),
                     label = stringResource(Res.string.low_severity_label),
-                    text = summary.lowSeverity.run { "$count (${cost.formatAsCurrency()})" }
+                    text = defects.lowSeverity.run { "$count (${cost.formatAsCurrency()})" }
                 )
 
                 InfoRow(
                     modifier = Modifier.fillMaxWidth(),
                     label = stringResource(Res.string.medium_severity_label),
-                    text = summary.mediumSeverity.run { "$count (${cost.formatAsCurrency()})" }
+                    text = defects.mediumSeverity.run { "$count (${cost.formatAsCurrency()})" }
                 )
 
                 InfoRow(
                     modifier = Modifier.fillMaxWidth(),
                     label = stringResource(Res.string.high_severity_label),
-                    text = summary.highSeverity.run { "$count (${cost.formatAsCurrency()})" }
+                    text = defects.highSeverity.run { "$count (${cost.formatAsCurrency()})" }
                 )
             }
         }

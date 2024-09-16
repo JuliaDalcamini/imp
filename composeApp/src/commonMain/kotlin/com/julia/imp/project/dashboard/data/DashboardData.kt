@@ -8,7 +8,7 @@ data class DashboardData(
     val defectsProgress: Progress,
     val effortOverview: EffortOverview,
     val costOverview: CostOverview,
-    val inspectorsProgress: List<InspectorProgress>,
-    val artifactTypes: List<ArtifactTypeDefectSummary>,
+    val inspectors: List<InspectorSummary>,
+    val artifactTypes: List<ArtifactTypeSummary>,
     val defectTypes: List<DefectTypeSummary>
 )

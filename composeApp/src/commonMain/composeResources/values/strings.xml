@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Imp</string>
     <string name="welcome_to_format">Bem-vindo ao %1$s</string>
+    <string name="login_subtitle">Inspection Management Platform</string>
     <string name="login_error_title">Erro no login</string>
     <string name="login_error_message">Ocorreu um erro ao entrar na sua conta. Por favor, tente novamente.</string>
     <string name="ok_label">Ok</string>
@@ -159,9 +160,10 @@
     <string name="project_stats_title">Dashboard do projeto</string>
     <string name="dashboard_error_message">Ocorreu um erro ao carregar os dados do projeto. Por favor, tente novamente.</string>
     <string name="overall_progress_title">Progresso geral</string>
-    <string name="fully_inspected_artifacts">Artefatos totalmente inspecionados</string>
+    <string name="fully_inspected_artifacts_label">Artefatos totalmente inspecionados</string>
     <string name="count_format">%1$d/%2$d</string>
     <string name="count_with_percentage_format">%1$d/%2$d (%3$d%)</string>
+    <string name="quantity_with_percentage_format">%1$d (%2$d%)</string>
     <string name="percentage_format">%1$d%</string>
     <string name="effort_title">Esforço</string>
     <string name="total_label">Total</string>
@@ -212,4 +214,24 @@
     <string name="confirm_update_artifact_title">Atualizar artefato</string>
     <string name="confirm_update_artifact_message">Tem certeza de que deseja atualizar o artefato? Talvez seja necessário repriorizá-lo.</string>
     <string name="version_change_needed_message">A versão deve ser alterada</string>
+    <string name="publish_date_label">Data da publicação</string>
+    <string name="owner_label">Responsável</string>
+    <string name="min_inspectors_number_label">Nº min. de inspetores</string>
+    <string name="total_of_artifacts_label">Total de artefatos</string>
+    <string name="inspected_artifacts_label">Artefatos inspecionados</string>
+    <string name="inspected_percentage_label">Percentual inspecionado</string>
+    <string name="average_cost_per_artifact">Custo médio por artefato</string>
+    <string name="average_cost_per_inspection">Custo médio por inspeção</string>
+    <string name="total_effort_label">Esforço total</string>
+    <string name="average_effort_per_artifact">Esforço médio por artefato</string>
+    <string name="average_effort_per_inspection">Esforço médio por inspeção</string>
+    <string name="project_report_title">Relatório do projeto</string>
+    <string name="overview_title">Visão geral</string>
+    <string name="defect_type_label">Tipo de defeito</string>
+    <string name="number_of_defects_label">Qtde. defeitos</string>
+    <string name="assigned_inspections_label">Inspeções atribuídas</string>
+    <string name="inspections_made_label">Inspeções realizadas</string>
+    <string name="artifact_types_title">Tipos de artefato</string>
+    <string name="defects_by_severity_label">Defeitos por severidade</string>
+    <string name="no_data_available">Nenhum dado disponível.</string>
 </resources>

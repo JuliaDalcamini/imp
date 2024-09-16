@@ -11,6 +11,5 @@ data class ProjectsUiState(
     val showCreateButton: Boolean = false,
     val showManageOption: Boolean = false,
     val projectToRename: Project? = null,
-    val projectToGenerateReport: Project? = null,
     val actionError: Boolean = false
 )
