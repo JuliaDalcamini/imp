@@ -38,6 +38,7 @@ fun ProjectReportGenerator(
 ) {
     ReportGenerator(
         { OverviewPage(modifier = Modifier.fillMaxSize(), data = data, project = project) },
+        { InspectorsPage(modifier = Modifier.fillMaxSize(), data = data.inspectors) },
         { DefectTypesPage(modifier = Modifier.fillMaxSize(), data = data) },
         { ArtifactTypesPage(modifier = Modifier.fillMaxSize(), data = data.artifactTypes) },
         { ArtifactTypeDefectsPage(modifier = Modifier.fillMaxSize(), data = data.artifactTypes) },

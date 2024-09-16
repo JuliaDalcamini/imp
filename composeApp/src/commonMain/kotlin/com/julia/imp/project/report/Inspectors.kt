@@ -19,20 +19,22 @@ import com.julia.imp.common.report.Table
 import com.julia.imp.common.report.TableCell
 import com.julia.imp.common.report.TableHeader
 import com.julia.imp.common.report.TableRow
-import com.julia.imp.common.text.formatAsCurrency
-import com.julia.imp.project.dashboard.data.ArtifactTypeSummary
+import com.julia.imp.project.dashboard.data.InspectorSummary
 import imp.composeapp.generated.resources.Res
-import imp.composeapp.generated.resources.artifact_type_label
-import imp.composeapp.generated.resources.artifact_types_title
-import imp.composeapp.generated.resources.total_cost_label
+import imp.composeapp.generated.resources.assigned_inspections_label
+import imp.composeapp.generated.resources.inspections_made_label
+import imp.composeapp.generated.resources.inspector_label
+import imp.composeapp.generated.resources.inspectors_overview_title
+import imp.composeapp.generated.resources.no_data_available
+import imp.composeapp.generated.resources.quantity_with_percentage_format
 import imp.composeapp.generated.resources.total_effort_label
 import imp.composeapp.generated.resources.total_label
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun ArtifactTypesPage(
-    data: List<ArtifactTypeSummary>,
+fun InspectorsPage(
+    data: List<InspectorSummary>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -43,29 +45,39 @@ fun ArtifactTypesPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
-            pageName = stringResource(Res.string.artifact_types_title)
+            pageName = stringResource(Res.string.inspectors_overview_title)
         )
 
-        ArtifactTypesOverviewTable(
-            modifier = Modifier.fillMaxWidth(),
-            data = data
-        )
+        if (data.isNotEmpty()) {
+            InspectorsTable(
+                modifier = Modifier.fillMaxWidth(),
+                data = data
+            )
 
-        ArtifactTypesCharts(
-            modifier = Modifier.fillMaxWidth(),
-            data = data
-        )
+            InspectorsCharts(
+                modifier = Modifier.fillMaxWidth(),
+                data = data
+            )
+        } else {
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(Res.string.no_data_available),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
 @Composable
-private fun ArtifactTypesOverviewTable(
-    data: List<ArtifactTypeSummary>,
+private fun InspectorsTable(
+    data: List<InspectorSummary>,
     modifier: Modifier = Modifier
 ) {
     Table(modifier) {
         TableRow {
-            TableHeader(stringResource(Res.string.artifact_type_label))
+            TableHeader(stringResource(Res.string.inspector_label))
 
             TableHeader(
                 modifier = Modifier.weight(.5f),
@@ -74,13 +86,20 @@ private fun ArtifactTypesOverviewTable(
 
             TableHeader(
                 modifier = Modifier.weight(.5f),
-                text = stringResource(Res.string.total_cost_label)
+                text = stringResource(Res.string.assigned_inspections_label)
+            )
+
+            TableHeader(
+                modifier = Modifier.weight(.5f),
+                text = stringResource(Res.string.inspections_made_label)
             )
         }
 
         data.forEach { summary ->
+            val percentage = (summary.progress.percentage * 100).toInt()
+
             TableRow {
-                TableCell(summary.artifactType.name)
+                TableCell(summary.inspector.fullName)
 
                 TableCell(
                     modifier = Modifier.weight(.5f),
@@ -91,7 +110,17 @@ private fun ArtifactTypesOverviewTable(
                 TableCell(
                     modifier = Modifier.weight(.5f),
                     textAlign = TextAlign.End,
-                    text = summary.totalCost.formatAsCurrency()
+                    text = summary.progress.total.toString()
+                )
+
+                TableCell(
+                    modifier = Modifier.weight(.5f),
+                    textAlign = TextAlign.End,
+                    text = stringResource(
+                        Res.string.quantity_with_percentage_format,
+                        summary.progress.count,
+                        percentage
+                    )
                 )
             }
         }
@@ -116,7 +145,20 @@ private fun ArtifactTypesOverviewTable(
             TableCell(
                 modifier = Modifier.weight(.5f),
                 textAlign = TextAlign.End,
-                text = data.sumOf { it.totalCost }.formatAsCurrency(),
+                text = data.sumOf { it.progress.total }.toString(),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+
+            TableCell(
+                modifier = Modifier.weight(.5f),
+                textAlign = TextAlign.End,
+                text = stringResource(
+                    Res.string.quantity_with_percentage_format,
+                    data.sumOf { it.progress.count }.toString(),
+                    (data.sumOf { it.progress.percentage } * 100).toInt()
+                ),
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold
                 )
@@ -126,8 +168,8 @@ private fun ArtifactTypesOverviewTable(
 }
 
 @Composable
-private fun ArtifactTypesCharts(
-    data: List<ArtifactTypeSummary>,
+private fun InspectorsCharts(
+    data: List<InspectorSummary>,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -147,26 +189,44 @@ private fun ArtifactTypesCharts(
                 label = { index ->
                     val summary = effortData[index]
 
-                    Text(summary.artifactType.name)
+                    Text(summary.inspector.fullName)
                     Text(summary.totalEffort.inWholeSeconds.seconds.toString())
                 }
             )
         }
 
-        val costData = data.filter { it.totalCost > 0 }
-        val totalCost = costData.sumOf { it.totalCost }
-        val costPercentages = costData.map { (it.totalCost / totalCost).toFloat() }
+        val assignedData = data.filter { it.progress.total > 0 }
+        val totalAssigned = assignedData.sumOf { it.progress.total }
+        val assignedPercentages = assignedData.map { (it.progress.total / totalAssigned).toFloat() }
 
-        if (totalCost > 0) {
+        if (totalAssigned > 0) {
             LabeledPieChart(
                 modifier = Modifier.weight(1f),
-                title = stringResource(Res.string.total_cost_label),
-                values = costPercentages,
+                title = stringResource(Res.string.assigned_inspections_label),
+                values = assignedPercentages,
                 label = { index ->
-                    val summary = costData[index]
+                    val summary = assignedData[index]
 
-                    Text(summary.artifactType.name)
-                    Text(summary.totalCost.formatAsCurrency())
+                    Text(summary.inspector.fullName)
+                    Text(summary.progress.total.toString())
+                }
+            )
+        }
+
+        val doneData = data.filter { it.progress.count > 0 }
+        val totalDone = doneData.sumOf { it.progress.count }
+        val donePercentages = doneData.map { (it.progress.count / totalDone).toFloat() }
+
+        if (totalDone > 0) {
+            LabeledPieChart(
+                modifier = Modifier.weight(1f),
+                title = stringResource(Res.string.inspections_made_label),
+                values = donePercentages,
+                label = { index ->
+                    val summary = doneData[index]
+
+                    Text(summary.inspector.fullName)
+                    Text(summary.progress.count.toString())
                 }
             )
         }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +21,7 @@ import com.julia.imp.common.report.TableHeader
 import com.julia.imp.common.report.TableRow
 import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.project.dashboard.data.DashboardData
+import com.julia.imp.project.dashboard.data.DefectTypeSummary
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.average_cost_label
 import imp.composeapp.generated.resources.average_effort_label
@@ -59,8 +59,8 @@ fun DefectTypesPage(
             )
 
             DefectTypesCharts(
-                modifier = Modifier.fillMaxWidth().height(180.dp),
-                data = data
+                modifier = Modifier.fillMaxWidth(),
+                data = data.defectTypes
             )
         } else {
             Text(
@@ -169,7 +169,7 @@ private fun DefectTypesTable(
 
 @Composable
 private fun DefectTypesCharts(
-    data: DashboardData,
+    data: List<DefectTypeSummary>,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -177,49 +177,58 @@ private fun DefectTypesCharts(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val totalDefects = data.defectTypes.sumOf { it.count }
-        val defectPercentages = data.defectTypes.map { (it.count.toFloat() / totalDefects) }
+        val defectsData = data.filter { it.count > 0 }
+        val totalDefects = defectsData.sumOf { it.count }
+        val defectPercentages = defectsData.map { (it.count.toFloat() / totalDefects) }
 
-        LabeledPieChart(
-            modifier = Modifier.weight(1f),
-            title = stringResource(Res.string.number_of_defects_label),
-            values = defectPercentages,
-            label = { index ->
-                val summary = data.defectTypes[index]
+        if (totalDefects > 0) {
+            LabeledPieChart(
+                modifier = Modifier.weight(1f),
+                title = stringResource(Res.string.number_of_defects_label),
+                values = defectPercentages,
+                label = { index ->
+                    val summary = defectsData[index]
 
-                Text(summary.defectType.name)
-                Text(summary.count.toString())
-            }
-        )
+                    Text(summary.defectType.name)
+                    Text(summary.count.toString())
+                }
+            )
+        }
 
-        val totalEffort = data.defectTypes.sumOfDuration { it.averageEffort }
-        val effortPercentages = data.defectTypes.map { (it.averageEffort / totalEffort).toFloat() }
+        val effortData = data.filter { it.averageEffort.isPositive() }
+        val totalEffort = effortData.sumOfDuration { it.averageEffort }
+        val effortPercentages = effortData.map { (it.averageEffort / totalEffort).toFloat() }
 
-        LabeledPieChart(
-            modifier = Modifier.weight(1f),
-            title = stringResource(Res.string.average_effort_label),
-            values = effortPercentages,
-            label = { index ->
-                val summary = data.defectTypes[index]
+        if (totalEffort.isPositive()) {
+            LabeledPieChart(
+                modifier = Modifier.weight(1f),
+                title = stringResource(Res.string.average_effort_label),
+                values = effortPercentages,
+                label = { index ->
+                    val summary = effortData[index]
 
-                Text(summary.defectType.name)
-                Text(summary.averageEffort.inWholeSeconds.seconds.toString())
-            }
-        )
+                    Text(summary.defectType.name)
+                    Text(summary.averageEffort.inWholeSeconds.seconds.toString())
+                }
+            )
+        }
 
-        val totalCost = data.defectTypes.sumOf { it.averageCost }
-        val costPercentages = data.defectTypes.map { (it.averageCost / totalCost).toFloat() }
+        val costData = data.filter { it.averageCost > 0 }
+        val totalCost = costData.sumOf { it.averageCost }
+        val costPercentages = costData.map { (it.averageCost / totalCost).toFloat() }
 
-        LabeledPieChart(
-            modifier = Modifier.weight(1f),
-            title = stringResource(Res.string.average_cost_label),
-            values = costPercentages,
-            label = { index ->
-                val summary = data.defectTypes[index]
+        if (totalCost > 0) {
+            LabeledPieChart(
+                modifier = Modifier.weight(1f),
+                title = stringResource(Res.string.average_cost_label),
+                values = costPercentages,
+                label = { index ->
+                    val summary = costData[index]
 
-                Text(summary.defectType.name)
-                Text(summary.averageCost.formatAsCurrency())
-            }
-        )
+                    Text(summary.defectType.name)
+                    Text(summary.averageCost.formatAsCurrency())
+                }
+            )
+        }
     }
 }

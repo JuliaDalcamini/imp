@@ -234,4 +234,5 @@
     <string name="artifact_types_title">Tipos de artefato</string>
     <string name="defects_by_severity_label">Defeitos por severidade</string>
     <string name="no_data_available">Nenhum dado disponível.</string>
+    <string name="inspectors_overview_title">Visão geral dos inspetores</string>
 </resources>

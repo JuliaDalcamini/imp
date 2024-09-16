@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -66,7 +65,7 @@ fun ArtifactTypeDefectsPage(
 
         if (data.any { it.defects.total.count > 0 }) {
             ArtifactTypeDefectsCharts(
-                modifier = Modifier.fillMaxWidth().height(180.dp),
+                modifier = Modifier.fillMaxWidth(),
                 data = data
             )
         }
@@ -208,10 +207,11 @@ private fun ArtifactTypeDefectsCharts(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val highSeverityTotal = data.sumOf { it.defects.highSeverity.count }
+        val highSeverityData = data.filter { it.defects.highSeverity.count > 0 }
+        val highSeverityTotal = highSeverityData.sumOf { it.defects.highSeverity.count }
 
         if (highSeverityTotal > 0) {
-            val highSeverityPercentages = data.map {
+            val highSeverityPercentages = highSeverityData.map {
                 it.defects.highSeverity.count.toFloat() / highSeverityTotal
             }
 
@@ -220,7 +220,7 @@ private fun ArtifactTypeDefectsCharts(
                 title = stringResource(Res.string.high_severity_label),
                 values = highSeverityPercentages,
                 label = { index ->
-                    val summary = data[index]
+                    val summary = highSeverityData[index]
 
                     Text(summary.artifactType.name)
                     Text(summary.defects.highSeverity.count.toString())
@@ -228,10 +228,11 @@ private fun ArtifactTypeDefectsCharts(
             )
         }
 
-        val mediumSeverityTotal = data.sumOf { it.defects.mediumSeverity.count }
+        val mediumSeverityData = data.filter { it.defects.mediumSeverity.count > 0 }
+        val mediumSeverityTotal = mediumSeverityData.sumOf { it.defects.mediumSeverity.count }
 
         if (mediumSeverityTotal > 0) {
-            val mediumSeverityPercentages = data.map {
+            val mediumSeverityPercentages = mediumSeverityData.map {
                 it.defects.mediumSeverity.count.toFloat() / mediumSeverityTotal
             }
 
@@ -240,7 +241,7 @@ private fun ArtifactTypeDefectsCharts(
                 title = stringResource(Res.string.medium_severity_label),
                 values = mediumSeverityPercentages,
                 label = { index ->
-                    val summary = data[index]
+                    val summary = mediumSeverityData[index]
 
                     Text(summary.artifactType.name)
                     Text(summary.defects.mediumSeverity.count.toString())
@@ -248,10 +249,11 @@ private fun ArtifactTypeDefectsCharts(
             )
         }
 
-        val lowSeverityTotal = data.sumOf { it.defects.lowSeverity.count }
+        val lowSeverityData = data.filter { it.defects.lowSeverity.count > 0 }
+        val lowSeverityTotal = lowSeverityData.sumOf { it.defects.lowSeverity.count }
 
         if (lowSeverityTotal > 0) {
-            val lowSeverityPercentages = data.map {
+            val lowSeverityPercentages = lowSeverityData.map {
                 it.defects.lowSeverity.count.toFloat() / lowSeverityTotal
             }
 
@@ -260,7 +262,7 @@ private fun ArtifactTypeDefectsCharts(
                 title = stringResource(Res.string.low_severity_label),
                 values = lowSeverityPercentages,
                 label = { index ->
-                    val summary = data[index]
+                    val summary = lowSeverityData[index]
 
                     Text(summary.artifactType.name)
                     Text(summary.defects.lowSeverity.count.toString())
