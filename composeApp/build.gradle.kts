@@ -124,7 +124,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Imp"
-            packageVersion = "1.0.1"
+            packageVersion = "1.0.2"
             jvmArgs("-Dapple.awt.application.appearance=system")
 
             macOS {
@@ -134,6 +134,8 @@ compose.desktop {
             windows {
                 iconFile.set(rootProject.file("icons/icon.ico"))
                 shortcut = true
+                menu = true
+                menuGroup = "Imp"
             }
 
             linux {
