@@ -87,8 +87,8 @@ android {
         applicationId = "com.julia.imp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
+        versionName = libs.versions.imp.get()
         versionCode = 1
-        versionName = "1.0"
     }
 
     packaging {
@@ -124,7 +124,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Imp"
-            packageVersion = "1.0.3"
+            packageVersion = libs.versions.imp.get()
             jvmArgs("-Dapple.awt.application.appearance=system")
 
             macOS {
