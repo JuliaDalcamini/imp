@@ -133,6 +133,7 @@ compose.desktop {
 
             windows {
                 iconFile.set(rootProject.file("icons/icon.ico"))
+                shortcut = true
             }
 
             linux {
