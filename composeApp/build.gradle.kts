@@ -123,9 +123,21 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.julia.imp"
+            packageName = "Imp"
             packageVersion = "1.0.0"
             jvmArgs("-Dapple.awt.application.appearance=system")
+
+            macOS {
+                iconFile.set(rootProject.file("icons/icon.icns"))
+            }
+
+            windows {
+                iconFile.set(rootProject.file("icons/icon.ico"))
+            }
+
+            linux {
+                iconFile.set(rootProject.file("icons/icon.png"))
+            }
         }
     }
 }
