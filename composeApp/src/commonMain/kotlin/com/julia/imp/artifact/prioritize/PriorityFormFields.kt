@@ -19,6 +19,7 @@ import imp.composeapp.generated.resources.impact_label
 import imp.composeapp.generated.resources.priority_label
 import imp.composeapp.generated.resources.user_value_label
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @Composable
 fun PriorityFormFields(
@@ -112,9 +113,9 @@ private fun PrioritySliderFormField(
         modifier = modifier,
         label = label,
         value = value.toFloat(),
-        onValueChange = { onValueChange(it.toInt()) },
+        onValueChange = { onValueChange(it.roundToInt()) },
         enabled = enabled,
-        steps = 4,
+        steps = 3,
         valueRange = 1f..5f,
         valueText = value.toString()
     )
