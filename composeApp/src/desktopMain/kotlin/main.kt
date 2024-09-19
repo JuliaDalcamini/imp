@@ -4,9 +4,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.julia.imp.App
 import com.julia.imp.common.pdf.getPdfWriter
+import imp.composeapp.generated.resources.Res
+import imp.composeapp.generated.resources.icon_108px
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
 import java.awt.Desktop
 import java.nio.file.Files
 import kotlin.io.path.pathString
@@ -17,6 +20,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Imp",
+        icon = painterResource(Res.drawable.icon_108px)
     ) {
         App(
             onShowReportRequest = { coroutineScope.launch { shareReport(it) }}
