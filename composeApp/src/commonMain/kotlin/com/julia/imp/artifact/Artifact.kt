@@ -19,5 +19,6 @@ data class Artifact(
     val lastModification: Instant,
     val currentVersion: String,
     val totalCost: Double,
-    val fullyInspected: Boolean
+    val fullyInspected: Boolean,
+    val inspectedByUser: Boolean
 )

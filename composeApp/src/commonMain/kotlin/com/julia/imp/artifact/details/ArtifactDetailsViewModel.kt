@@ -38,9 +38,10 @@ class ArtifactDetailsViewModel(
 
     private fun updateInspectButtonState() {
         uiState = uiState.copy(
-            canInspect = uiState.artifact?.archived == false
-                    && isUserInInspectorList()
-                    && !project.finished
+            canInspect = uiState.artifact?.archived == false &&
+                    isUserInInspectorList() &&
+                    !project.finished &&
+                    uiState.artifact?.priority != null
         )
     }
 

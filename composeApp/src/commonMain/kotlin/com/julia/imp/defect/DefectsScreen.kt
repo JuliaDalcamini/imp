@@ -42,8 +42,8 @@ import com.julia.imp.common.ui.topbar.TopBar
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
+import imp.composeapp.generated.resources.check_20px
 import imp.composeapp.generated.resources.check_24px
-import imp.composeapp.generated.resources.check_circle_20px
 import imp.composeapp.generated.resources.defects_title
 import imp.composeapp.generated.resources.description_format
 import imp.composeapp.generated.resources.filter_all
@@ -270,10 +270,10 @@ private fun DefectListItem(
 
                         if (defect.fixed) {
                             Icon(
-                                modifier = Modifier.size(16.dp),
-                                imageVector = vectorResource(Res.drawable.check_circle_20px),
+                                modifier = Modifier.size(20.dp),
+                                imageVector = vectorResource(Res.drawable.check_20px),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }

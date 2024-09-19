@@ -67,7 +67,9 @@ import imp.composeapp.generated.resources.archived_label
 import imp.composeapp.generated.resources.artifacts_error_message
 import imp.composeapp.generated.resources.artifacts_title
 import imp.composeapp.generated.resources.bug_report_24px
+import imp.composeapp.generated.resources.check_20px
 import imp.composeapp.generated.resources.defects_label
+import imp.composeapp.generated.resources.done_all_20px
 import imp.composeapp.generated.resources.edit_24px
 import imp.composeapp.generated.resources.edit_label
 import imp.composeapp.generated.resources.filter_all
@@ -339,15 +341,29 @@ private fun ArtifactListItem(
                             overflow = TextOverflow.Ellipsis
                         )
 
-                        if (artifact.archived) {
-                            Icon(
+                        when {
+                            artifact.archived -> Icon(
                                 modifier = Modifier.size(16.dp),
                                 imageVector = vectorResource(Res.drawable.inventory_2_20px),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
-                        } else if (artifact.inspectors.isNotEmpty()) {
-                            Row(
+
+                            artifact.fullyInspected -> Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = vectorResource(Res.drawable.done_all_20px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+
+                            artifact.inspectedByUser -> Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = vectorResource(Res.drawable.check_20px),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+
+                            artifact.inspectors.isNotEmpty() -> Row(
                                 modifier = Modifier.offset(x = (-2).dp),
                                 horizontalArrangement = Arrangement.spacedBy((-8).dp)
                             ) {
