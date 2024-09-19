@@ -81,6 +81,7 @@ fun ProjectsScreen(
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     viewModel: ProjectsViewModel = viewModel { ProjectsViewModel() }
 ) {
     LaunchedEffect(SessionManager.activeSession) {
@@ -95,7 +96,8 @@ fun ProjectsScreen(
                     TeamSwitcher(
                         onTeamSwitch = onTeamSwitch,
                         onManageTeamClick = onManageTeamClick,
-                        onCreateTeamClick = onCreateTeamClick
+                        onCreateTeamClick = onCreateTeamClick,
+                        onLogoutClick = onLogoutClick
                     )
                 }
             )

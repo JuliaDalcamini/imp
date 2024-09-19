@@ -38,6 +38,8 @@ import com.julia.imp.inspection.details.InspectionDetailsRoute
 import com.julia.imp.inspection.details.InspectionDetailsScreen
 import com.julia.imp.login.LoginRoute
 import com.julia.imp.login.LoginScreen
+import com.julia.imp.logout.LogoutRoute
+import com.julia.imp.logout.LogoutScreen
 import com.julia.imp.project.ProjectsRoute
 import com.julia.imp.project.create.CreateProjectRoute
 import com.julia.imp.project.create.CreateProjectScreen
@@ -109,6 +111,10 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                     )
                 }
 
+                composable<LogoutRoute> {
+                    LogoutScreen(onLogout = { SessionManager.activeSession = null })
+                }
+
                 composable<NoTeamsRoute> {
                     NoTeamsScreen(onCreateTeamClick = { navController.navigate(CreateTeamRoute) })
                 }
@@ -142,7 +148,8 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onManageProjectClick = { navController.navigate(ManageProjectRoute(it.id)) },
                         onTeamSwitch = { SessionManager.activeSession = it },
                         onManageTeamClick = { navController.navigate(ManageTeamRoute) },
-                        onCreateTeamClick = { navController.navigate(CreateTeamRoute) }
+                        onCreateTeamClick = { navController.navigate(CreateTeamRoute) },
+                        onLogoutClick = { navController.navigate(LogoutRoute) }
                     )
                 }
 

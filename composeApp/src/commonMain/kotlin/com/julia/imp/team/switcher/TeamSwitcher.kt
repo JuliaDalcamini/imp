@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.session.UserSession
@@ -42,6 +43,8 @@ import imp.composeapp.generated.resources.add_24px
 import imp.composeapp.generated.resources.create_team_label
 import imp.composeapp.generated.resources.current_team_label
 import imp.composeapp.generated.resources.load_teams_error
+import imp.composeapp.generated.resources.logout_24px
+import imp.composeapp.generated.resources.logout_label
 import imp.composeapp.generated.resources.settings_24px
 import imp.composeapp.generated.resources.switch_team_error
 import imp.composeapp.generated.resources.switch_team_title
@@ -55,6 +58,7 @@ fun TeamSwitcher(
     onTeamSwitch: (UserSession) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     viewModel: TeamSwitcherViewModel = viewModel { TeamSwitcherViewModel() }
 ) {
     val uiState = viewModel.uiState
@@ -116,6 +120,10 @@ fun TeamSwitcher(
                                 onCreateTeamClick = {
                                     onCreateTeamClick()
                                     viewModel.closeSwitcher()
+                                },
+                                onLogoutClick = {
+                                    onLogoutClick()
+                                    viewModel.closeSwitcher()
                                 }
                             )
                         }
@@ -158,6 +166,7 @@ private fun TeamSwitcherList(
     onTeamClick: (Team) -> Unit,
     onManageTeamClick: () -> Unit,
     onCreateTeamClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val otherTeams = teams.filterNot { it == currentTeam }
@@ -186,6 +195,30 @@ private fun TeamSwitcherList(
             HorizontalDivider(Modifier.fillMaxWidth().padding(bottom = 8.dp))
         }
 
+        item("create") {
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .animateItem()
+                    .clickable { onCreateTeamClick() },
+                headlineContent = { Text(stringResource(Res.string.create_team_label)) },
+                leadingContent = { ListItemIcon(vectorResource(Res.drawable.add_24px)) }
+            )
+        }
+
+        item("logout") {
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .animateItem()
+                    .clickable { onLogoutClick() },
+                headlineContent = { Text(stringResource(Res.string.logout_label)) },
+                leadingContent = { ListItemIcon(vectorResource(Res.drawable.logout_24px)) }
+            )
+        }
+
         items(otherTeams) { team ->
             ListItem(
                 modifier = Modifier
@@ -197,23 +230,14 @@ private fun TeamSwitcherList(
                 leadingContent = { Avatar(team.name.getInitials()) }
             )
         }
-
-        item("create") {
-            ListItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .animateItem()
-                    .clickable { onCreateTeamClick() },
-                headlineContent = { Text(stringResource(Res.string.create_team_label)) },
-                leadingContent = { CreateTeamIcon() }
-            )
-        }
     }
 }
 
 @Composable
-private fun CreateTeamIcon(modifier: Modifier = Modifier) {
+private fun ListItemIcon(
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
     Surface(
         modifier = modifier.size(AvatarSize.Medium.shapeSize),
         shape = CircleShape,
@@ -223,7 +247,7 @@ private fun CreateTeamIcon(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Icon(vectorResource(Res.drawable.add_24px), null)
+            Icon(icon, null)
         }
     }
 }

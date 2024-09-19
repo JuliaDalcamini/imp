@@ -235,4 +235,5 @@
     <string name="defects_by_severity_label">Defeitos por severidade</string>
     <string name="no_data_available">Nenhum dado disponível.</string>
     <string name="inspectors_overview_title">Visão geral dos inspetores</string>
+    <string name="logout_label">Sair da conta</string>
 </resources>
