@@ -42,7 +42,7 @@ class ArtifactsViewModel(
                     entries = artifacts.map { artifact ->
                         ArtifactListEntry(
                             artifact = artifact,
-                            showOptions = isAdmin && !artifact.archived && !project.finished
+                            showManagementOptions = isAdmin && !artifact.archived && !project.finished
                         )
                     },
                     empty = artifacts.isEmpty()

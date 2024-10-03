@@ -236,4 +236,5 @@
     <string name="no_data_available">Nenhum dado disponível.</string>
     <string name="inspectors_overview_title">Visão geral dos inspetores</string>
     <string name="logout_label">Sair da conta</string>
+    <string name="performance_score_label">Classificação de desempenho</string>
 </resources>

@@ -190,7 +190,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
                         onArtifactClick = { navController.navigate(ArtifactDetailsRoute.of(it)) },
                         onNewArtifactClick = { navController.navigate(CreateArtifactRoute(route.project)) },
                         onEditArtifactClick = { navController.navigate(EditArtifactRoute(it)) },
-                        onShowDefectsClick = { navController.navigate(DefectRoute(it)) },
+                        onShowDefectsClick = { navController.navigate(DefectRoute(it, route.project)) },
                         onPrioritizeArtifactClick = {
                             navController.navigate(
                                 PrioritizeArtifactRoute(
@@ -300,6 +300,7 @@ fun App(onShowReportRequest: (List<ImageBitmap>) -> Unit) {
 
                     DefectsScreen(
                         artifact = route.artifact,
+                        project = route.project,
                         onBackClick = { navController.popBackStack() }
                     )
                 }

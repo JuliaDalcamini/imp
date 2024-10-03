@@ -257,7 +257,7 @@ private fun ArtifactList(
                         .fillMaxWidth()
                         .animateItem(),
                     artifact = entry.artifact,
-                    showOptions = entry.showOptions,
+                    showManagementOptions = entry.showManagementOptions,
                     onClick = { onArtifactClick(entry.artifact) },
                     onEditClick = { onEditArtifactClick(entry.artifact) },
                     onDefectsClick = { onShowDefectsClick(entry.artifact) },
@@ -307,7 +307,7 @@ private fun getFilterText(filter: ArtifactFilter): String =
 @Composable
 private fun ArtifactListItem(
     artifact: Artifact,
-    showOptions: Boolean,
+    showManagementOptions: Boolean,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onDefectsClick: () -> Unit,
@@ -414,15 +414,14 @@ private fun ArtifactListItem(
                     }
                 }
 
-                if (showOptions) {
-                    ArtifactOptions(
-                        compact = compact,
-                        onPrioritizeClick = onPrioritizeClick,
-                        onEditClick = onEditClick,
-                        onDefectsClick = onDefectsClick,
-                        onArchiveClick = onArchiveClick
-                    )
-                }
+                ArtifactOptions(
+                    compact = compact,
+                    showManagementOptions = showManagementOptions,
+                    onPrioritizeClick = onPrioritizeClick,
+                    onEditClick = onEditClick,
+                    onDefectsClick = onDefectsClick,
+                    onArchiveClick = onArchiveClick
+                )
             }
         }
     }
@@ -451,6 +450,7 @@ private fun getWiegersPriorityText(priority: Double?): String =
 @Composable
 private fun ArtifactOptions(
     compact: Boolean,
+    showManagementOptions: Boolean,
     onPrioritizeClick: () -> Unit,
     onEditClick: () -> Unit,
     onDefectsClick: () -> Unit,
@@ -461,7 +461,7 @@ private fun ArtifactOptions(
         var expanded by remember { mutableStateOf(false) }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (!compact) {
+            if (!compact && showManagementOptions) {
                 IconButton(onClick = onPrioritizeClick) {
                     Icon(vectorResource(Res.drawable.swap_vert_24px), null)
                 }
@@ -476,25 +476,27 @@ private fun ArtifactOptions(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            if (compact) {
+            if (showManagementOptions) {
+                if (compact) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.prioritize_label)) },
+                        leadingIcon = { Icon(vectorResource(Res.drawable.swap_vert_24px), null) },
+                        onClick = {
+                            onPrioritizeClick()
+                            expanded = false
+                        }
+                    )
+                }
+
                 DropdownMenuItem(
-                    text = { Text(stringResource(Res.string.prioritize_label)) },
-                    leadingIcon = { Icon(vectorResource(Res.drawable.swap_vert_24px), null) },
+                    text = { Text(stringResource(Res.string.edit_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
                     onClick = {
-                        onPrioritizeClick()
+                        onEditClick()
                         expanded = false
                     }
                 )
             }
-
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.edit_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.edit_24px), null) },
-                onClick = {
-                    onEditClick()
-                    expanded = false
-                }
-            )
 
             DropdownMenuItem(
                 text = { Text(stringResource(Res.string.defects_label)) },
@@ -505,14 +507,16 @@ private fun ArtifactOptions(
                 }
             )
 
-            DropdownMenuItem(
-                text = { Text(stringResource(Res.string.archive_label)) },
-                leadingIcon = { Icon(vectorResource(Res.drawable.archive_24px), null) },
-                onClick = {
-                    onArchiveClick()
-                    expanded = false
-                }
-            )
+            if (showManagementOptions) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.archive_label)) },
+                    leadingIcon = { Icon(vectorResource(Res.drawable.archive_24px), null) },
+                    onClick = {
+                        onArchiveClick()
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }

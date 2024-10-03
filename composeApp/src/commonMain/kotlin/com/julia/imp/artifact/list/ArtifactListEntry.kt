@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ArtifactListEntry(
     val artifact: Artifact,
-    val showOptions: Boolean
+    val showManagementOptions: Boolean
 )

@@ -10,5 +10,6 @@ data class DashboardData(
     val costOverview: CostOverview,
     val inspectors: List<InspectorSummary>,
     val artifactTypes: List<ArtifactTypeSummary>,
-    val defectTypes: List<DefectTypeSummary>
+    val defectTypes: List<DefectTypeSummary>,
+    val performanceScore: PerformanceScore
 )

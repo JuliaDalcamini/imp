@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.session.requireSession
+import com.julia.imp.project.Project
 import kotlinx.coroutines.launch
 
 class DefectsViewModel(
@@ -14,19 +15,22 @@ class DefectsViewModel(
 ) : ViewModel() {
 
     private lateinit var artifact: Artifact
+    private lateinit var project: Project
 
     var uiState by mutableStateOf(DefectsUiState())
         private set
 
-    fun initialize(artifact: Artifact) {
+    fun initialize(artifact: Artifact, project: Project) {
         this.artifact = artifact
+        this.project = project
         getDefects()
     }
 
     fun getDefects() {
         viewModelScope.launch {
             try {
-                val canFix = requireSession().isTeamAdmin || requireSession().isInspector
+                val canFix = (requireSession().isTeamAdmin || requireSession().isInspector) &&
+                        !artifact.archived && !project.finished
 
                 uiState = DefectsUiState(
                     loading = true,

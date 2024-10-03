@@ -94,6 +94,7 @@ fun ImpTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = getDefaultTypography(),
         content = content
     )
 }

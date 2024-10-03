@@ -1,5 +1,6 @@
 package com.julia.imp.project.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -8,13 +9,17 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,12 +33,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.julia.imp.common.text.formatAsCurrency
 import com.julia.imp.common.ui.padding.plus
@@ -45,6 +54,7 @@ import com.julia.imp.project.dashboard.data.DashboardData
 import com.julia.imp.project.dashboard.data.DefectTypeSummary
 import com.julia.imp.project.dashboard.data.EffortOverview
 import com.julia.imp.project.dashboard.data.InspectorSummary
+import com.julia.imp.project.dashboard.data.PerformanceScore
 import com.julia.imp.project.dashboard.data.Progress
 import com.julia.imp.project.report.ProjectReportGenerator
 import imp.composeapp.generated.resources.Res
@@ -69,6 +79,7 @@ import imp.composeapp.generated.resources.medium_severity_label
 import imp.composeapp.generated.resources.no_defects_found_message
 import imp.composeapp.generated.resources.overall_progress_title
 import imp.composeapp.generated.resources.percentage_format
+import imp.composeapp.generated.resources.performance_score_label
 import imp.composeapp.generated.resources.progress_by_inspector_title
 import imp.composeapp.generated.resources.project_stats_title
 import imp.composeapp.generated.resources.quantity_label
@@ -186,7 +197,8 @@ fun DashboardContents(
                 ProjectProgressCard(
                     modifier = Modifier.fillMaxWidth(),
                     inspectionProgress = data.inspectionProgress,
-                    defectsProgress = data.defectsProgress
+                    defectsProgress = data.defectsProgress,
+                    performanceScore = data.performanceScore
                 )
             }
 
@@ -232,6 +244,7 @@ fun DashboardContents(
 fun ProjectProgressCard(
     inspectionProgress: Progress,
     defectsProgress: Progress,
+    performanceScore: PerformanceScore,
     modifier: Modifier = Modifier
 ) {
     DashboardCard(
@@ -239,6 +252,12 @@ fun ProjectProgressCard(
         title = stringResource(Res.string.overall_progress_title),
         itemSpacing = 12.dp
     ) {
+        PerformanceScoreGauge(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(Res.string.performance_score_label),
+            score = performanceScore
+        )
+
         LabeledProgress(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.fully_inspected_artifacts_label),
@@ -273,7 +292,7 @@ fun LabeledProgress(
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
             progress = { progress.percentage.toFloat() }
         )
 
@@ -281,6 +300,79 @@ fun LabeledProgress(
             modifier = Modifier.fillMaxWidth(),
             label = stringResource(Res.string.count_format, progress.count, progress.total),
             text = stringResource(Res.string.percentage_format, percentage)
+        )
+    }
+}
+
+@Composable
+fun PerformanceScoreGauge(
+    label: String,
+    score: PerformanceScore,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PerformanceScore.entries.forEach { entry ->
+                PerformanceScoreIndicator(
+                    score = entry,
+                    active = entry == score,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PerformanceScoreIndicator(
+    score: PerformanceScore,
+    active: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor: Color
+    val contentColor: Color
+
+    if (active) {
+        backgroundColor = MaterialTheme.colorScheme.primary
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    } else {
+        backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .size(24.dp)
+            .aspectRatio(1f)
+            .background(backgroundColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier.wrapContentHeight(unbounded = true),
+            text = score.name,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium.copy(
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.Both
+                )
+            ),
+            fontSize = 10.sp,
+            color = contentColor
         )
     }
 }

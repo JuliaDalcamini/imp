@@ -39,6 +39,7 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.common.ui.dialog.ConfirmationDialog
 import com.julia.imp.common.ui.dialog.ErrorDialog
 import com.julia.imp.common.ui.topbar.TopBar
+import com.julia.imp.project.Project
 import imp.composeapp.generated.resources.Res
 import imp.composeapp.generated.resources.action_error_message
 import imp.composeapp.generated.resources.action_error_title
@@ -64,11 +65,12 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun DefectsScreen(
     artifact: Artifact,
+    project: Project,
     onBackClick: () -> Unit,
     viewModel: DefectsViewModel = viewModel { DefectsViewModel() }
 ) {
     LaunchedEffect(artifact) {
-        viewModel.initialize(artifact)
+        viewModel.initialize(artifact, project)
     }
 
     Scaffold(
