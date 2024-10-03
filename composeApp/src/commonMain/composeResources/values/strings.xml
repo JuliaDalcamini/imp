@@ -172,6 +172,7 @@
     <string name="standard_deviation_label">Desvio padrão</string>
     <string name="cost_title">Custo</string>
     <string name="progress_by_inspector_title">Progresso por inspetor</string>
+    <string name="no_inspections_found_message">Nenhuma inspeção foi encontrada.</string>
     <string name="defect_types_title">Tipos de defeito</string>
     <string name="quantity_label">Quantidade</string>
     <string name="average_cost_label">Custo médio</string>
