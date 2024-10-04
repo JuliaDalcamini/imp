@@ -218,7 +218,6 @@
     <string name="publish_date_label">Data da publicação</string>
     <string name="owner_label">Responsável</string>
     <string name="min_inspectors_number_label">Nº min. de inspetores</string>
-    <string name="total_of_artifacts_label">Total de artefatos</string>
     <string name="inspected_artifacts_label">Artefatos inspecionados</string>
     <string name="inspected_percentage_label">Percentual inspecionado</string>
     <string name="average_cost_per_artifact">Custo médio por artefato</string>

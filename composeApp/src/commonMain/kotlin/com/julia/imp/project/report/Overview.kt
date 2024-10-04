@@ -21,6 +21,7 @@ import imp.composeapp.generated.resources.average_cost_per_artifact
 import imp.composeapp.generated.resources.average_cost_per_inspection
 import imp.composeapp.generated.resources.average_effort_per_artifact
 import imp.composeapp.generated.resources.average_effort_per_inspection
+import imp.composeapp.generated.resources.count_format
 import imp.composeapp.generated.resources.inspected_artifacts_label
 import imp.composeapp.generated.resources.inspected_percentage_label
 import imp.composeapp.generated.resources.min_inspectors_number_label
@@ -28,13 +29,13 @@ import imp.composeapp.generated.resources.moscow_label
 import imp.composeapp.generated.resources.overview_title
 import imp.composeapp.generated.resources.owner_label
 import imp.composeapp.generated.resources.percentage_format
+import imp.composeapp.generated.resources.performance_score_label
 import imp.composeapp.generated.resources.prioritization_method_label
 import imp.composeapp.generated.resources.project_name_label
 import imp.composeapp.generated.resources.start_date_label
 import imp.composeapp.generated.resources.target_date_label
 import imp.composeapp.generated.resources.total_cost_label
 import imp.composeapp.generated.resources.total_effort_label
-import imp.composeapp.generated.resources.total_of_artifacts_label
 import imp.composeapp.generated.resources.wiegers_label
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.stringResource
@@ -148,14 +149,18 @@ private fun ProgressAndCostOverview(
 
             ReportField(
                 modifier = Modifier.weight(1f),
-                label = stringResource(Res.string.total_of_artifacts_label),
-                value = data.inspectionProgress.total.toString()
+                label = stringResource(Res.string.performance_score_label),
+                value = data.performanceScore.name
             )
 
             ReportField(
                 modifier = Modifier.weight(1f),
                 label = stringResource(Res.string.inspected_artifacts_label),
-                value = data.inspectionProgress.count.toString()
+                value = stringResource(
+                    Res.string.count_format,
+                    data.inspectionProgress.count,
+                    data.inspectionProgress.total
+                )
             )
 
             ReportField(
@@ -212,4 +217,3 @@ private fun ProgressAndCostOverview(
         }
     }
 }
-
